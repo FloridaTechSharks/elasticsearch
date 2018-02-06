@@ -117,6 +117,17 @@ public class MainResponse extends ActionResponse implements ToXContentObject {
             .field("minimum_index_compatibility_version", version.minimumIndexCompatibilityVersion().toString())
             .endObject();
         builder.field("tagline", "You Know, for Search");
+        // Adds Intro to Software Engineering (CSE 2410) group info
+        builder.startObject("Group")
+            .field("Group Name", "Sharks");
+            builder.startObject("Group Members")
+                .field("Member 1", "Micah Billouin")
+                .field("Member 2", "Christian Cambron")
+                .field("Member 3", "Dan Levy")
+                .field("Member 4", "Spencer McPherson")
+                .endObject()
+            .endObject();
+        // End CSE 2410 change
         builder.endObject();
         return builder;
     }
