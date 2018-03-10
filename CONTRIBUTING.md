@@ -121,26 +121,49 @@ The Elasticsearch codebase makes heavy use of Java `assert`s and the test runner
 
 Wildcard imports (`import java.util.*`) are forbidden and will cause the build to fail. In IntelliJ, follow these steps to tame your `IDE` so it does not make create wildcard imports:
 
- 1. Select `Preferences/Settings -> Editor -> Code Style -> Java -> Imports`
- 2. There are two configuration options: `Class count to use import with *` and `Names count to use static import with` *. Set their values to `99999` or some other absurdly high value.
+ - Select `Preferences/Settings -> Editor -> Code Style -> Java -> Imports`
+ - There are two configuration options: `Class count to use import with *` and `Names count to use static import with *`. Set their values to `99999` or some other absurdly high value.
 
 **Formatting Guidelines**
 
-- Java indent is 4 spaces
-- Line width is 140 characters
-- The rest is left to Java coding standards
-- Disable “auto-format on save” to prevent unnecessary format changes. Doing this makes reviews much easier as it gets rid of unnecessary formatting changes. If your IDE supports formatting only modified chunks, that is fine to do.
-- Do not worry too much about import order. Try not to change it but there is no need to fight your `IDE` to stop it from doing so.
+ - Java indent is 4 spaces
+ - Line width is 140 characters
+ - The rest is left to Java coding standards
+ - Disable “auto-format on save” to prevent unnecessary format changes. Doing this makes reviews much easier as it gets rid of unnecessary formatting changes. If your IDE supports formatting only modified chunks, that is fine to do.
+ - Do not worry too much about import order. Try not to change it but there is no need to fight your `IDE` to stop it from doing so.
 
 **Preparing to Submit Changes**
 
-- To create a distribution from the source, follow these steps:
+ - To create a distribution from the source, follow these steps:
 	1. Using your favorite Command Line Interface (CLI), `cd` into your cloned Elasticsearch folder
 	2. Run `./gradlew assemble`
-- The package distribution (Debian and RPM) can be found under ./distribution/packages/(deb|rpm)/build/distributions/
-- The archive distributions (tar and zip) can be found under ./distribution/archives/(tar|zip)/build/distributions/
-- Before submitting changes, run the test suite to make sure that nothing is broken: `./gradlew check`
+ - The package distribution (Debian and RPM) can be found under ./distribution/packages/(deb|rpm)/build/distributions/
+ - The archive distributions (tar and zip) can be found under ./distribution/archives/(tar|zip)/build/distributions/
+ - Before submitting changes, run the test suite to make sure that nothing is broken: `./gradlew check`
 
+**Submitting Changes**
+
+Please follow these steps in order to make sure your code has a chance to make it into the Elasticsearch codebase:
+
+1. Test your changes
+		 - Run the test suite to make sure nothing is broken. See the [TESTING](https://github.com/elastic/elasticsearch/blob/master/TESTING.asciidoc) file for help running tests
+2.  Sign the [Contributor License Agreement](https://www.elastic.co/contributor-agreement/) (CLA)
+	- We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction
+	 - The CLA is used to assure our users of the origin and continuing existence of the code
+	- You only need to sign the CLA once
+3. Rebase your changes
+	- Update your local repository with the most recent code from the main Elasticsearch repository and rebase your branch on top of the latest master branch
+	- We prefer your initial changes to be squashed into a single commit. Later, if we ask you to make changes, add them as separate commits. This makes them easier to review.
+	- As a final step before merging, we will either ask you to squash all commits yourself or we will do it for you
+4. Submit a pull request
+	- Push your local changes to your forked copy of the repository and [submit a pull request](https://help.github.com/articles/using-pull-requests) 
+	- In the pull request, please follow these guidelines:
+		1. **Title**: Sum up the changes that you have made
+		2. **Body**: Provide more details about what your changes do and mention the number of the issue where discussion has taken place, eg "Closes #123."
+
+Once you have completed the above steps, sit back and wait. A discussion about the pull request will most likely be created. If any changes are needed, we would love to work with you to get your pull request merged into Elasticsearch!
+
+Please adhere to the general guideline that you should **never** force push to a **publicly shared** branch. Once you have opened your pull request, you should consider your branch publicly shared. Instead of force pushing, just add incremental commits. This is generally easier on your reviewers. If you need to pick up changes from master, you can merge master into your branch. A reviewer might ask you to rebase a long-running pull request in which case force pushing **is okay** for that request. Note that **squashing** at the end of the review process should also **not** be done. That can be done when the pull request is [integrated via GitHub](https://github.com/blog/2141-squash-your-commits).
 
 ## Contributing as Part of a Class
 
