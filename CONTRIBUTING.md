@@ -5,7 +5,7 @@ Elasticsearch is an open source project and we love receiving contributions from
  1. Writing tutorials and blog posts
  2. Improving the documentation
  3. Submitting bug reports and feature requests
- 4. Writing code which can be incorporated into Elasticsearch
+ 4. Writing code that can be incorporated into Elasticsearch
  5. And more!
 
 
@@ -14,17 +14,17 @@ Elasticsearch is an open source project and we love receiving contributions from
 There are two _very important_ tasks that you should complete before creating a bug report:
 
  1. Make sure you are using the latest version of Elasticsearch available. The latest public release is available [here](https://www.elastic.co/downloads/elasticsearch) and the latest GitHub release is available [here](https://github.com/elastic/elasticsearch). It’s possible that the newest version has already fixed the bug you found.
- 2. If you tried replicating your bug on the latest version of Elasticsearch, and it still appears, try searching through Elasticsearch’s GitHub [issues list](https://github.com/elastic/elasticsearch/issues). If a similar issue has already been opened, try to build off of that one by commenting rather than creating a new issue.
+ 2. If you tried replicating your bug on the latest version of Elasticsearch, and it still appears, try searching for your bug on Elasticsearch’s GitHub [issues list](https://github.com/elastic/elasticsearch/issues). If a similar issue has already been opened, try to build off of that one by commenting rather than creating a new issue.
 
 If you tried the above tasks and still want to report a bug, please follow these guidelines:
 
  - At the beginning of your bug report, provide the following:
 	 1. The version of Elasticsearch you are using (run `elasticsearch --version`)
 	 2. Any plugins installed
-	 3. The version of `JVM` (Java Virtual Machine) you are using (this can also be obtained by running `elasticsearch --version`)
-	 4. The OS you are running Elasticsearch on (Windows 10, macOS 10.13, Unix, etc.)			 
+	 3. The version of Java Virtual Machine (JVM) you are using (this can also be obtained by running `elasticsearch --version`)
+	 4. The OS you are running Elasticsearch on (Windows 10, macOS 10.13, etc.)			 
 		 - For a Unix-like system, run `uname -a`
-- Prepare a reproduction of the bug. For example, include the code you input into Elasticsearch and the output Elasticsearch gave you back. These commands should be curl commands. Some examples can be found in the Elasticsearch [getting started documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html).
+- Prepare a reproduction of the bug. For example, include the code you input into Elasticsearch and the output Elasticsearch gives you back. These commands should be `curl` commands. Some `curl` examples can be found in the Elasticsearch [getting started documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html).
 - Provide as much information as you can. While you might think the bug lies in one area, it could be in another. The more information we have, the easier it is for us to fix it!
 
 ## Writing Feature Requests
@@ -38,11 +38,11 @@ By following the above guidelines, you are more likely to get your feature imple
 
 ## Contributing Code and Documentation Changes
 
-If you would like to fix a bug or implement a feature, please open an issue [here](https://github.com/elastic/elasticsearch/issues/new) first. Here, you can talk about how you want to go about the task. This allows others to have a conversation with you and make sure everyone is happy with the way it will be implemented. It is also possible that someone else is working on the same bug fix or feature request. In this case, it is more likely that you, or someone else, will catch the duplicate.
+If you would like to fix a bug or implement a feature, please open an [issue](https://github.com/elastic/elasticsearch/issues/new) first. Here, you can talk about how you want to go about the task. This allows others to have a conversation with you and make sure everyone is happy with the way it will be implemented. It is also possible that someone else is working on the same bug fix or feature request. By creating an issue, it is more likely that you, or someone else, will catch the duplicate.
 
-We enjoy working with our open-source contributors and want to make sure the code changes you make can be accepted into our codebase in a seamless manner. Since there are so many ways to fix a problem or implement a feature, it is important to find the best approach before writing too much code.
+We enjoy working with our open-source contributors and want to make sure that the code changes you make can be accepted into our codebase in a seamless manner. Since there are so many ways to fix a problem or implement a feature, it is important to find the best approach before writing too much code.
 
-If you are considering refactoring code just for the sake of refactoring it, please take a look at our issues list instead! Code refactors are not likely to be accepted because there is a high cost to maintainers to review and test the code. This is especially true regarding changes generated by tools. For example, converting all generic interfaces to use the diamond operator.
+If you are considering refactoring code just for the sake of refactoring it, please take a look at our issues list instead! Code refactors are not likely to be accepted because there is a high cost to maintainers to review and test the code. This is especially true regarding changes generated by tools. For example, converting all generic interfaces to use the diamond operator is not likely to be accepted.
 
 The process for contributing to any of the [Elastic repositories](https://github.com/elastic/) is similar.
 
@@ -57,9 +57,9 @@ In order to get Elasticsearch onto your machine, you will need to fork the main 
 
 **Running Elasticsearch**
 
-`JDK 9` is required to build Elasticsearch. You can download the latest version of the `JDK` [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html). The environment variable `JAVA\_HOME` needs to reference the path to Java home for your `JDK 9` installation. By default, tests use the same runtime as `JAVA\_HOME`. However, since Elasticsearch supports `JDK 8` and the build supports compiling with `JDK 9` and testing on a `JDK 8` runtime, you can set `RUNTIME\_JAVA\_HOME` pointing to the Java home of a `JDK 8` installation. This mechanism can is not limited to just `JDK 8` and can be used to test against other `JDKs` as well. **Add how to set up JAVA_HOME**.
+JDK 9 is required to build Elasticsearch. You can download the latest version of the JDK [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html). The environment variable `JAVA_HOME` needs to reference the path to Java home for your JDK 9 installation. By default, tests use the same runtime as `JAVA_HOME`. However, since Elasticsearch supports JDK 8 and the build supports compiling with JDK 9 and testing on a JDK 8 runtime, you can set `RUNTIME_JAVA_HOME` pointing to the Java home of a JDK 8 installation. This mechanism can is not limited to just JDK 8 and can be used to test against other JDKs as well.
 
-In order to run Elasticsearch right out of the box, make sure you have Elasticsearch on your machine. Use your favorite command line interface (Terminal, etc) to `cd` into the location of the elasticsearch-master folder. Here you can enter `./gradlew run`. Success is achieved when your command line interface no longer prints out information and the progress bar holds steady right around 97%. To check that Elasticsearch is running properly, go to `localhost:9200` on your favorite browser. If Elasticsearch is running, you will see a some `JSON` appear with your Elasticsearch build information and the Elasticsearch tagline, `“You Know, for Search”`. If your run into problems running Elasticsearch, make sure you set your `JAVA_HOME` environment variable correctly and that you `cd`’d all the way into the elasticsearch-master folder in command line.
+In order to run Elasticsearch right out of the box, make sure you have Elasticsearch on your machine. Use your favorite command line interface (Terminal, etc) to `cd` into the location of the elasticsearch folder. Here you can enter `./gradlew run`. Elasticsearch is runing when your command line interface shows the green progress bar holding steady right around 97%. To check that Elasticsearch is running properly, go to `localhost:9200` on your favorite browser. If Elasticsearch is running, you will see a some `JSON` appear with your Elasticsearch build information and the Elasticsearch tagline, `“You Know, for Search”`. If your run into problems running Elasticsearch, make sure you set your `JAVA_HOME` environment variable correctly and that you `cd`’d all the way into the elasticsearch folder in command line. Although the Elasticsearch [issues](https://github.com/elastic/elasticsearch/issues) list is reserved for bug reports, feature requests, and documentation changes, there is a general discussion available [here](https://discuss.elastic.co) if you need more help.
 
 ## Contributing to the Elasticsearch Codebase
 
