@@ -175,26 +175,53 @@ final class DocumentParser {
         return new MapperParsingException("failed to parse", e);
     }
 
+    /**
+     * Checks fullFieldPath to make sure it follows guidelines
+     * Guidelines for fullFieldPath include:
+     * Must not be just a [.], 
+     * Must not contain a [.] as the first or last character (e.g. '.foo' or 'foo.'), 
+     * Must not just be whitespace, 
+     * Must not be an empty string
+     * @param fullFieldPath
+     * @return String array with String fullFieldPath as only element
+     */
     private static String[] splitAndValidatePath(String fullFieldPath) {
         if (fullFieldPath.contains(".")) {
-            String[] parts = fullFieldPath.split("\\.");
-            for (String part : parts) {
-                if (Strings.hasText(part) == false) {
-                    // check if the field name contains only whitespace
-                    if (Strings.isEmpty(part) == false) {
+            // Checks if field path needs to be split before other checks occur (e.g. 'foo.bar.baz')
+            if (fullFieldPath.equals(".")) {
+                // Checks if field path is just a [.] (e.g. '.')
+                throw new IllegalArgumentException(
+                        "object field containing only a [.] makes the object resolution ambiguous");
+            } else if (fullFieldPath.charAt(0) == '.' || fullFieldPath.charAt(fullFieldPath.length() - 1) == '.') { 
+                // Checks if first or last character of field path is a [.] (e.g. '.foo' or 'foo.')
+                throw new IllegalArgumentException(
+                        "object field starting or ending with a [.] makes object resolution ambiguous: ['" + fullFieldPath + "']");
+            } else {
+                String[] parts = fullFieldPath.split("\\."); // Splits field by [.]'s
+                for (String part : parts) {
+                    // Checks each part of the split field path
+                    if (Strings.hasText(part) == false) {
+                        // Checks if the field name contains only whitespace (e.g. '   ')
+                        if (Strings.isEmpty(part) == false) {
+                            throw new IllegalArgumentException(
+                                    "object field cannot contain only whitespace: ['" + fullFieldPath + "']");
+                        }
+                        // If part is not empty, there must be an illegal [.] -> duplicate check due to String split method limitations
                         throw new IllegalArgumentException(
-                                "object field cannot contain only whitespace: ['" + fullFieldPath + "']");
+                                "object field starting or ending with a [.] makes object resolution ambiguous: [" + fullFieldPath + "]");
                     }
-                    throw new IllegalArgumentException(
-                            "object field starting or ending with a [.] makes object resolution ambiguous: [" + fullFieldPath + "]");
                 }
+                return parts;
             }
-            return parts;
         } else {
-            if (Strings.isEmpty(fullFieldPath)) {
+            // Field path does not need to be split (e.g. foo)
+            if (fullFieldPath.equals("")) {
+                // Checks if field name is empty (e.g. '')
                 throw new IllegalArgumentException("field name cannot be an empty string");
+            } else {
+                // Field name passes all tests -> returns fullFieldPath as the only element in a String array
+                return new String[] {fullFieldPath}; 
             }
-            return new String[] {fullFieldPath};
         }
     }
 
