@@ -6,10 +6,10 @@ h3. "https://www.elastic.co/products/elasticsearch":https://www.elastic.co/produ
 
 h3. Group Name: Sharks
 
+Micah Billouin
+Christian Cambron
 Dan Levy
 Spencer McPherson
-Christian Cambron
-Micah Billouin
 
 Elasticsearch is a distributed RESTful search engine built for the cloud. Features include:
 
