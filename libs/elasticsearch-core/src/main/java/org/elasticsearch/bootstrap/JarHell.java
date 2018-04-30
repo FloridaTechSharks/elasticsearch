@@ -76,7 +76,7 @@ public class JarHell {
      * Checks the current classpath for duplicate classes
      * @throws IllegalStateException if jar hell was found
      */
-    public static void checkJarHell() throws IOException, URISyntaxException {
+    static void checkJarHell() throws IOException, URISyntaxException {
         ClassLoader loader = JarHell.class.getClassLoader();
         Logger logger = Loggers.getLogger(JarHell.class);
         if (logger.isDebugEnabled()) {
@@ -138,7 +138,7 @@ public class JarHell {
             // now just parse as ordinary file
             try {
                 URL url = PathUtils.get(element).toUri().toURL();
-                if (urlElements.add(url) == false) {
+                if (!urlElements.add(url)) {
                     throw new IllegalStateException("jar hell!" + System.lineSeparator() +
                         "duplicate jar [" + element + "] on classpath: " + classPath);
                 }
