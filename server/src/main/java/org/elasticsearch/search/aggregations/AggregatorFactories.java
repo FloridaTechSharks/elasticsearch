@@ -35,6 +35,9 @@ import org.elasticsearch.search.aggregations.support.AggregationPath.PathElement
 import org.elasticsearch.search.internal.SearchContext;
 import org.elasticsearch.search.profile.Profilers;
 import org.elasticsearch.search.profile.aggregation.ProfilingAggregator;
+import org.elasticsearch.common.xcontent.NamedXContentRegistry.UnknownNamedObjectException;
+import org.elasticsearch.common.xcontent.XContentLocation;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -115,9 +118,19 @@ public class AggregatorFactories {
                             throw new ParsingException(parser.getTokenLocation(), "Found two aggregation type definitions in ["
                                     + aggregationName + "]: [" + aggBuilder.getType() + "] and [" + fieldName + "]");
                         }
-
-                        aggBuilder = parser.namedObject(BaseAggregationBuilder.class, fieldName,
-                                new AggParseContext(aggregationName));
+                       
+                       try {
+                    	   aggBuilder = parser.namedObject(BaseAggregationBuilder.class, fieldName,
+                    			   new AggParseContext(aggregationName));
+                       }
+                       catch(UnknownNamedObjectException e) {
+                    	   throw new ParsingException (new XContentLocation(e.getLineNumber(),e.getColumnNumber()),
+                    			   "Unknown Aggregation [" +fieldName+ "]");
+                    	   
+                       }
+                        
+                        
+                        
                     }
                 } else {
                     throw new ParsingException(parser.getTokenLocation(), "Expected [" + XContentParser.Token.START_OBJECT + "] under ["
