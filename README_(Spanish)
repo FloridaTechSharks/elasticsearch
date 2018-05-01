@@ -1,0 +1,114 @@
+Elasticsearch
+
+A Distribute RESTful Search Engine 
+
+https://www.elastic.co/products/elasticsearch
+
+	Distribuido y bien disponible buscador
+        o	Cada endisi es fácil de fragmentar y se pueden configurar los fragmentos.
+        o	Cada fragmento puede tener más de una réplica.
+        o	Operaciones de leer y escribir pueden funcionar en cualquier fragmento replicado.
+	Multi Inquilino
+        o	Apolla mas de un índice.
+        o	El Nivel de configuración de índice (número de fragmentos, almacenaje de índice, …).
+	Varios Interfaz
+        o	HTTP RESTful 
+        o	Java en forma Nativa.
+        o	Todos los interfaces hacen operaciones de nodo automáticamente.
+	Orientado para Documentos
+        o	No es necesario definir el esquema desde el principio.
+        o	El esquema puede ser definido en procesos de índices personalizado.
+	Confiable, escribe persistente por arto tiempo asincrónico.
+	Búsqueda en tiempo real(casi).
+	Es compuesto de Lucene
+        o	Cada fragmento funciona con el índice de lucene.
+        o	Todo el poder de lucene esta fácilmente expuesto en configuraciones y enchufes. 
+
+Empezando
+
+Requerimiento
+	Necesitas tener la versión más reciente de JAVA instalado. 
+
+Instalación
+	Paja la distribución original de Elastic Search en su página web.
+	Corre bin/elasticsearch en unix, oh bin/elasticsearch.bat en windows.
+	Corre curl -X GET http://localhost:9200/.
+	Abre más terminales.
+
+
+Indexación 
+	Vamos a poner información de twitter en índice (el índice de twitter va hacer creado automática mente).
+
+        curl -XPUT 'http://localhost:9200/twitter/doc/1?pretty' -H 'Content-Type: application/json' -d '
+        {
+            "user": "kimchy",
+            "post_date": "2009-11-15T13:12:00",
+            "message": "¿Usando ElasticSearch por primera vez, todo bien por orita?"
+        }'
+
+
+Ahora vamos a ver si la información fue agregada
+
+        curl -XGET 'http://localhost:9200/twitter/doc/1?pretty=true'
+
+
+Buscando
+
+¿Buscando... to tendría que hacer Elastic?
+Vamos a encontrar todo los twiteo's que Kimchy ha subido. 
+
+        curl -XGET 'http://localhost:9200/twitter/_search?q=user:kimchy&pretty=true'
+
+también podemos usar el lenguaje query de JSON que nos da Elasticsearch den ves de el query de string:
+
+        curl -XGET 'http://localhost:9200/twitter/_search?pretty=true' -H 'Content-Type: application/json' -d '
+        {
+            "query" : {
+                "match" : { "user": "kimchy" }
+            }
+        }'
+
+También podemos ver todos los documentos almacenados.
+
+        curl -XGET 'http://localhost:9200/twitter/_search?pretty=true' -H 'Content-Type: application/json' -d '
+        {
+            "query" : {
+                "match_all" : {}
+            }
+        }'
+También podemos hacer una búsqueda de fecha.
+
+        application/json' -d '
+        {
+            "query" : {
+                "range" : {
+                    "post_date" : { "from" : "2009-11-15T13:00:00", "to" : "2009-11-15T14:00:00" }
+                }
+            }
+        }'
+
+Hay muchas otras formas para hacer búsquedas, todo lo lucene queries son disponibles por el lenguaje de JSAON. 
+
+Mutli Inquilino - Índices y tipo.
+
+El índice de twitter puede crecer muy grande. Vamos a ver si podemos hacer un estructura para que podamos almacenar harta información. 
+
+ElasticSearch pude con artos índices. 
+
+Otra forma de definir el sistema de twitter es tener diferentes indicies para cada persona. 
+
+        curl -XPUT 'http://localhost:9200/kimchy/doc/1?pretty' -H 'Content-Type: application/json' -d '
+        {
+            "user": "kimchy",
+            "post_date": "2009-11-15T13:12:00",
+            "message": "Usando ElasticSearch por primera vez, todo bien por horita?"
+        }'
+
+La parte de arriba va ah indexar por el nombre de Kimchy, cada usuario va a recibir su propio índice.
+
+
+
+
+
+
+
