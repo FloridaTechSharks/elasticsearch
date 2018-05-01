@@ -70,7 +70,7 @@ final class DocumentParser {
             throw wrapInMapperParsingException(source, e);
         }
         String remainingPath = context.path().pathAsText("");
-        if (remainingPath.isEmpty() == false) {
+        if (!remainingPath.isEmpty()) {
             throw new IllegalStateException("found leftover path elements: " + remainingPath);
         }
 
@@ -86,10 +86,10 @@ final class DocumentParser {
             metadataMapper.preParse(context);
         }
 
-        if (mapping.root.isEnabled() == false) {
+        if (!mapping.root.isEnabled()) {
             // entire type is disabled
             parser.skipChildren();
-        } else if (emptyDoc == false) {
+        } else if (!emptyDoc) {
             parseObjectOrNested(context, mapping.root);
         }
 
@@ -178,9 +178,9 @@ final class DocumentParser {
     /**
      * Checks fullFieldPath to make sure it follows guidelines
      * Guidelines for fullFieldPath include:
-     * Must not be just a [.], 
-     * Must not contain a [.] as the first or last character (e.g. '.foo' or 'foo.'), 
-     * Must not just be whitespace, 
+     * Must not be just a [.],
+     * Must not contain a [.] as the first or last character (e.g. '.foo' or 'foo.'),
+     * Must not just be whitespace,
      * Must not be an empty string
      * @param fullFieldPath
      * @return String array with String fullFieldPath as only element
@@ -192,7 +192,7 @@ final class DocumentParser {
                 // Checks if field path is just a [.] (e.g. '.')
                 throw new IllegalArgumentException(
                         "object field containing only a [.] makes the object resolution ambiguous");
-            } else if (fullFieldPath.charAt(0) == '.' || fullFieldPath.charAt(fullFieldPath.length() - 1) == '.') { 
+            } else if (fullFieldPath.charAt(0) == '.' || fullFieldPath.charAt(fullFieldPath.length() - 1) == '.') {
                 // Checks if first or last character of field path is a [.] (e.g. '.foo' or 'foo.')
                 throw new IllegalArgumentException(
                         "object field starting or ending with a [.] makes object resolution ambiguous: ['" + fullFieldPath + "']");
@@ -200,9 +200,9 @@ final class DocumentParser {
                 String[] parts = fullFieldPath.split("\\."); // Splits field by [.]'s
                 for (String part : parts) {
                     // Checks each part of the split field path
-                    if (Strings.hasText(part) == false) {
+                    if (!Strings.hasText(part)) {
                         // Checks if the field name contains only whitespace (e.g. '   ')
-                        if (Strings.isEmpty(part) == false) {
+                        if (!Strings.isEmpty(part)) {
                             throw new IllegalArgumentException(
                                     "object field cannot contain only whitespace: ['" + fullFieldPath + "']");
                         }
@@ -220,7 +220,7 @@ final class DocumentParser {
                 throw new IllegalArgumentException("field name cannot be an empty string");
             } else {
                 // Field name passes all tests -> returns fullFieldPath as the only element in a String array
-                return new String[] {fullFieldPath}; 
+                return new String[] {fullFieldPath};
             }
         }
     }
@@ -362,7 +362,7 @@ final class DocumentParser {
             parentMappers.add((ObjectMapper)intermediate);
             previousIntermediate = (ObjectMapper)intermediate;
         }
-        if (parentMappers.isEmpty() == false) {
+        if (!parentMappers.isEmpty()) {
             // add the new mapper to the stack, and pop down to the original parent level
             addToLastMapper(parentMappers, mapper, false);
             popMappers(parentMappers, 1, false);
@@ -372,7 +372,7 @@ final class DocumentParser {
     }
 
     static void parseObjectOrNested(ParseContext context, ObjectMapper mapper) throws IOException {
-        if (mapper.isEnabled() == false) {
+        if (!mapper.isEnabled()) {
             context.parser().skipChildren();
             return;
         }
@@ -744,7 +744,7 @@ final class DocumentParser {
                     builder = newFloatBuilder(currentFieldName, Version.indexCreated(context.indexSettings()));
                 }
                 return builder;
-            } else if (parseableAsLong == false && parseableAsDouble == false && context.root().dateDetection()) {
+            } else if (!parseableAsLong  && !parseableAsDouble && context.root().dateDetection()) {
                 // We refuse to match pure numbers, which are too likely to be
                 // false positives with date formats that include eg.
                 // `epoch_millis` or `YYYY`
@@ -761,7 +761,7 @@ final class DocumentParser {
                     }
                     if (builder instanceof DateFieldMapper.Builder) {
                         DateFieldMapper.Builder dateBuilder = (DateFieldMapper.Builder) builder;
-                        if (dateBuilder.isDateTimeFormatterSet() == false) {
+                        if (!dateBuilder.isDateTimeFormatterSet()) {
                             dateBuilder.dateTimeFormatter(dateTimeFormatter);
                         }
                     }
@@ -845,7 +845,7 @@ final class DocumentParser {
 
     /** Creates instances of the fields that the current field should be copied to */
     private static void parseCopyFields(ParseContext context, List<String> copyToFields) throws IOException {
-        if (!context.isWithinCopyTo() && copyToFields.isEmpty() == false) {
+        if (!context.isWithinCopyTo() && !copyToFields.isEmpty()) {
             context = context.createCopyToContext();
             for (String field : copyToFields) {
                 // In case of a hierarchy of nested documents, we need to figure out
