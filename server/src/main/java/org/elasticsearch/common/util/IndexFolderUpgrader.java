@@ -103,7 +103,7 @@ public class IndexFolderUpgrader {
                         // we rename the folder in custom path only the first time we encounter a state
                         // in a node path, which needs upgrading, it is a no-op for subsequent node paths
                         if (Files.exists(customLocationSource) // might not exist if no data was written for this index
-                            && Files.exists(customLocationTarget) == false) {
+                            && !Files.exists(customLocationTarget)) {
                             upgrade(index, customLocationSource, customLocationTarget);
                         } else {
                             logger.info("[{}] no upgrade needed - already upgraded", customLocationTarget);

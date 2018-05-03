@@ -48,7 +48,7 @@ public final class SettingsFilter extends AbstractComponent {
     public SettingsFilter(Settings settings, Collection<String> patterns) {
         super(settings);
         for (String pattern : patterns) {
-            if (isValidPattern(pattern) == false) {
+            if (!isValidPattern(pattern)) {
                 throw new IllegalArgumentException("invalid pattern: " + pattern);
             }
         }
@@ -73,7 +73,7 @@ public final class SettingsFilter extends AbstractComponent {
     }
 
     public void addFilterSettingParams(RestRequest request) {
-        if (patterns.isEmpty() == false) {
+        if (!patterns.isEmpty()) {
             request.params().put(SETTINGS_FILTER_PARAM, patternString);
         }
     }
@@ -81,7 +81,7 @@ public final class SettingsFilter extends AbstractComponent {
     public static Settings filterSettings(Params params, Settings settings) {
         String patterns = params.param(SETTINGS_FILTER_PARAM);
         final Settings filteredSettings;
-        if (patterns != null && patterns.isEmpty() == false) {
+        if (patterns != null && !patterns.isEmpty()) {
             filteredSettings = filterSettings(Strings.commaDelimitedListToSet(patterns), settings);
         } else {
             filteredSettings = settings;

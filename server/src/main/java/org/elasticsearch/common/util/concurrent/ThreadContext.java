@@ -635,7 +635,7 @@ public final class ThreadContext implements Closeable, Writeable {
                 in.doRun();
                 whileRunning = false;
             } catch (IllegalStateException ex) {
-                if (whileRunning || threadLocal.closed.get() == false) {
+                if (whileRunning || !threadLocal.closed.get()) {
                     throw ex;
                 }
                 // if we hit an ISE here we have been shutting down

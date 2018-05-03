@@ -122,11 +122,8 @@ public class MoreLikeThisQuery extends Query {
         } else if (!similarity.equals(other.similarity))
             return false;
         if (stopWords == null) {
-            if (other.stopWords != null)
-                return false;
-        } else if (!stopWords.equals(other.stopWords))
-            return false;
-        return true;
+            return other.stopWords == null;
+        } else return stopWords.equals(other.stopWords);
     }
 
     @Override

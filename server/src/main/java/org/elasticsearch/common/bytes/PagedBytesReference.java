@@ -95,7 +95,7 @@ public class PagedBytesReference extends BytesReference {
             public BytesRef next() throws IOException {
                 if (nextFragmentSize != 0) {
                     final boolean materialized = byteArray.get(offset + position, nextFragmentSize, slice);
-                    assert materialized == false : "iteration should be page aligned but array got materialized";
+                    assert !materialized : "iteration should be page aligned but array got materialized";
                     position += nextFragmentSize;
                     final int remaining = length - position;
                     nextFragmentSize = Math.min(remaining, PAGE_SIZE);

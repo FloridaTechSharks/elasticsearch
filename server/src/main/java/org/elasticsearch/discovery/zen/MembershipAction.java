@@ -231,11 +231,11 @@ public class MembershipAction extends AbstractComponent {
     /** ensures that the joining node has a version that's compatible with a given version range */
     static void ensureNodesCompatibility(Version joiningNodeVersion, Version minClusterNodeVersion, Version maxClusterNodeVersion) {
         assert minClusterNodeVersion.onOrBefore(maxClusterNodeVersion) : minClusterNodeVersion + " > " + maxClusterNodeVersion;
-        if (joiningNodeVersion.isCompatible(maxClusterNodeVersion) == false) {
+        if (!joiningNodeVersion.isCompatible(maxClusterNodeVersion)) {
             throw new IllegalStateException("node version [" + joiningNodeVersion + "] is not supported. " +
                 "The cluster contains nodes with version [" + maxClusterNodeVersion + "], which is incompatible.");
         }
-        if (joiningNodeVersion.isCompatible(minClusterNodeVersion) == false) {
+        if (!joiningNodeVersion.isCompatible(minClusterNodeVersion)) {
             throw new IllegalStateException("node version [" + joiningNodeVersion + "] is not supported." +
                 "The cluster contains nodes with version [" + minClusterNodeVersion + "], which is incompatible.");
         }

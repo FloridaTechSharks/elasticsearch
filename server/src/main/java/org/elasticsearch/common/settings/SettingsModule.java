@@ -79,9 +79,9 @@ public class SettingsModule implements Module {
             // special case - we want to get Did you mean indices.query.bool.max_clause_count
             // which means we need to by-pass this check for this setting
             // TODO remove in 6.0!!
-            "index.query.bool.max_clause_count".equals(s) == false)
+            !"index.query.bool.max_clause_count".equals(s))
             && clusterSettings.get(s) == null);
-        if (indexSettings.isEmpty() == false) {
+        if (!indexSettings.isEmpty()) {
             try {
                 String separator = IntStream.range(0, 85).mapToObj(s -> "*").collect(Collectors.joining("")).trim();
                 StringBuilder builder = new StringBuilder();
@@ -151,7 +151,7 @@ public class SettingsModule implements Module {
      */
     private void registerSetting(Setting<?> setting) {
         if (setting.isFiltered()) {
-            if (settingsFilterPattern.contains(setting.getKey()) == false) {
+            if (!settingsFilterPattern.contains(setting.getKey())) {
                 registerSettingsFilter(setting.getKey());
             }
         }
@@ -180,7 +180,7 @@ public class SettingsModule implements Module {
      * or if a setting is for internal purposes only. The given pattern must either be a valid settings key or a simple regexp pattern.
      */
     private void registerSettingsFilter(String filter) {
-        if (SettingsFilter.isValidPattern(filter) == false) {
+        if (!SettingsFilter.isValidPattern(filter)) {
             throw new IllegalArgumentException("filter [" + filter +"] is invalid must be either a key or a regex pattern");
         }
         if (settingsFilterPattern.contains(filter)) {

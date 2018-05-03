@@ -128,7 +128,7 @@ public abstract class Rounding implements Streamable {
         @Override
         public long round(long utcMillis) {
             long rounded = field.roundFloor(utcMillis);
-            if (timeZone.isFixed() == false) {
+            if (!timeZone.isFixed()) {
                 // special cases for non-fixed time zones with dst transitions
                 if (timeZone.getOffset(utcMillis) != timeZone.getOffset(rounded)) {
                     /*
@@ -240,7 +240,7 @@ public abstract class Rounding implements Streamable {
             long timeLocal = timeZone.convertUTCToLocal(utcMillis);
             long rounded = roundKey(timeLocal, interval) * interval;
             long roundedUTC;
-            if (isInDSTGap(rounded) == false) {
+            if (!isInDSTGap(rounded)) {
                 roundedUTC = timeZone.convertLocalToUTC(rounded, true, utcMillis);
                 // check if we crossed DST transition, in this case we want the
                 // last rounded value before the transition
@@ -297,10 +297,7 @@ public abstract class Rounding implements Streamable {
                 if (nextAdjusted == (instantLocal - offset)) {
                     nextAdjusted = Long.MAX_VALUE;
                 }
-                if (nextLocal != nextAdjusted) {
-                    // we are in the DST gap
-                    return true;
-                }
+                return nextLocal != nextAdjusted;
             }
             return false;
         }

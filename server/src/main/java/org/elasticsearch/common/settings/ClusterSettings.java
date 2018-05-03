@@ -120,7 +120,7 @@ public final class ClusterSettings extends AbstractScopedSettings {
 
         @Override
         public boolean hasChanged(Settings current, Settings previous) {
-            return current.filter(loggerPredicate).equals(previous.filter(loggerPredicate)) == false;
+            return !current.filter(loggerPredicate).equals(previous.filter(loggerPredicate));
         }
 
         @Override
@@ -128,8 +128,8 @@ public final class ClusterSettings extends AbstractScopedSettings {
             Settings.Builder builder = Settings.builder();
             builder.put(current.filter(loggerPredicate));
             for (String key : previous.keySet()) {
-                if (loggerPredicate.test(key) && builder.keys().contains(key) == false) {
-                    if (ServerLoggers.LOG_LEVEL_SETTING.getConcreteSetting(key).exists(settings) == false) {
+                if (loggerPredicate.test(key) && !builder.keys().contains(key)) {
+                    if (!ServerLoggers.LOG_LEVEL_SETTING.getConcreteSetting(key).exists(settings)) {
                         builder.putNull(key);
                     } else {
                         builder.put(key, ServerLoggers.LOG_LEVEL_SETTING.getConcreteSetting(key).get(settings).toString());

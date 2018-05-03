@@ -215,7 +215,7 @@ public class FunctionScoreQuery extends Query {
 
     @Override
     public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
-        if (needsScores == false && minScore == null) {
+        if (!needsScores && minScore == null) {
             return subQuery.createWeight(searcher, needsScores, boost);
         }
 
@@ -287,14 +287,14 @@ public class FunctionScoreQuery extends Query {
             if (!expl.isMatch()) {
                 return expl;
             }
-            boolean singleFunction = functions.length == 1 && functions[0] instanceof FilterScoreFunction == false;
+            boolean singleFunction = functions.length == 1 && !(functions[0] instanceof FilterScoreFunction);
             if (functions.length > 0) {
                 // First: Gather explanations for all functions/filters
                 List<Explanation> functionsExplanations = new ArrayList<>();
                 for (int i = 0; i < functions.length; ++i) {
                     if (filterWeights[i] != null) {
                         final Bits docSet = Lucene.asSequentialAccessBits(context.reader().maxDoc(), filterWeights[i].scorerSupplier(context));
-                        if (docSet.get(doc) == false) {
+                        if (!docSet.get(doc)) {
                             continue;
                         }
                     }
@@ -462,7 +462,7 @@ public class FunctionScoreQuery extends Query {
         if (this == o) {
             return true;
         }
-        if (sameClassAs(o) == false) {
+        if (!sameClassAs(o)) {
             return false;
         }
         FunctionScoreQuery other = (FunctionScoreQuery) o;

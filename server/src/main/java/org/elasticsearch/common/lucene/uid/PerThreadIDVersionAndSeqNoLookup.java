@@ -97,7 +97,7 @@ final class PerThreadIDVersionAndSeqNoLookup {
             if (versions == null) {
                 throw new IllegalArgumentException("reader misses the [" + VersionFieldMapper.NAME + "] field");
             }
-            if (versions.advanceExact(docID) == false) {
+            if (!versions.advanceExact(docID)) {
                 throw new IllegalArgumentException("Document [" + docID + "] misses the [" + VersionFieldMapper.NAME + "] field");
             }
             return new DocIdAndVersion(docID, versions.longValue(), context);
@@ -116,7 +116,7 @@ final class PerThreadIDVersionAndSeqNoLookup {
             // there may be more than one matching docID, in the case of nested docs, so we want the last one:
             docsEnum = termsEnum.postings(docsEnum, 0);
             for (int d = docsEnum.nextDoc(); d != DocIdSetIterator.NO_MORE_DOCS; d = docsEnum.nextDoc()) {
-                if (liveDocs != null && liveDocs.get(d) == false) {
+                if (liveDocs != null && !liveDocs.get(d)) {
                     continue;
                 }
                 docID = d;

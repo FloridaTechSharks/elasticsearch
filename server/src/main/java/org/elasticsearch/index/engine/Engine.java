@@ -593,7 +593,7 @@ public abstract class Engine implements Closeable {
         try (Searcher searcher = acquireSearcher("segments_stats", SearcherScope.EXTERNAL)) {
             for (LeafReaderContext ctx : searcher.reader().getContext().leaves()) {
                 SegmentReader segmentReader = Lucene.segmentReader(ctx.reader());
-                if (segmentName.contains(segmentReader.getSegmentName()) == false) {
+                if (!segmentName.contains(segmentReader.getSegmentName())) {
                     fillSegmentStats(segmentReader, includeSegmentFileSizes, stats);
                 }
             }
@@ -712,7 +712,7 @@ public abstract class Engine implements Closeable {
         try (Searcher searcher = acquireSearcher("segments", SearcherScope.INTERNAL)){
             for (LeafReaderContext ctx : searcher.reader().getContext().leaves()) {
                 SegmentReader segmentReader = Lucene.segmentReader(ctx.reader());
-                if (segments.containsKey(segmentReader.getSegmentName()) == false) {
+                if (!segments.containsKey(segmentReader.getSegmentName())) {
                     fillSegmentInfo(segmentReader, verbose, false, segments);
                 }
             }
@@ -750,7 +750,7 @@ public abstract class Engine implements Closeable {
 
     private void fillSegmentInfo(SegmentReader segmentReader, boolean verbose, boolean search, Map<String, Segment> segments) {
         SegmentCommitInfo info = segmentReader.getSegmentInfo();
-        assert segments.containsKey(info.info.name) == false;
+        assert !segments.containsKey(info.info.name);
         Segment segment = new Segment(info.info.name);
         segment.search = search;
         segment.docCount = segmentReader.numDocs();
@@ -789,7 +789,7 @@ public abstract class Engine implements Closeable {
                 final IndexSearcher searcher =  manager.acquire();
                 try {
                     final IndexReader r = searcher.getIndexReader();
-                    return ((DirectoryReader) r).isCurrent() == false;
+                    return !((DirectoryReader) r).isCurrent();
                 } finally {
                     manager.release(searcher);
                 }
@@ -1345,7 +1345,7 @@ public abstract class Engine implements Closeable {
      * translog) and close it.
      */
     public void flushAndClose() throws IOException {
-        if (isClosed.get() == false) {
+        if (!isClosed.get()) {
             logger.trace("flushAndClose now acquire writeLock");
             try (ReleasableLock lock = writeLock.acquire()) {
                 logger.trace("flushAndClose now acquired writeLock");
@@ -1426,11 +1426,7 @@ public abstract class Engine implements Closeable {
 
             CommitId commitId = (CommitId) o;
 
-            if (!Arrays.equals(id, commitId.id)) {
-                return false;
-            }
-
-            return true;
+            return Arrays.equals(id, commitId.id);
         }
 
         @Override

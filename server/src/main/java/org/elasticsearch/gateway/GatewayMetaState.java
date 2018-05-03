@@ -91,11 +91,11 @@ public class GatewayMetaState extends AbstractComponent implements ClusterStateA
                 // and found no non-upgradable indices, which means the upgrade can continue.
                 // Now it's safe to overwrite global and index metadata.
                 if (metaData != upgradedMetaData) {
-                    if (MetaData.isGlobalStateEquals(metaData, upgradedMetaData) == false) {
+                    if (!MetaData.isGlobalStateEquals(metaData, upgradedMetaData)) {
                         metaStateService.writeGlobalState("upgrade", upgradedMetaData);
                     }
                     for (IndexMetaData indexMetaData : upgradedMetaData) {
-                        if (metaData.hasIndexMetaData(indexMetaData) == false) {
+                        if (!metaData.hasIndexMetaData(indexMetaData)) {
                             metaStateService.writeIndex("upgrade", indexMetaData);
                         }
                     }
@@ -199,7 +199,7 @@ public class GatewayMetaState extends AbstractComponent implements ClusterStateA
 
 
     protected static boolean isDataOnlyNode(ClusterState state) {
-        return ((state.nodes().getLocalNode().isMasterNode() == false) && state.nodes().getLocalNode().isDataNode());
+        return ((!state.nodes().getLocalNode().isMasterNode()) && state.nodes().getLocalNode().isDataNode());
     }
 
     /**
@@ -271,7 +271,7 @@ public class GatewayMetaState extends AbstractComponent implements ClusterStateA
         }
         // upgrade global custom meta data
         Map<String, Data> upgradedCustoms = upgrader.apply(existingMap);
-        if (upgradedCustoms.equals(existingMap) == false) {
+        if (!upgradedCustoms.equals(existingMap)) {
             // remove all data first so a plugin can remove custom metadata or templates if needed
             existingMap.keySet().forEach(removeData);
             for (Map.Entry<String, Data> upgradedCustomEntry : upgradedCustoms.entrySet()) {

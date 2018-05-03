@@ -98,8 +98,7 @@ public final class MessageDigests {
         Objects.requireNonNull(bytes);
         StringBuilder sb = new StringBuilder(2 * bytes.length);
 
-        for (int i = 0; i < bytes.length; i++) {
-            byte b = bytes[i];
+        for (byte b : bytes) {
             sb.append(HEX_DIGITS[b >> 4 & 0xf]).append(HEX_DIGITS[b & 0xf]);
         }
 

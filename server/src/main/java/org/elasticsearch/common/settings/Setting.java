@@ -379,7 +379,7 @@ public class Setting<T> implements ToXContentObject {
      * @param defaultSettings the default settings object to diff against
      */
     public void diff(Settings.Builder builder, Settings source, Settings defaultSettings) {
-        if (exists(source) == false) {
+        if (!exists(source)) {
             builder.put(getKey(), getRaw(defaultSettings));
         }
     }
@@ -544,7 +544,7 @@ public class Setting<T> implements ToXContentObject {
             public boolean hasChanged(Settings current, Settings previous) {
                 Settings currentSettings = get(current);
                 Settings previousSettings = get(previous);
-                return currentSettings.equals(previousSettings) == false;
+                return !currentSettings.equals(previousSettings);
             }
 
             @Override
@@ -637,7 +637,7 @@ public class Setting<T> implements ToXContentObject {
 
                 @Override
                 public boolean hasChanged(Settings current, Settings previous) {
-                    return current.filter(k -> match(k)).equals(previous.filter(k -> match(k))) == false;
+                    return !current.filter(k -> match(k)).equals(previous.filter(k -> match(k)));
                 }
 
                 @Override
@@ -918,10 +918,10 @@ public class Setting<T> implements ToXContentObject {
         public boolean hasChanged(Settings current, Settings previous) {
             final String newValue = getRaw(current);
             final String value = getRaw(previous);
-            assert isGroupSetting() == false : "group settings must override this method";
+            assert !isGroupSetting() : "group settings must override this method";
             assert value != null : "value was null but can't be unless default is null which is invalid";
 
-            return value.equals(newValue) == false;
+            return !value.equals(newValue);
         }
 
         @Override
@@ -1307,7 +1307,7 @@ public class Setting<T> implements ToXContentObject {
     public static final class GroupKey extends SimpleKey {
         public GroupKey(String key) {
             super(key);
-            if (key.endsWith(".") == false) {
+            if (!key.endsWith(".")) {
                 throw new IllegalArgumentException("key must end with a '.'");
             }
         }
@@ -1349,7 +1349,7 @@ public class Setting<T> implements ToXContentObject {
             assert prefix != null || suffix != null: "Either prefix or suffix must be non-null";
 
             this.prefix = prefix;
-            if (prefix.endsWith(".") == false) {
+            if (!prefix.endsWith(".")) {
                 throw new IllegalArgumentException("prefix must end with a '.'");
             }
             this.suffix = suffix;
@@ -1371,7 +1371,7 @@ public class Setting<T> implements ToXContentObject {
          */
         String getConcreteString(String key) {
             Matcher matcher = pattern.matcher(key);
-            if (matcher.matches() == false) {
+            if (!matcher.matches()) {
                 throw new IllegalStateException("can't get concrete string for key " + key + " key doesn't match");
             }
             return matcher.group(1);
@@ -1382,7 +1382,7 @@ public class Setting<T> implements ToXContentObject {
          */
         String getNamespace(String key) {
             Matcher matcher = pattern.matcher(key);
-            if (matcher.matches() == false) {
+            if (!matcher.matches()) {
                 throw new IllegalStateException("can't get concrete string for key " + key + " key doesn't match");
             }
             return matcher.group(2);

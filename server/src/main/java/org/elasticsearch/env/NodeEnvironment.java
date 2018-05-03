@@ -261,7 +261,7 @@ public final class NodeEnvironment  implements Closeable {
             assertCanWrite();
             success = true;
         } finally {
-            if (success == false) {
+            if (!success) {
                 IOUtils.closeWhileHandlingException(locks);
             }
         }
@@ -317,7 +317,7 @@ public final class NodeEnvironment  implements Closeable {
             for (NodePath nodePath : nodePaths) {
                 FsInfo.Path fsPath = FsProbe.getFSInfo(nodePath);
                 String mount = fsPath.getMount();
-                if (allMounts.contains(mount) == false) {
+                if (!allMounts.contains(mount)) {
                     allMounts.add(mount);
                     String type = fsPath.getType();
                     if (type != null) {
@@ -450,7 +450,7 @@ public final class NodeEnvironment  implements Closeable {
             IOUtils.rm(customLocation);
         }
         logger.trace("deleted shard {} directory, paths: [{}]", shardId, paths);
-        assert FileSystemUtils.exists(paths) == false;
+        assert !FileSystemUtils.exists(paths);
     }
 
     private boolean isShardLocked(ShardId id) {
@@ -527,7 +527,7 @@ public final class NodeEnvironment  implements Closeable {
             }
             success = true;
         } finally {
-            if (success == false) {
+            if (!success) {
                 logger.trace("unable to lock all shards for index {}", index);
                 IOUtils.closeWhileHandlingException(allLocks);
             }
@@ -574,13 +574,13 @@ public final class NodeEnvironment  implements Closeable {
                 acquired = true;
             }
         }
-        if (acquired == false) {
+        if (!acquired) {
             boolean success = false;
             try {
                 shardLock.acquire(lockTimeoutMS);
                 success = true;
             } finally {
-                if (success == false) {
+                if (!success) {
                     shardLock.decWaitCount();
                 }
             }

@@ -645,10 +645,10 @@ public class Cache<K, V> {
         long hits = 0;
         long misses = 0;
         long evictions = 0;
-        for (int i = 0; i < segments.length; i++) {
-            hits += segments[i].segmentStats.hits.longValue();
-            misses += segments[i].segmentStats.misses.longValue();
-            evictions += segments[i].segmentStats.evictions.longValue();
+        for (CacheSegment<K, V> segment : segments) {
+            hits += segment.segmentStats.hits.longValue();
+            misses += segment.segmentStats.misses.longValue();
+            evictions += segment.segmentStats.evictions.longValue();
         }
         return new CacheStats(hits, misses, evictions);
     }

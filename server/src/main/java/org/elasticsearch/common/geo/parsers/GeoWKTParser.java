@@ -96,7 +96,7 @@ public class GeoWKTParser {
             throws IOException, ElasticsearchParseException {
         final GeoShapeType type = GeoShapeType.forName(nextWord(stream));
         if (shapeType != null && shapeType != GeoShapeType.GEOMETRYCOLLECTION) {
-            if (type.wktName().equals(shapeType.wktName()) == false) {
+            if (!type.wktName().equals(shapeType.wktName())) {
                 throw new ElasticsearchParseException("Expected geometry type [{}] but found [{}]", shapeType, type);
             }
         }
@@ -142,7 +142,7 @@ public class GeoWKTParser {
             return null;
         }
         PointBuilder pt = new PointBuilder(nextNumber(stream), nextNumber(stream));
-        if (isNumberNext(stream) == true) {
+        if (isNumberNext(stream)) {
             nextNumber(stream);
         }
         nextCloser(stream);
@@ -157,7 +157,7 @@ public class GeoWKTParser {
             coordinates.coordinate(parseCoordinate(stream));
         }
 
-        if (isOpenParen && nextCloser(stream).equals(RPAREN) == false) {
+        if (isOpenParen && !nextCloser(stream).equals(RPAREN)) {
             throw new ElasticsearchParseException("expected: [{}]" + RPAREN + " but found: [{}]" + tokenString(stream), stream.lineno());
         }
 
@@ -166,7 +166,7 @@ public class GeoWKTParser {
             if (isNumberNext(stream) || (isOpenParen = nextWord(stream).equals(LPAREN))) {
                 coordinates.coordinate(parseCoordinate(stream));
             }
-            if (isOpenParen && nextCloser(stream).equals(RPAREN) == false) {
+            if (isOpenParen && !nextCloser(stream).equals(RPAREN)) {
                 throw new ElasticsearchParseException("expected: " + RPAREN + " but found: " + tokenString(stream), stream.lineno());
             }
         }
@@ -309,7 +309,7 @@ public class GeoWKTParser {
     }
 
     private static String nextComma(StreamTokenizer stream) throws IOException, ElasticsearchParseException {
-        if (nextWord(stream).equals(COMMA) == true) {
+        if (nextWord(stream).equals(COMMA)) {
             return COMMA;
         }
         throw new ElasticsearchParseException("expected " + COMMA + " but found: " + tokenString(stream), stream.lineno());

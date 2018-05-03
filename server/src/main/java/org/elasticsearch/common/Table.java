@@ -197,8 +197,7 @@ public class Table {
 
     public Map<String, String> getAliasMap() {
         Map<String, String> headerAliasMap = new HashMap<>();
-        for (int i = 0; i < headers.size(); i++) {
-            Cell headerCell = headers.get(i);
+        for (Cell headerCell : headers) {
             String headerName = headerCell.value.toString();
             if (headerCell.attr.containsKey("alias")) {
                 String[] aliases = Strings.splitStringByCommaToArray(headerCell.attr.get("alias"));

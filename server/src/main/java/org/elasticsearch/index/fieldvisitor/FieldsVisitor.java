@@ -84,7 +84,7 @@ public class FieldsVisitor extends StoredFieldVisitor {
         if (mapperService.getIndexSettings().isSingleType()) {
             final Collection<String> types = mapperService.types();
             assert types.size() <= 1 : types;
-            if (types.isEmpty() == false) {
+            if (!types.isEmpty()) {
                 type = types.iterator().next();
             }
         }

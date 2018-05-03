@@ -67,7 +67,7 @@ public final class CombinedDeletionPolicy extends IndexDeletionPolicy {
                 break;
             case OPEN_INDEX_CREATE_TRANSLOG:
             case OPEN_INDEX_AND_TRANSLOG:
-                assert commits.isEmpty() == false : "index is opened, but we have no commits";
+                assert !commits.isEmpty() : "index is opened, but we have no commits";
                 assert startingCommit != null && commits.contains(startingCommit) : "Starting commit not in the existing commit list; "
                     + "startingCommit [" + startingCommit + "], commit list [" + commits + "]";
                 keepOnlyStartingCommitOnInit(commits);
@@ -105,8 +105,8 @@ public final class CombinedDeletionPolicy extends IndexDeletionPolicy {
      * the policy can consider the snapshotted commit as a safe commit for recovery even the commit does not have translog.
      */
     private void keepOnlyStartingCommitOnInit(List<? extends IndexCommit> commits) {
-        commits.stream().filter(commit -> startingCommit.equals(commit) == false).forEach(IndexCommit::delete);
-        assert startingCommit.isDeleted() == false : "Starting commit must not be deleted";
+        commits.stream().filter(commit -> !startingCommit.equals(commit)).forEach(IndexCommit::delete);
+        assert !startingCommit.isDeleted() : "Starting commit must not be deleted";
         lastCommit = startingCommit;
         safeCommit = startingCommit;
     }
@@ -117,7 +117,7 @@ public final class CombinedDeletionPolicy extends IndexDeletionPolicy {
         lastCommit = commits.get(commits.size() - 1);
         safeCommit = commits.get(keptPosition);
         for (int i = 0; i < keptPosition; i++) {
-            if (snapshottedCommits.containsKey(commits.get(i)) == false) {
+            if (!snapshottedCommits.containsKey(commits.get(i))) {
                 commits.get(i).delete();
             }
         }
@@ -126,9 +126,9 @@ public final class CombinedDeletionPolicy extends IndexDeletionPolicy {
 
     private void updateTranslogDeletionPolicy() throws IOException {
         assert Thread.holdsLock(this);
-        assert safeCommit.isDeleted() == false : "The safe commit must not be deleted";
+        assert !safeCommit.isDeleted() : "The safe commit must not be deleted";
         final long minRequiredGen = Long.parseLong(safeCommit.getUserData().get(Translog.TRANSLOG_GENERATION_KEY));
-        assert lastCommit.isDeleted() == false : "The last commit must not be deleted";
+        assert !lastCommit.isDeleted() : "The last commit must not be deleted";
         final long lastGen = Long.parseLong(lastCommit.getUserData().get(Translog.TRANSLOG_GENERATION_KEY));
 
         assert minRequiredGen <= lastGen : "minRequiredGen must not be greater than lastGen";

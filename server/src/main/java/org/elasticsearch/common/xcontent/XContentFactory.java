@@ -171,7 +171,7 @@ public class XContentFactory {
             if (c == '{') {
                 return XContentType.JSON;
             }
-            if (Character.isWhitespace(c) == false) {
+            if (!Character.isWhitespace(c)) {
                 break;
             }
         }
@@ -242,7 +242,7 @@ public class XContentFactory {
      */
     @Deprecated
     public static XContentType xContentType(InputStream si) throws IOException {
-        if (si.markSupported() == false) {
+        if (!si.markSupported()) {
             throw new IllegalArgumentException("Cannot guess the xcontent type without mark/reset support on " + si.getClass());
         }
         si.mark(GUESS_HEADER_LENGTH);
@@ -334,7 +334,7 @@ public class XContentFactory {
             if (b == '{') {
                 return XContentType.JSON;
             }
-            if (Character.isWhitespace(b) == false) {
+            if (!Character.isWhitespace(b)) {
                 break;
             }
         }

@@ -1051,9 +1051,9 @@ public class InternalEngine extends Engine {
         private IndexingStrategy(boolean currentNotFoundOrDeleted, boolean useLuceneUpdateDocument,
                                  boolean indexIntoLucene, long seqNoForIndexing,
                                  long versionForIndexing, IndexResult earlyResultOnPreFlightError) {
-            assert useLuceneUpdateDocument == false || indexIntoLucene :
+            assert !useLuceneUpdateDocument || indexIntoLucene :
                 "use lucene update is set to true, but we're not indexing into lucene";
-            assert (indexIntoLucene && earlyResultOnPreFlightError != null) == false :
+            assert !(indexIntoLucene && earlyResultOnPreFlightError != null) :
                 "can only index into lucene or have a preflight result but not both." +
                     "indexIntoLucene: " + indexIntoLucene
                     + "  earlyResultOnPreFlightError:" + earlyResultOnPreFlightError;
@@ -1104,7 +1104,7 @@ public class InternalEngine extends Engine {
         // map in the version map such that we don't need to refresh if we are unsafe;
         final VersionValue versionValue = versionMap.getVersionForAssert(index.uid().bytes());
         if (versionValue != null) {
-            if (versionValue.isDelete() == false || allowDeleted == false) {
+            if (!versionValue.isDelete() || !allowDeleted) {
                 throw new AssertionError("doc [" + index.type() + "][" + index.id() + "] exists in version map (version " + versionValue + ")");
             }
         } else {
@@ -1150,11 +1150,11 @@ public class InternalEngine extends Engine {
                 deleteResult = deleteInLucene(delete, plan);
             } else {
                 deleteResult = new DeleteResult(
-                        plan.versionOfDeletion, plan.seqNoOfDeletion, plan.currentlyDeleted == false);
+                        plan.versionOfDeletion, plan.seqNoOfDeletion, !plan.currentlyDeleted);
             }
             if (delete.origin() != Operation.Origin.LOCAL_TRANSLOG_RECOVERY) {
                 final Translog.Location location;
-                if (deleteResult.hasFailure() == false) {
+                if (!deleteResult.hasFailure()) {
                     location = translog.add(new Translog.Delete(delete, deleteResult));
                 } else if (deleteResult.getSeqNo() != SequenceNumbers.UNASSIGNED_SEQ_NO) {
                     location = translog.add(new Translog.NoOp(deleteResult.getSeqNo(),
@@ -1245,7 +1245,7 @@ public class InternalEngine extends Engine {
     private DeleteResult deleteInLucene(Delete delete, DeletionStrategy plan)
         throws IOException {
         try {
-            if (plan.currentlyDeleted == false) {
+            if (!plan.currentlyDeleted) {
                 // any exception that comes from this is a either an ACE or a fatal exception there
                 // can't be any document failures  coming from this
                 indexWriter.deleteDocuments(delete.uid());
@@ -1254,12 +1254,12 @@ public class InternalEngine extends Engine {
                 new DeleteVersionValue(plan.versionOfDeletion, plan.seqNoOfDeletion, delete.primaryTerm(),
                     engineConfig.getThreadPool().relativeTimeInMillis()));
             return new DeleteResult(
-                plan.versionOfDeletion, plan.seqNoOfDeletion, plan.currentlyDeleted == false);
+                plan.versionOfDeletion, plan.seqNoOfDeletion, !plan.currentlyDeleted);
         } catch (Exception ex) {
             if (indexWriter.getTragicException() == null) {
                 // there is no tragic event and such it must be a document level failure
                 return new DeleteResult(
-                        ex, plan.versionOfDeletion, plan.seqNoOfDeletion, plan.currentlyDeleted == false);
+                        ex, plan.versionOfDeletion, plan.seqNoOfDeletion, !plan.currentlyDeleted);
             } else {
                 throw ex;
             }
@@ -1277,7 +1277,7 @@ public class InternalEngine extends Engine {
         private DeletionStrategy(boolean deleteFromLucene, boolean currentlyDeleted,
                                  long seqNoOfDeletion, long versionOfDeletion,
                                  DeleteResult earlyResultOnPreflightError) {
-            assert (deleteFromLucene && earlyResultOnPreflightError != null) == false :
+            assert !(deleteFromLucene && earlyResultOnPreflightError != null) :
                 "can only delete from lucene or have a preflight result but not both." +
                     "deleteFromLucene: " + deleteFromLucene
                     + "  earlyResultOnPreFlightError:" + earlyResultOnPreflightError;
@@ -1408,7 +1408,7 @@ public class InternalEngine extends Engine {
             logger.trace("can't sync commit [{}]. have pending changes", syncId);
             return SyncedFlushResult.PENDING_OPERATIONS;
         }
-        if (expectedCommitId.idsEqual(lastCommittedSegmentInfos.getId()) == false) {
+        if (!expectedCommitId.idsEqual(lastCommittedSegmentInfos.getId())) {
             logger.trace("can't sync commit [{}]. current commit id is not equal to expected.", syncId);
             return SyncedFlushResult.COMMIT_MISMATCH;
         }
@@ -1422,7 +1422,7 @@ public class InternalEngine extends Engine {
                 logger.trace("can't sync commit [{}]. have pending changes", syncId);
                 return SyncedFlushResult.PENDING_OPERATIONS;
             }
-            if (expectedCommitId.idsEqual(lastCommittedSegmentInfos.getId()) == false) {
+            if (!expectedCommitId.idsEqual(lastCommittedSegmentInfos.getId())) {
                 logger.trace("can't sync commit [{}]. current commit id is not equal to expected.", syncId);
                 return SyncedFlushResult.COMMIT_MISMATCH;
             }
@@ -1479,7 +1479,7 @@ public class InternalEngine extends Engine {
          */
         try (ReleasableLock lock = readLock.acquire()) {
             ensureOpen();
-            if (flushLock.tryLock() == false) {
+            if (!flushLock.tryLock()) {
                 // if we can't get the lock right away we block if needed otherwise barf
                 if (waitIfOngoing) {
                     logger.trace("waiting for in-flight flush to finish");
@@ -1536,7 +1536,7 @@ public class InternalEngine extends Engine {
             // reread the last committed segment infos
             lastCommittedSegmentInfos = store.readLastCommittedSegmentsInfo();
         } catch (Exception e) {
-            if (isClosed.get() == false) {
+            if (!isClosed.get()) {
                 try {
                     logger.warn("failed to read latest segment infos on flush", e);
                 } catch (Exception inner) {
@@ -1643,16 +1643,16 @@ public class InternalEngine extends Engine {
             store.incRef(); // increment the ref just to ensure nobody closes the store while we optimize
             try {
                 if (onlyExpungeDeletes) {
-                    assert upgrade == false;
+                    assert !upgrade;
                     indexWriter.forceMergeDeletes(true /* blocks and waits for merges*/);
                 } else if (maxNumSegments <= 0) {
-                    assert upgrade == false;
+                    assert !upgrade;
                     indexWriter.maybeMerge();
                 } else {
                     indexWriter.forceMerge(maxNumSegments, true /* blocks and waits for merges*/);
                 }
                 if (flush) {
-                    if (tryRenewSyncCommit() == false) {
+                    if (!tryRenewSyncCommit()) {
                         flush(false, true);
                     }
                 }
@@ -1704,14 +1704,14 @@ public class InternalEngine extends Engine {
         // if we are already closed due to some tragic exception
         // we need to fail the engine. it might have already been failed before
         // but we are double-checking it's failed and closed
-        if (indexWriter.isOpen() == false && indexWriter.getTragicException() != null) {
+        if (!indexWriter.isOpen() && indexWriter.getTragicException() != null) {
             maybeDie("tragic event in index writer", indexWriter.getTragicException());
             failEngine("already closed by tragic event on the index writer", (Exception) indexWriter.getTragicException());
             engineFailed = true;
-        } else if (translog.isOpen() == false && translog.getTragicException() != null) {
+        } else if (!translog.isOpen() && translog.getTragicException() != null) {
             failEngine("already closed by tragic event on the translog", translog.getTragicException());
             engineFailed = true;
-        } else if (failedEngine.get() == null && isClosed.get() == false) { // we are closed but the engine is not failed yet?
+        } else if (failedEngine.get() == null && !isClosed.get()) { // we are closed but the engine is not failed yet?
             // this smells like a bug - we only expect ACE if we are in a fatal case ie. either translog or IW is closed by
             // a tragic event or has closed itself. if that is not the case we are in a buggy state and raise an assertion error
             throw new AssertionError("Unexpected AlreadyClosedException", ex);
@@ -1733,8 +1733,8 @@ public class InternalEngine extends Engine {
         if (e instanceof AlreadyClosedException) {
             return failOnTragicEvent((AlreadyClosedException)e);
         } else if (e != null &&
-                ((indexWriter.isOpen() == false && indexWriter.getTragicException() == e)
-                        || (translog.isOpen() == false && translog.getTragicException() == e))) {
+                ((!indexWriter.isOpen() && indexWriter.getTragicException() == e)
+                        || (!translog.isOpen() && translog.getTragicException() == e))) {
             // this spot on - we are handling the tragic event exception here so we have to fail the engine
             // right away
             failEngine(source, e);
@@ -1918,7 +1918,7 @@ public class InternalEngine extends Engine {
                     assert searcher.getIndexReader() instanceof ElasticsearchDirectoryReader : "this class needs an ElasticsearchDirectoryReader but got: " + searcher.getIndexReader().getClass();
                     warmer.warm(new Searcher("top_reader_warming", searcher));
                 } catch (Exception e) {
-                    if (isEngineClosed.get() == false) {
+                    if (!isEngineClosed.get()) {
                         logger.warn("failed to prepare/warm", e);
                     }
                 }
@@ -1975,7 +1975,7 @@ public class InternalEngine extends Engine {
         public synchronized void beforeMerge(OnGoingMerge merge) {
             int maxNumMerges = mergeScheduler.getMaxMergeCount();
             if (numMergesInFlight.incrementAndGet() > maxNumMerges) {
-                if (isThrottling.getAndSet(true) == false) {
+                if (!isThrottling.getAndSet(true)) {
                     logger.info("now throttling indexing: numMergesInFlight={}, maxNumMerges={}", numMergesInFlight, maxNumMerges);
                     activateThrottling();
                 }
@@ -1991,13 +1991,13 @@ public class InternalEngine extends Engine {
                     deactivateThrottling();
                 }
             }
-            if (indexWriter.hasPendingMerges() == false && System.nanoTime() - lastWriteNanos >= engineConfig.getFlushMergesAfter().nanos()) {
+            if (!indexWriter.hasPendingMerges() && System.nanoTime() - lastWriteNanos >= engineConfig.getFlushMergesAfter().nanos()) {
                 // NEVER do this on a merge thread since we acquire some locks blocking here and if we concurrently rollback the writer
                 // we deadlock on engine#close for instance.
                 engineConfig.getThreadPool().executor(ThreadPool.Names.FLUSH).execute(new AbstractRunnable() {
                     @Override
                     public void onFailure(Exception e) {
-                        if (isClosed.get() == false) {
+                        if (!isClosed.get()) {
                             logger.warn("failed to flush after merge has finished");
                         }
                     }
@@ -2010,7 +2010,7 @@ public class InternalEngine extends Engine {
                         // if we either have records in the translog or if we don't have a sync ID at all...
                         // maybe even more important, we flush after all merges finish and we are inactive indexing-wise to
                         // free up transient disk usage of the (presumably biggish) segments that were just merged
-                        if (tryRenewSyncCommit() == false) {
+                        if (!tryRenewSyncCommit()) {
                             flush();
                         }
                     }

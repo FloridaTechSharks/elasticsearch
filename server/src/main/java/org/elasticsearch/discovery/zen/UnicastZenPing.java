@@ -232,7 +232,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
                     for (int addressId = 0; addressId < addresses.length; addressId++) {
                         final TransportAddress address = addresses[addressId];
                         // no point in pinging ourselves
-                        if (localAddresses.contains(address) == false) {
+                        if (!localAddresses.contains(address)) {
                             discoveryNodes.add(
                                 new DiscoveryNode(
                                     nodeId_prefix + hostname + "_" + addressId + "#",
@@ -322,7 +322,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
         final AbstractRunnable pingSender = new AbstractRunnable() {
             @Override
             public void onFailure(Exception e) {
-                if (e instanceof AlreadyClosedException == false) {
+                if (!(e instanceof AlreadyClosedException)) {
                     logger.warn("unexpected error while pinging", e);
                 }
             }
@@ -407,7 +407,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
                             success = true;
                         }
                     } finally {
-                        if (success == false) {
+                        if (!success) {
                             logger.trace("[{}] closing connection to [{}] due to failure", id(), node);
                             IOUtils.closeWhileHandlingException(result);
                         }
@@ -424,7 +424,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
         }
 
         public void addPingResponseToCollection(PingResponse pingResponse) {
-            if (localNode.equals(pingResponse.node()) == false) {
+            if (!localNode.equals(pingResponse.node())) {
                 pingCollection.addPing(pingResponse);
             }
         }
@@ -580,7 +580,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
                     exp.getCause() instanceof AlreadyClosedException) {
                     // ok, not connected...
                     logger.trace((Supplier<?>) () -> new ParameterizedMessage("failed to connect to {}", node), exp);
-                } else if (closed == false) {
+                } else if (!closed) {
                     logger.warn((Supplier<?>) () -> new ParameterizedMessage("failed to send ping to [{}]", node), exp);
                 }
             }

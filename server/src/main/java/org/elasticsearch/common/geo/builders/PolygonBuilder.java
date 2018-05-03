@@ -201,9 +201,9 @@ public class PolygonBuilder extends ShapeBuilder<JtsGeometry, PolygonBuilder> {
      */
     public Coordinate[][][] coordinates() {
         int numEdges = shell.coordinates.size()-1; // Last point is repeated
-        for (int i = 0; i < holes.size(); i++) {
-            numEdges += holes.get(i).coordinates.size()-1;
-            validateHole(shell, this.holes.get(i));
+        for (LineStringBuilder hole : holes) {
+            numEdges += hole.coordinates.size() - 1;
+            validateHole(shell, hole);
         }
 
         Edge[] edges = new Edge[numEdges];

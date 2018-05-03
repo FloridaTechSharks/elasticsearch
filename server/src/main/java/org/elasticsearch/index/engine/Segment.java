@@ -145,9 +145,7 @@ public class Segment implements Streamable {
 
         Segment segment = (Segment) o;
 
-        if (name != null ? !name.equals(segment.name) : segment.name != null) return false;
-
-        return true;
+        return name != null ? name.equals(segment.name) : segment.name == null;
     }
 
     @Override

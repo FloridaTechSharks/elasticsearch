@@ -161,7 +161,7 @@ public final class ShardGetService extends AbstractIndexShardComponent {
             }
         }
 
-        if (get == null || get.exists() == false) {
+        if (get == null || !get.exists()) {
             return new GetResult(shardId.getIndexName(), type, id, -1, false, null, null);
         }
 

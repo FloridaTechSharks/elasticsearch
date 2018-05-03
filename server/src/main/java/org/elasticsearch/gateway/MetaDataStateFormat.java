@@ -220,7 +220,7 @@ public abstract class MetaDataStateFormat<T> {
                 final String entryFileName = entry.getFileName().toString();
                 return Files.isRegularFile(entry)
                         && entryFileName.startsWith(prefix) // only state files
-                        && currentStateFile.equals(entryFileName) == false; // keep the current state file around
+                        && !currentStateFile.equals(entryFileName); // keep the current state file around
             }
         };
         // now clean up the old files
@@ -278,7 +278,7 @@ public abstract class MetaDataStateFormat<T> {
                         if (matcher.matches()) {
                             final long stateId = Long.parseLong(matcher.group(1));
                             maxStateId = Math.max(maxStateId, stateId);
-                            final boolean legacy = MetaDataStateFormat.STATE_FILE_EXTENSION.equals(matcher.group(2)) == false;
+                            final boolean legacy = !MetaDataStateFormat.STATE_FILE_EXTENSION.equals(matcher.group(2));
                             maxStateIdIsLegacy &= legacy; // on purpose, see NOTE below
                             PathAndStateId pav = new PathAndStateId(stateFile, stateId, legacy);
                             logger.trace("found state file: {}", pav);

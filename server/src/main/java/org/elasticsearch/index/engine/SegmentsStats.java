@@ -127,8 +127,7 @@ public class SegmentsStats implements Streamable, ToXContentFragment {
     public void addFileSizes(ImmutableOpenMap<String, Long> fileSizes) {
         ImmutableOpenMap.Builder<String, Long> map = ImmutableOpenMap.builder(this.fileSizes);
 
-        for (Iterator<ObjectObjectCursor<String, Long>> it = fileSizes.iterator(); it.hasNext();) {
-            ObjectObjectCursor<String, Long> entry = it.next();
+        for (ObjectObjectCursor<String, Long> entry : fileSizes) {
             if (map.containsKey(entry.key)) {
                 Long oldValue = map.get(entry.key);
                 map.put(entry.key, oldValue + entry.value);
@@ -303,8 +302,7 @@ public class SegmentsStats implements Streamable, ToXContentFragment {
         builder.byteSizeField(Fields.FIXED_BIT_SET_MEMORY_IN_BYTES, Fields.FIXED_BIT_SET, bitsetMemoryInBytes);
         builder.field(Fields.MAX_UNSAFE_AUTO_ID_TIMESTAMP, maxUnsafeAutoIdTimestamp);
         builder.startObject(Fields.FILE_SIZES);
-        for (Iterator<ObjectObjectCursor<String, Long>> it = fileSizes.iterator(); it.hasNext();) {
-            ObjectObjectCursor<String, Long> entry = it.next();
+        for (ObjectObjectCursor<String, Long> entry : fileSizes) {
             builder.startObject(entry.key);
             builder.byteSizeField(Fields.SIZE_IN_BYTES, Fields.SIZE, entry.value);
             builder.field(Fields.DESCRIPTION, fileDescriptions.getOrDefault(entry.key, "Others"));

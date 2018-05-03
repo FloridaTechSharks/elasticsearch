@@ -342,7 +342,7 @@ public final class ObjectParser<Value, Context> extends AbstractObjectParser<Val
 
     private FieldParser getParser(String fieldName) {
         FieldParser parser = fieldParserMap.get(fieldName);
-        if (parser == null && false == ignoreUnknownFields) {
+        if (parser == null && !ignoreUnknownFields) {
             throw new IllegalArgumentException("[" + name  + "] unknown field [" + fieldName + "], parser not found");
         }
         return parser;
@@ -362,11 +362,11 @@ public final class ObjectParser<Value, Context> extends AbstractObjectParser<Val
         }
 
         void assertSupports(String parserName, XContentParser.Token token, String currentFieldName, XContentLocation location) {
-            if (parseField.match(currentFieldName) == false) {
+            if (!parseField.match(currentFieldName)) {
                 throw new ParsingException(location, "[" + parserName  + "] parsefield doesn't accept: " + currentFieldName);
             }
-            if (supportedTokens.contains(token) == false) {
-                throw new ParsingException(location, 
+            if (!supportedTokens.contains(token)) {
+                throw new ParsingException(location,
                         "[" + parserName + "] " + currentFieldName + " doesn't support values of type: " + token);
             }
         }

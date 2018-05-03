@@ -74,7 +74,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
                 if (shard.primary()) {
                     continue;
                 }
-                if (shard.initializing() == false) {
+                if (!shard.initializing()) {
                     continue;
                 }
                 if (shard.relocatingNodeId() != null) {
@@ -87,7 +87,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
                 }
 
                 AsyncShardFetch.FetchResult<NodeStoreFilesMetaData> shardStores = fetchData(shard, allocation);
-                if (shardStores.hasData() == false) {
+                if (!shardStores.hasData()) {
                     logger.trace("{}: fetching new stores for initializing shard", shard);
                     continue; // still fetching
                 }
@@ -113,8 +113,8 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
                     } else {
                         currentSyncId = null;
                     }
-                    if (currentNode.equals(nodeWithHighestMatch) == false
-                            && Objects.equals(currentSyncId, primaryStore.syncId()) == false
+                    if (!currentNode.equals(nodeWithHighestMatch)
+                            && !Objects.equals(currentSyncId, primaryStore.syncId())
                             && matchingNodes.isNodeMatchBySyncID(nodeWithHighestMatch)) {
                         // we found a better match that has a full sync id match, the existing allocation is not fully synced
                         // so we found a better one, cancel this one
@@ -148,7 +148,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
     public AllocateUnassignedDecision makeAllocationDecision(final ShardRouting unassignedShard,
                                                              final RoutingAllocation allocation,
                                                              final Logger logger) {
-        if (isResponsibleFor(unassignedShard) == false) {
+        if (!isResponsibleFor(unassignedShard)) {
             // this allocator is not responsible for deciding on this shard
             return AllocateUnassignedDecision.NOT_TAKEN;
         }
@@ -159,7 +159,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
         Tuple<Decision, Map<String, NodeAllocationResult>> result = canBeAllocatedToAtLeastOneNode(unassignedShard, allocation);
         Decision allocateDecision = result.v1();
         if (allocateDecision.type() != Decision.Type.YES
-                && (explain == false || hasInitiatedFetching(unassignedShard) == false)) {
+                && (!explain || !hasInitiatedFetching(unassignedShard))) {
             // only return early if we are not in explain mode, or we are in explain mode but we have not
             // yet attempted to fetch any shard data
             logger.trace("{}: ignoring allocation, can't be allocated on any node", unassignedShard);
@@ -168,7 +168,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
         }
 
         AsyncShardFetch.FetchResult<NodeStoreFilesMetaData> shardStores = fetchData(unassignedShard, allocation);
-        if (shardStores.hasData() == false) {
+        if (!shardStores.hasData()) {
             logger.trace("{}: ignoring allocation, still fetching shard stores", unassignedShard);
             allocation.setHasPendingAsyncFetch();
             List<NodeAllocationResult> nodeDecisions = null;
@@ -217,7 +217,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
                 // we found a match
                 return AllocateUnassignedDecision.yes(nodeWithHighestMatch.node(), null, nodeDecisions, true);
             }
-        } else if (matchingNodes.hasAnyData() == false && unassignedShard.unassignedInfo().isDelayed()) {
+        } else if (!matchingNodes.hasAnyData() && unassignedShard.unassignedInfo().isDelayed()) {
             // if we didn't manage to find *any* data (regardless of matching sizes), and the replica is
             // unassigned due to a node leaving, so we delay allocation of this replica to see if the
             // node with the shard copy will rejoin so we can re-use the copy it has
@@ -428,7 +428,7 @@ public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
          * Did we manage to find any data, regardless how well they matched or not.
          */
         public boolean hasAnyData() {
-            return nodesToSize.isEmpty() == false;
+            return !nodesToSize.isEmpty();
         }
     }
 }

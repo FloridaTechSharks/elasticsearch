@@ -179,10 +179,7 @@ public final class Numbers {
 
     /** Returns true if value is neither NaN nor infinite. */
     public static boolean isValidDouble(double value) {
-        if (Double.isNaN(value) || Double.isInfinite(value)) {
-            return false;
-        }
-        return true;
+        return !Double.isNaN(value) && !Double.isInfinite(value);
     }
 
     /** Return the long that {@code n} stores, or throws an exception if the

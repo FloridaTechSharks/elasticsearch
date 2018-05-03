@@ -144,7 +144,7 @@ public class FilterableTermsEnum extends TermsEnum {
                     // 2 choices for performing same heavy loop - one attempts to calculate totalTermFreq and other does not
                     if (docsEnumFlag == PostingsEnum.FREQS) {
                         for (int docId = docsEnum.nextDoc(); docId != DocIdSetIterator.NO_MORE_DOCS; docId = docsEnum.nextDoc()) {
-                            if (anEnum.bits != null && anEnum.bits.get(docId) == false) {
+                            if (anEnum.bits != null && !anEnum.bits.get(docId)) {
                                 continue;
                             }
                             docFreq++;
@@ -154,7 +154,7 @@ public class FilterableTermsEnum extends TermsEnum {
                         }
                     } else {
                         for (int docId = docsEnum.nextDoc(); docId != DocIdSetIterator.NO_MORE_DOCS; docId = docsEnum.nextDoc()) {
-                            if (anEnum.bits != null && anEnum.bits.get(docId) == false) {
+                            if (anEnum.bits != null && !anEnum.bits.get(docId)) {
                                 continue;
                             }
                             // docsEnum.freq() behaviour is undefined if docsEnumFlag==PostingsEnum.FLAG_NONE so don't bother with call

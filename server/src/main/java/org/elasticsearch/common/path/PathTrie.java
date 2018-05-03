@@ -243,7 +243,7 @@ public class PathTrie<T> {
                 }
             } else {
                 if (index + 1 == path.length && node.value == null && children.get(wildcard) != null
-                        && EXPLICIT_OR_ROOT_WILDCARD.contains(trieMatchingMode) == false) {
+                        && !EXPLICIT_OR_ROOT_WILDCARD.contains(trieMatchingMode)) {
                     /*
                      * If we are at the end of the path, the current node does not have a value but
                      * there is a child wildcard node, use the child wildcard node.
@@ -391,7 +391,7 @@ public class PathTrie<T> {
 
         @Override
         public boolean hasNext() {
-            return modes.isEmpty() == false;
+            return !modes.isEmpty();
         }
 
         @Override

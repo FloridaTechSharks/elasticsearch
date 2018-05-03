@@ -61,7 +61,7 @@ public abstract class ShardLock implements Closeable {
      * Returns true if this lock is still open ie. has not been closed yet.
      */
     public final boolean isOpen() {
-        return closed.get() == false;
+        return !closed.get();
     }
 
     @Override

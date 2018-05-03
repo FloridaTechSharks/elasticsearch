@@ -108,7 +108,7 @@ public class Environment {
         List<String> dataPaths = PATH_DATA_SETTING.get(settings);
         final ClusterName clusterName = ClusterName.CLUSTER_NAME_SETTING.get(settings);
         if (DiscoveryNode.nodeRequiresLocalStorage(settings)) {
-            if (dataPaths.isEmpty() == false) {
+            if (!dataPaths.isEmpty()) {
                 dataFiles = new Path[dataPaths.size()];
                 dataWithClusterFiles = new Path[dataPaths.size()];
                 for (int i = 0; i < dataPaths.size(); i++) {

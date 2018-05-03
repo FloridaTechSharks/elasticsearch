@@ -256,7 +256,7 @@ public class XContentMapValues {
                 Map<String, Object> valueAsMap = (Map<String, Object>) value;
                 Map<String, Object> filteredValue = filter(valueAsMap,
                         subIncludeAutomaton, subIncludeState, excludeAutomaton, excludeState, matchAllAutomaton);
-                if (includeAutomaton.isAccept(includeState) || filteredValue.isEmpty() == false) {
+                if (includeAutomaton.isAccept(includeState) || !filteredValue.isEmpty()) {
                     filtered.put(key, filteredValue);
                 }
 
@@ -264,7 +264,7 @@ public class XContentMapValues {
 
                 List<Object> filteredValue = filter((Iterable<?>) value,
                         subIncludeAutomaton, subIncludeState, excludeAutomaton, excludeState, matchAllAutomaton);
-                if (filteredValue.isEmpty() == false) {
+                if (!filteredValue.isEmpty()) {
                     filtered.put(key, filteredValue);
                 }
 
@@ -272,7 +272,7 @@ public class XContentMapValues {
 
                 // leaf property
                 if (includeAutomaton.isAccept(includeState)
-                        && (excludeState == -1 || excludeAutomaton.isAccept(excludeState) == false)) {
+                        && (excludeState == -1 || !excludeAutomaton.isAccept(excludeState))) {
                     filtered.put(key, value);
                 }
 
@@ -297,13 +297,13 @@ public class XContentMapValues {
                 }
                 Map<String, Object> filteredValue = filter((Map<String, ?>)value,
                         includeAutomaton, includeState, excludeAutomaton, excludeState, matchAllAutomaton);
-                if (filteredValue.isEmpty() == false) {
+                if (!filteredValue.isEmpty()) {
                     filtered.add(filteredValue);
                 }
             } else if (value instanceof Iterable) {
                 List<Object> filteredValue = filter((Iterable<?>) value,
                         includeAutomaton, initialIncludeState, excludeAutomaton, initialExcludeState, matchAllAutomaton);
-                if (filteredValue.isEmpty() == false) {
+                if (!filteredValue.isEmpty()) {
                     filtered.add(filteredValue);
                 }
             } else if (isInclude) {

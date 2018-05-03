@@ -382,7 +382,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
 
             boolean sentToApplier = processNextCommittedClusterState("master " + newState.nodes().getMasterNode() +
                 " committed version [" + newState.version() + "] source [" + clusterChangedEvent.source() + "]");
-            if (sentToApplier == false && processedOrFailed.get() == false) {
+            if (!sentToApplier && !processedOrFailed.get()) {
                 assert false : "cluster state published locally neither processed nor failed: " + newState;
                 logger.warn("cluster state with version [{}] that is published locally has neither been processed nor failed",
                     newState.version());
@@ -490,7 +490,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
                         // a valid master.
                         logger.debug("no master node is set, despite of join request completing. retrying pings.");
                         joinThreadControl.markThreadAsDoneAndStartNew(currentThread);
-                    } else if (currentMasterNode.equals(masterNode) == false) {
+                    } else if (!currentMasterNode.equals(masterNode)) {
                         // update cluster state
                         joinThreadControl.stopRunningThreadAndRejoin("master_switched_while_finalizing_join");
                     }
@@ -627,7 +627,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
             final ClusterState remainingNodesClusterState = remainingNodesClusterState(currentState, remainingNodesBuilder);
 
             final ClusterTasksResult.Builder<Task> resultBuilder = ClusterTasksResult.<Task>builder().successes(tasks);
-            if (electMasterService.hasEnoughMasterNodes(remainingNodesClusterState.nodes()) == false) {
+            if (!electMasterService.hasEnoughMasterNodes(remainingNodesClusterState.nodes())) {
                 final int masterNodes = electMasterService.countMasterNodes(remainingNodesClusterState.nodes());
                 rejoin.accept(LoggerMessageFormat.format("not enough master nodes (has [{}], but needed [{}])",
                                                          masterNodes, electMasterService.minimumMasterNodes()));
@@ -743,7 +743,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
         assert newClusterState.nodes().getMasterNode() != null : "received a cluster state without a master";
         assert !newClusterState.blocks().hasGlobalBlock(discoverySettings.getNoMasterBlock()) : "received a cluster state with a master block";
 
-        if (currentState.nodes().isLocalNodeElectedMaster() && newClusterState.nodes().isLocalNodeElectedMaster() == false) {
+        if (currentState.nodes().isLocalNodeElectedMaster() && !newClusterState.nodes().isLocalNodeElectedMaster()) {
             handleAnotherMaster(currentState, newClusterState.nodes().getMasterNode(), newClusterState.version(), "via a new cluster state");
             return false;
         }
@@ -990,7 +990,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
 
         if (clusterState.nodes().getMasterNodeId() != null) {
             // remove block if it already exists before adding new one
-            assert clusterState.blocks().hasGlobalBlock(discoverySettings.getNoMasterBlock().id()) == false :
+            assert !clusterState.blocks().hasGlobalBlock(discoverySettings.getNoMasterBlock().id()) :
                 "NO_MASTER_BLOCK should only be added by ZenDiscovery";
             ClusterBlocks clusterBlocks = ClusterBlocks.builder().blocks(clusterState.blocks())
                 .addGlobalBlock(discoverySettings.getNoMasterBlock())
@@ -1096,7 +1096,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
                 incomingState.nodes().getMasterNode(), incomingClusterName);
             throw new IllegalStateException("received state from a node that is not part of the cluster");
         }
-        if (lastState.nodes().getLocalNode().equals(incomingState.nodes().getLocalNode()) == false) {
+        if (!lastState.nodes().getLocalNode().equals(incomingState.nodes().getLocalNode())) {
             logger.warn("received a cluster state from [{}] and not part of the cluster, should not happen",
                 incomingState.nodes().getMasterNode());
             throw new IllegalStateException("received state with a local node that does not match the current local node");

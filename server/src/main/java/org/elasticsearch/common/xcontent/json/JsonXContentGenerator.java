@@ -84,12 +84,12 @@ public class JsonXContentGenerator implements XContentGenerator {
 
         JsonGenerator generator = jsonGenerator;
 
-        boolean hasExcludes = excludes.isEmpty() == false;
+        boolean hasExcludes = !excludes.isEmpty();
         if (hasExcludes) {
             generator = new FilteringGeneratorDelegate(generator, new FilterPathBasedFilter(excludes, false), true, true);
         }
 
-        boolean hasIncludes = includes.isEmpty() == false;
+        boolean hasIncludes = !includes.isEmpty();
         if (hasIncludes) {
             generator = new FilteringGeneratorDelegate(generator, new FilterPathBasedFilter(includes, true), true, true);
         }
@@ -133,7 +133,7 @@ public class JsonXContentGenerator implements XContentGenerator {
             if (delegate instanceof JsonGeneratorDelegate) {
                 // In case of combined inclusion and exclusion filters, we have one and only one another delegating level
                 delegate = ((JsonGeneratorDelegate) delegate).getDelegate();
-                assert delegate instanceof JsonGeneratorDelegate == false;
+                assert !(delegate instanceof JsonGeneratorDelegate);
             }
             return delegate;
         }
@@ -299,7 +299,7 @@ public class JsonXContentGenerator implements XContentGenerator {
 
     @Override
     public void writeRawField(String name, InputStream content) throws IOException {
-        if (content.markSupported() == false) {
+        if (!content.markSupported()) {
             // needed for the XContentFactory.xContentType call
             content = new BufferedInputStream(content);
         }
@@ -312,7 +312,7 @@ public class JsonXContentGenerator implements XContentGenerator {
 
     @Override
     public void writeRawField(String name, InputStream content, XContentType contentType) throws IOException {
-        if (mayWriteRawData(contentType) == false) {
+        if (!mayWriteRawData(contentType)) {
             // EMPTY is safe here because we never call namedObject when writing raw data
             try (XContentParser parser = XContentFactory.xContent(contentType).createParser(NamedXContentRegistry.EMPTY, content)) {
                 parser.nextToken();
@@ -338,7 +338,7 @@ public class JsonXContentGenerator implements XContentGenerator {
 
     @Override
     public final void writeRawField(String name, BytesReference content, XContentType contentType) throws IOException {
-        if (mayWriteRawData(contentType) == false) {
+        if (!mayWriteRawData(contentType)) {
             writeFieldName(name);
             copyRawValue(content, contentType.xContent());
         } else {
@@ -360,7 +360,7 @@ public class JsonXContentGenerator implements XContentGenerator {
 
     @Override
     public final void writeRawValue(BytesReference content, XContentType contentType) throws IOException {
-        if (mayWriteRawData(contentType) == false) {
+        if (!mayWriteRawData(contentType)) {
             copyRawValue(content, contentType.xContent());
         } else {
             if (generator.getOutputContext().getCurrentName() != null) {
@@ -379,9 +379,9 @@ public class JsonXContentGenerator implements XContentGenerator {
         // we need to copy the whole structure so that it will be correctly
         // filtered or converted
         return supportsRawWrites()
-                && isFiltered() == false
+                && !isFiltered()
                 && contentType == contentType()
-                && prettyPrint == false;
+                && !prettyPrint;
     }
 
     /** Whether this generator supports writing raw data directly */
@@ -421,7 +421,7 @@ public class JsonXContentGenerator implements XContentGenerator {
             return;
         }
         JsonStreamContext context = generator.getOutputContext();
-        if ((context != null) && (context.inRoot() ==  false)) {
+        if ((context != null) && (!context.inRoot())) {
             throw new IOException("Unclosed object or array found");
         }
         if (writeLineFeedAtEnd) {

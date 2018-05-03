@@ -365,9 +365,9 @@ public final class AnalysisRegistry implements Closeable {
         for (Map.Entry<String, ? extends AnalysisModule.AnalysisProvider<T>> entry : defaultInstance.entrySet()) {
             final String name = entry.getKey();
             final AnalysisModule.AnalysisProvider<T> provider = entry.getValue();
-            if (factories.containsKey(name) == false) {
+            if (!factories.containsKey(name)) {
                 final T instance = provider.get(settings, environment, name, defaultSettings);
-                if (factories.containsKey(name) == false) {
+                if (!factories.containsKey(name)) {
                     factories.put(name, instance);
                 }
             }

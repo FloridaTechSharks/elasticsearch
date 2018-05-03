@@ -95,13 +95,12 @@ class MembersInjectorImpl<T> implements MembersInjector<T> {
 
     void injectMembers(T t, Errors errors, InternalContext context) {
         // optimization: use manual for/each to save allocating an iterator here
-        for (int i = 0, size = memberInjectors.size(); i < size; i++) {
-            memberInjectors.get(i).inject(errors, context, t);
+        for (SingleMemberInjector memberInjector : memberInjectors) {
+            memberInjector.inject(errors, context, t);
         }
 
         // optimization: use manual for/each to save allocating an iterator here
-        for (int i = 0, size = userMembersInjectors.size(); i < size; i++) {
-            MembersInjector<? super T> userMembersInjector = userMembersInjectors.get(i);
+        for (MembersInjector<? super T> userMembersInjector : userMembersInjectors) {
             try {
                 userMembersInjector.injectMembers(t);
             } catch (RuntimeException e) {

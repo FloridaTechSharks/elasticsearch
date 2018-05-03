@@ -105,11 +105,11 @@ public class MultiPhrasePrefixQuery extends Query {
         if (termArrays.size() == 0)
             field = terms[0].field();
 
-        for (int i = 0; i < terms.length; i++) {
-            if (terms[i].field() != field) {
+        for (Term term : terms) {
+            if (term.field() != field) {
                 throw new IllegalArgumentException(
-                        "All phrase terms must be in the same field (" + field + "): "
-                                + terms[i]);
+                    "All phrase terms must be in the same field (" + field + "): "
+                        + term);
             }
         }
 
@@ -262,7 +262,7 @@ public class MultiPhrasePrefixQuery extends Query {
      */
     @Override
     public boolean equals(Object o) {
-        if (sameClassAs(o) == false) {
+        if (!sameClassAs(o)) {
             return false;
         }
         MultiPhrasePrefixQuery other = (MultiPhrasePrefixQuery) o;

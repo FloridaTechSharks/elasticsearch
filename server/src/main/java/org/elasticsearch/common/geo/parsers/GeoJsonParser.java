@@ -60,7 +60,7 @@ abstract class GeoJsonParser {
                 if (ShapeParser.FIELD_TYPE.match(fieldName)) {
                     parser.nextToken();
                     final GeoShapeType type = GeoShapeType.forName(parser.text());
-                    if (shapeType != null && shapeType.equals(type) == false) {
+                    if (shapeType != null && !shapeType.equals(type)) {
                         malformedException = ShapeParser.FIELD_TYPE + " already parsed as ["
                             + shapeType + "] cannot redefine as [" + type + "]";
                     } else {

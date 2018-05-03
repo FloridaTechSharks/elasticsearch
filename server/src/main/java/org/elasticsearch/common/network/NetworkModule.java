@@ -116,7 +116,7 @@ public final class NetworkModule {
         this.settings = settings;
         this.transportClient = transportClient;
         for (NetworkPlugin plugin : plugins) {
-            if (transportClient == false && HTTP_ENABLED.get(settings)) {
+            if (!transportClient && HTTP_ENABLED.get(settings)) {
                 Map<String, Supplier<HttpServerTransport>> httpTransportFactory = plugin.getHttpTransports(settings, threadPool, bigArrays,
                     circuitBreakerService, namedWriteableRegistry, xContentRegistry, networkService, dispatcher);
                 for (Map.Entry<String, Supplier<HttpServerTransport>> entry : httpTransportFactory.entrySet()) {
@@ -197,7 +197,7 @@ public final class NetworkModule {
     }
 
     public boolean isHttpEnabled() {
-        return transportClient == false && HTTP_ENABLED.get(settings);
+        return !transportClient && HTTP_ENABLED.get(settings);
     }
 
     public Supplier<Transport> getTransportSupplier() {

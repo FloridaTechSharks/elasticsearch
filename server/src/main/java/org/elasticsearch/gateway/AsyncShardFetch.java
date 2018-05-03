@@ -115,7 +115,7 @@ public abstract class AsyncShardFetch<T extends BaseNodeResponse> implements Rel
         nodesToIgnore.addAll(ignoreNodes);
         fillShardCacheWithDataNodes(cache, nodes);
         List<NodeEntry<T>> nodesToFetch = findNodesToFetch(cache);
-        if (nodesToFetch.isEmpty() == false) {
+        if (!nodesToFetch.isEmpty()) {
             // mark all node as fetching and go ahead and async fetch them
             // use a unique round id to detect stale responses in processAsyncFetch
             final long fetchingRound = round.incrementAndGet();
@@ -159,7 +159,7 @@ public abstract class AsyncShardFetch<T extends BaseNodeResponse> implements Rel
             nodesToIgnore.clear();
             // if at least one node failed, make sure to have a protective reroute
             // here, just case this round won't find anything, and we need to retry fetching data
-            if (failedNodes.isEmpty() == false || allIgnoreNodes.isEmpty() == false) {
+            if (!failedNodes.isEmpty() || !allIgnoreNodes.isEmpty()) {
                 reroute(shardId, "nodes failed [" + failedNodes.size() + "], ignored [" + allIgnoreNodes.size() + "]");
             }
             return new FetchResult<>(shardId, fetchData, allIgnoreNodes);
@@ -208,7 +208,7 @@ public abstract class AsyncShardFetch<T extends BaseNodeResponse> implements Rel
                         assert nodeEntry.getFetchingRound() > fetchingRound : "node entries only replaced by newer rounds";
                         logger.trace("{} received failure for [{}] from node {} for an older fetching round (expected: {} but was: {})",
                             shardId, nodeEntry.getNodeId(), type, nodeEntry.getFetchingRound(), fetchingRound);
-                    } else if (nodeEntry.isFailed() == false) {
+                    } else if (!nodeEntry.isFailed()) {
                         // if the entry is there, for the right fetching round and not marked as failed already, process it
                         Throwable unwrappedCause = ExceptionsHelper.unwrapCause(failure.getCause());
                         // if the request got rejected or timed out, we need to try it again next time...
@@ -241,14 +241,14 @@ public abstract class AsyncShardFetch<T extends BaseNodeResponse> implements Rel
         // verify that all current data nodes are there
         for (ObjectObjectCursor<String, DiscoveryNode> cursor : nodes.getDataNodes()) {
             DiscoveryNode node = cursor.value;
-            if (shardCache.containsKey(node.getId()) == false) {
+            if (!shardCache.containsKey(node.getId())) {
                 shardCache.put(node.getId(), new NodeEntry<T>(node.getId()));
             }
         }
         // remove nodes that are not longer part of the data nodes set
         for (Iterator<String> it = shardCache.keySet().iterator(); it.hasNext(); ) {
             String nodeId = it.next();
-            if (nodes.nodeExists(nodeId) == false) {
+            if (!nodes.nodeExists(nodeId)) {
                 it.remove();
             }
         }
@@ -261,7 +261,7 @@ public abstract class AsyncShardFetch<T extends BaseNodeResponse> implements Rel
     private List<NodeEntry<T>> findNodesToFetch(Map<String, NodeEntry<T>> shardCache) {
         List<NodeEntry<T>> nodesToFetch = new ArrayList<>();
         for (NodeEntry<T> nodeEntry : shardCache.values()) {
-            if (nodeEntry.hasData() == false && nodeEntry.isFetching() == false) {
+            if (!nodeEntry.hasData() && !nodeEntry.isFetching()) {
                 nodesToFetch.add(nodeEntry);
             }
         }

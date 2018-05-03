@@ -183,7 +183,7 @@ public class LogConfigurator {
         }
         ServerLoggers.LOG_LEVEL_SETTING.getAllConcreteSettings(settings)
             // do not set a log level for a logger named level (from the default log setting)
-            .filter(s -> s.getKey().equals(ServerLoggers.LOG_DEFAULT_LEVEL_SETTING.getKey()) == false).forEach(s -> {
+            .filter(s -> !s.getKey().equals(ServerLoggers.LOG_DEFAULT_LEVEL_SETTING.getKey())).forEach(s -> {
             final Level level = s.get(settings);
             ServerLoggers.setLevel(ESLoggerFactory.getLogger(s.getKey().substring("logger.".length())), level);
         });

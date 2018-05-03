@@ -134,7 +134,7 @@ public class PublishClusterStateAction extends AbstractComponent {
             DiscoveryNode localNode = nodes.getLocalNode();
             final int totalMasterNodes = nodes.getMasterNodes().size();
             for (final DiscoveryNode node : nodes) {
-                if (node.equals(localNode) == false) {
+                if (!node.equals(localNode)) {
                     nodesToPublishTo.add(node);
                 }
             }
@@ -221,7 +221,7 @@ public class PublishClusterStateAction extends AbstractComponent {
             try {
                 if (sendFullVersion || !previousState.nodes().nodeExists(node)) {
                     // will send a full reference
-                    if (serializedStates.containsKey(node.getVersion()) == false) {
+                    if (!serializedStates.containsKey(node.getVersion())) {
                         serializedStates.put(node.getVersion(), serializeFullClusterState(clusterState, node.getVersion()));
                     }
                 } else {
@@ -229,7 +229,7 @@ public class PublishClusterStateAction extends AbstractComponent {
                     if (diff == null) {
                         diff = clusterState.diff(previousState);
                     }
-                    if (serializedDiffs.containsKey(node.getVersion()) == false) {
+                    if (!serializedDiffs.containsKey(node.getVersion())) {
                         serializedDiffs.put(node.getVersion(), serializeDiffClusterState(diff, node.getVersion()));
                     }
                 }
@@ -519,7 +519,7 @@ public class PublishClusterStateAction extends AbstractComponent {
         public void waitForCommit(TimeValue commitTimeout) {
             boolean timedout = false;
             try {
-                timedout = committedOrFailedLatch.await(commitTimeout.millis(), TimeUnit.MILLISECONDS) == false;
+                timedout = !committedOrFailedLatch.await(commitTimeout.millis(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 // the commit check bellow will either translate to an exception or we are committed and we can safely continue
             }
@@ -527,7 +527,7 @@ public class PublishClusterStateAction extends AbstractComponent {
             if (timedout) {
                 markAsFailed("timed out waiting for commit (commit timeout [" + commitTimeout + "])");
             }
-            if (isCommitted() == false) {
+            if (!isCommitted()) {
                 throw new Discovery.FailedToCommitClusterStateException("{} enough masters to ack sent cluster state. [{}] left",
                         timedout ? "timed out while waiting for" : "failed to get", neededMastersToCommit);
             }
@@ -614,7 +614,7 @@ public class PublishClusterStateAction extends AbstractComponent {
          **/
         private synchronized boolean markAsFailed(String details, Exception reason) {
             if (committedOrFailed()) {
-                return committed == false;
+                return !committed;
             }
             logger.trace((org.apache.logging.log4j.util.Supplier<?>) () -> new ParameterizedMessage("failed to commit version [{}]. {}",
                 clusterState.version(), details), reason);
@@ -630,7 +630,7 @@ public class PublishClusterStateAction extends AbstractComponent {
          **/
         private synchronized boolean markAsFailed(String reason) {
             if (committedOrFailed()) {
-                return committed == false;
+                return !committed;
             }
             logger.trace("failed to commit version [{}]. {}", clusterState.version(), reason);
             committed = false;

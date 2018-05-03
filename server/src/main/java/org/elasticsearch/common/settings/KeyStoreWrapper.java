@@ -177,7 +177,7 @@ public class KeyStoreWrapper implements SecureSettings {
 
     /** Add the bootstrap seed setting, which may be used as a unique, secure, random value by the node */
     public static void addBootstrapSeed(KeyStoreWrapper wrapper) throws GeneralSecurityException {
-        assert wrapper.getSettingNames().contains(SEED_SETTING.getKey()) == false;
+        assert !wrapper.getSettingNames().contains(SEED_SETTING.getKey());
         SecureRandom random = Randomness.createSecure();
         int passwordLength = 20; // Generate 20 character passwords
         char[] characters = new char[passwordLength];
@@ -196,7 +196,7 @@ public class KeyStoreWrapper implements SecureSettings {
      */
     public static KeyStoreWrapper load(Path configDir) throws IOException {
         Path keystoreFile = keystorePath(configDir);
-        if (Files.exists(keystoreFile) == false) {
+        if (!Files.exists(keystoreFile)) {
             return null;
         }
 
@@ -206,7 +206,7 @@ public class KeyStoreWrapper implements SecureSettings {
             int formatVersion = CodecUtil.checkHeader(input, KEYSTORE_FILENAME, MIN_FORMAT_VERSION, FORMAT_VERSION);
             byte hasPasswordByte = input.readByte();
             boolean hasPassword = hasPasswordByte == 1;
-            if (hasPassword == false && hasPasswordByte != 0) {
+            if (!hasPassword && hasPasswordByte != 0) {
                 throw new IllegalStateException("hasPassword boolean is corrupt: "
                     + String.format(Locale.ROOT, "%02x", hasPasswordByte));
             }
@@ -281,11 +281,11 @@ public class KeyStoreWrapper implements SecureSettings {
             Set<String> expectedSettings = new HashSet<>(settingTypes.keySet());
             while (aliases.hasMoreElements()) {
                 String settingName = aliases.nextElement();
-                if (expectedSettings.remove(settingName) == false) {
+                if (!expectedSettings.remove(settingName)) {
                     throw new SecurityException("Keystore has been corrupted or tampered with");
                 }
             }
-            if (expectedSettings.isEmpty() == false) {
+            if (!expectedSettings.isEmpty()) {
                 throw new SecurityException("Keystore has been corrupted or tampered with");
             }
         }
@@ -350,7 +350,7 @@ public class KeyStoreWrapper implements SecureSettings {
         assert isLoaded();
         KeyStore.Entry entry = keystore.get().getEntry(setting, keystorePassword.get());
         if (settingTypes.get(setting) != KeyType.STRING ||
-            entry instanceof KeyStore.SecretKeyEntry == false) {
+            !(entry instanceof KeyStore.SecretKeyEntry)) {
             throw new IllegalStateException("Secret setting " + setting + " is not a string");
         }
         // TODO: only allow getting a setting once?
@@ -366,7 +366,7 @@ public class KeyStoreWrapper implements SecureSettings {
         assert isLoaded();
         KeyStore.Entry entry = keystore.get().getEntry(setting, keystorePassword.get());
         if (settingTypes.get(setting) != KeyType.FILE ||
-            entry instanceof KeyStore.SecretKeyEntry == false) {
+            !(entry instanceof KeyStore.SecretKeyEntry)) {
             throw new IllegalStateException("Secret setting " + setting + " is not a file");
         }
         KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) entry;
@@ -394,7 +394,7 @@ public class KeyStoreWrapper implements SecureSettings {
      * @throws IllegalArgumentException if the setting name is not valid
      */
     public static void validateSettingName(String setting) {
-        if (ALLOWED_SETTING_NAME.matcher(setting).matches() == false) {
+        if (!ALLOWED_SETTING_NAME.matcher(setting).matches()) {
             throw new IllegalArgumentException("Setting name [" + setting + "] does not match the allowed setting name pattern ["
                 + ALLOWED_SETTING_NAME.pattern() + "]");
         }
@@ -408,7 +408,7 @@ public class KeyStoreWrapper implements SecureSettings {
     void setString(String setting, char[] value) throws GeneralSecurityException {
         assert isLoaded();
         validateSettingName(setting);
-        if (ASCII_ENCODER.canEncode(CharBuffer.wrap(value)) == false) {
+        if (!ASCII_ENCODER.canEncode(CharBuffer.wrap(value))) {
             throw new IllegalArgumentException("Value must be ascii");
         }
         SecretKey secretKey = stringFactory.generateSecret(new PBEKeySpec(value));

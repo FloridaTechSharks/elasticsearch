@@ -99,7 +99,7 @@ public class SingleNodeDiscovery extends AbstractLifecycleComponent implements D
 
     @Override
     public synchronized void startInitialJoin() {
-        if (lifecycle.started() == false) {
+        if (!lifecycle.started()) {
             throw new IllegalStateException("can't start initial join when not started");
         }
         // apply a fresh cluster state just so that state recovery gets triggered by GatewayService

@@ -84,7 +84,7 @@ public class DeprecationLogger {
         Objects.requireNonNull(threadContext, "Cannot register a null ThreadContext");
 
         // add returning false means it _did_ have it already
-        if (THREAD_CONTEXT.add(threadContext) == false) {
+        if (!THREAD_CONTEXT.add(threadContext)) {
             throw new IllegalStateException("Double-setting ThreadContext not allowed!");
         }
     }

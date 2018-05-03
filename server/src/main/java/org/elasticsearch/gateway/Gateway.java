@@ -22,6 +22,7 @@ package org.elasticsearch.gateway;
 import com.carrotsearch.hppc.ObjectFloatHashMap;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import org.apache.logging.log4j.message.ParameterizedMessage;
+import org.apache.logging.log4j.util.Supplier;
 import org.elasticsearch.action.FailedNodeException;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
@@ -97,9 +98,9 @@ public class Gateway extends AbstractComponent {
 
         assert !indices.containsKey(null);
         final Object[] keys = indices.keys;
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i] != null) {
-                Index index = (Index) keys[i];
+        for (Object key : keys) {
+            if (key != null) {
+                Index index = (Index) key;
                 IndexMetaData electedIndexMetaData = null;
                 int indexMetaDataCount = 0;
                 for (TransportNodesListGatewayMetaState.NodeGatewayMetaState nodeState : nodesState.getNodes()) {
@@ -129,7 +130,7 @@ public class Gateway extends AbstractComponent {
                     } catch (Exception e) {
                         final Index electedIndex = electedIndexMetaData.getIndex();
                         logger.warn(
-                            (org.apache.logging.log4j.util.Supplier<?>)
+                            (Supplier<?>)
                                 () -> new ParameterizedMessage("recovering index {} failed - recovering as closed", electedIndex), e);
                         electedIndexMetaData = IndexMetaData.builder(electedIndexMetaData).state(IndexMetaData.State.CLOSE).build();
                     }

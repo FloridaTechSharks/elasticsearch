@@ -192,7 +192,7 @@ public class NodeJoinController extends AbstractComponent {
     private synchronized void checkPendingJoinsAndElectIfNeeded() {
         assert electionContext != null : "election check requested but no active context";
         final int pendingMasterJoins = electionContext.getPendingMasterJoinsCount();
-        if (electionContext.isEnoughPendingJoins(pendingMasterJoins) == false) {
+        if (!electionContext.isEnoughPendingJoins(pendingMasterJoins)) {
             if (logger.isTraceEnabled()) {
                 logger.trace("not enough joins for election. Got [{}], required [{}]", pendingMasterJoins,
                     electionContext.requiredMasterJoins);
@@ -424,7 +424,7 @@ public class NodeJoinController extends AbstractComponent {
                 // during the cluster state publishing guarantees that we have enough
                 newState = becomeMasterAndTrimConflictingNodes(currentState, joiningNodes);
                 nodesChanged = true;
-            } else if (currentNodes.isLocalNodeElectedMaster() == false) {
+            } else if (!currentNodes.isLocalNodeElectedMaster()) {
                 logger.trace("processing node joins, but we are not the master. current master: {}", currentNodes.getMasterNode());
                 throw new NotMasterException("Node [" + currentNodes.getLocalNode() + "] not master for join request");
             } else {
@@ -438,7 +438,7 @@ public class NodeJoinController extends AbstractComponent {
             Version minClusterNodeVersion = newState.nodes().getMinNodeVersion();
             Version maxClusterNodeVersion = newState.nodes().getMaxNodeVersion();
             // we only enforce major version transitions on a fully formed clusters
-            final boolean enforceMajorVersion = currentState.getBlocks().hasGlobalBlock(STATE_NOT_RECOVERED_BLOCK) == false;
+            final boolean enforceMajorVersion = !currentState.getBlocks().hasGlobalBlock(STATE_NOT_RECOVERED_BLOCK);
             // processing any joins
             for (final DiscoveryNode node : joiningNodes) {
                 if (node.equals(BECOME_MASTER_TASK) || node.equals(FINISH_ELECTION_TASK)) {
@@ -483,12 +483,12 @@ public class NodeJoinController extends AbstractComponent {
 
             for (final DiscoveryNode joiningNode : joiningNodes) {
                 final DiscoveryNode nodeWithSameId = nodesBuilder.get(joiningNode.getId());
-                if (nodeWithSameId != null && nodeWithSameId.equals(joiningNode) == false) {
+                if (nodeWithSameId != null && !nodeWithSameId.equals(joiningNode)) {
                     logger.debug("removing existing node [{}], which conflicts with incoming join from [{}]", nodeWithSameId, joiningNode);
                     nodesBuilder.remove(nodeWithSameId.getId());
                 }
                 final DiscoveryNode nodeWithSameAddress = currentNodes.findByAddress(joiningNode.getAddress());
-                if (nodeWithSameAddress != null && nodeWithSameAddress.equals(joiningNode) == false) {
+                if (nodeWithSameAddress != null && !nodeWithSameAddress.equals(joiningNode)) {
                     logger.debug("removing existing node [{}], which conflicts with incoming join from [{}]", nodeWithSameAddress,
                         joiningNode);
                     nodesBuilder.remove(nodeWithSameAddress.getId());

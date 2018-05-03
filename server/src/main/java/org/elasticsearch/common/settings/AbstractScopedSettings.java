@@ -64,7 +64,7 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
         Map<String, Setting<?>> complexMatchers = new HashMap<>();
         Map<String, Setting<?>> keySettings = new HashMap<>();
         for (Setting<?> setting : settingsSet) {
-            if (setting.getProperties().contains(scope) == false) {
+            if (!setting.getProperties().contains(scope)) {
                 throw new IllegalArgumentException("Setting must be a " + scope + " setting but has: " + setting.getProperties());
             }
             validateSettingKey(setting);
@@ -337,7 +337,7 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
             }
             String msg = msgPrefix + " [" + key + "]";
             List<String> keys = scoredKeys.stream().map((a) -> a.v2()).collect(Collectors.toList());
-            if (keys.isEmpty() == false) {
+            if (!keys.isEmpty()) {
                 msg += " did you mean " + (keys.size() == 1 ? "[" + keys.get(0) + "]": "any of " + keys.toString()) + "?";
             } else {
                 msg += " please check that any required plugins are installed, or check the breaking changes documentation for removed " +
@@ -349,10 +349,10 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
             if (setting.hasComplexMatcher()) {
                 setting = setting.getConcreteSetting(key);
             }
-            if (validateDependencies && settingsDependencies.isEmpty() == false) {
+            if (validateDependencies && !settingsDependencies.isEmpty()) {
                 Set<String> settingKeys = settings.keySet();
                 for (String requiredSetting : settingsDependencies) {
-                    if (settingKeys.contains(requiredSetting) == false) {
+                    if (!settingKeys.contains(requiredSetting)) {
                         throw new IllegalArgumentException("Missing required setting ["
                             + requiredSetting + "] for setting [" + setting.getKey() + "]");
                     }
@@ -492,7 +492,7 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
      * Returns the value for the given setting.
      */
     public <T> T get(Setting<T> setting) {
-        if (setting.getProperties().contains(scope) == false) {
+        if (!setting.getProperties().contains(scope)) {
             throw new IllegalArgumentException("settings scope doesn't match the setting scope [" + this.scope + "] not in [" +
                 setting.getProperties() + "]");
         }
@@ -561,10 +561,10 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
         final Set<String> toRemove = new HashSet<>();
         Settings.Builder settingsBuilder = Settings.builder();
         final Predicate<String> canUpdate = (key) -> (
-            isFinalSetting(key) == false && // it's not a final setting
+            !isFinalSetting(key) && // it's not a final setting
                 ((onlyDynamic == false && get(key) != null) || isDynamicSetting(key)));
         for (String key : toApply.keySet()) {
-            boolean isDelete = toApply.hasValue(key) == false;
+            boolean isDelete = !toApply.hasValue(key);
             if (isDelete && (isValidDelete(key, onlyDynamic) || key.endsWith("*"))) {
                 // this either accepts null values that suffice the canUpdate test OR wildcard expressions (key ends with *)
                 // we don't validate if there is any dynamic setting with that prefix yet we could do in the future
@@ -572,7 +572,7 @@ public abstract class AbstractScopedSettings extends AbstractComponent {
                 // we don't set changed here it's set after we apply deletes below if something actually changed
             } else if (get(key) == null) {
                 throw new IllegalArgumentException(type + " setting [" + key + "], not recognized");
-            } else if (isDelete == false && canUpdate.test(key)) {
+            } else if (!isDelete && canUpdate.test(key)) {
                 validate(key, toApply, false); // we might not have a full picture here do to a dependency validation
                 settingsBuilder.copy(key, toApply);
                 updates.copy(key, toApply);

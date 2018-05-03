@@ -259,15 +259,15 @@ public abstract class ShapeBuilder<T extends Shape, E extends ShapeBuilder<T,E>>
     protected static int intersections(double dateline, Edge[] edges) {
         int numIntersections = 0;
         assert !Double.isNaN(dateline);
-        for (int i = 0; i < edges.length; i++) {
-            Coordinate p1 = edges[i].coordinate;
-            Coordinate p2 = edges[i].next.coordinate;
+        for (Edge edge : edges) {
+            Coordinate p1 = edge.coordinate;
+            Coordinate p2 = edge.next.coordinate;
             assert !Double.isNaN(p2.x) && !Double.isNaN(p1.x);
-            edges[i].intersect = Edge.MAX_COORDINATE;
+            edge.intersect = Edge.MAX_COORDINATE;
 
             double position = intersection(p1, p2, dateline);
             if (!Double.isNaN(position)) {
-                edges[i].intersection(position);
+                edge.intersection(position);
                 numIntersections++;
             }
         }
@@ -375,7 +375,7 @@ public abstract class ShapeBuilder<T extends Shape, E extends ShapeBuilder<T,E>>
     private static String coordinateToWKT(final Coordinate coordinate) {
         final StringBuilder sb = new StringBuilder();
         sb.append(coordinate.x + GeoWKTParser.SPACE + coordinate.y);
-        if (Double.isNaN(coordinate.z) == false) {
+        if (!Double.isNaN(coordinate.z)) {
             sb.append(GeoWKTParser.SPACE + coordinate.z);
         }
         return sb.toString();

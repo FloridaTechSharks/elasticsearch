@@ -113,7 +113,7 @@ final class LiveVersionMap implements ReferenceManager.RefreshListener, Accounta
         }
 
         boolean shouldInheritSafeAccess() {
-            final boolean mapHasNotSeenAnyOperations = current.isEmpty() && current.isUnsafe() == false;
+            final boolean mapHasNotSeenAnyOperations = current.isEmpty() && !current.isUnsafe();
             return needsSafeAccess
                 // we haven't seen any ops and map before needed it so we maintain it
                 || (mapHasNotSeenAnyOperations && previousMapsNeededSafeAccess);
@@ -305,7 +305,7 @@ final class LiveVersionMap implements ReferenceManager.RefreshListener, Accounta
 
         // Add RAM for the new version:
         long newBytes = BASE_BYTES_PER_CHM_ENTRY;
-        if (version.isDelete() == false) {
+        if (!version.isDelete()) {
             newBytes += version.ramBytesUsed() + uidRAMBytesUsed;
         }
         ramBytesUsedCurrent.addAndGet(newBytes);

@@ -61,7 +61,7 @@ class AddFileKeyStoreCommand extends EnvironmentAwareCommand {
     protected void execute(Terminal terminal, OptionSet options, Environment env) throws Exception {
         KeyStoreWrapper keystore = KeyStoreWrapper.load(env.configFile());
         if (keystore == null) {
-            if (options.has(forceOption) == false &&
+            if (!options.has(forceOption) &&
                 terminal.promptYesNo("The elasticsearch keystore does not exist. Do you want to create it?", false) == false) {
                 terminal.println("Exiting without creating keystore.");
                 return;
