@@ -1043,7 +1043,7 @@ public final class SearchSourceBuilder implements Writeable, ToXContentObject, R
                             extSectionName = parser.currentName();
                         } else {
                             SearchExtBuilder searchExtBuilder = parser.namedObject(SearchExtBuilder.class, extSectionName, null);
-                            if (searchExtBuilder.getWriteableName().equals(extSectionName) == false) {
+                            if (!searchExtBuilder.getWriteableName().equals(extSectionName)) {
                                 throw new IllegalStateException("The parsed [" + searchExtBuilder.getClass().getName() + "] object has a "
                                         + "different writeable name compared to the name of the section that it was parsed from: found ["
                                         + searchExtBuilder.getWriteableName() + "] expected [" + extSectionName + "]");
@@ -1186,7 +1186,7 @@ public final class SearchSourceBuilder implements Writeable, ToXContentObject, R
             builder.field(TRACK_SCORES_FIELD.getPreferredName(), true);
         }
 
-        if (trackTotalHits == false) {
+        if (!trackTotalHits) {
             builder.field(TRACK_TOTAL_HITS_FIELD.getPreferredName(), false);
         }
 
@@ -1232,7 +1232,7 @@ public final class SearchSourceBuilder implements Writeable, ToXContentObject, R
             builder.field(STATS_FIELD.getPreferredName(), stats);
         }
 
-        if (extBuilders != null && extBuilders.isEmpty() == false) {
+        if (extBuilders != null && !extBuilders.isEmpty()) {
             builder.startObject(EXT_FIELD.getPreferredName());
             for (SearchExtBuilder extBuilder : extBuilders) {
                 extBuilder.toXContent(builder, params);

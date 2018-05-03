@@ -262,7 +262,7 @@ public class GeoContextMapping extends ContextMapping<GeoQueryContext> {
             locations.add(geoHash);
             if (queryContext.getNeighbours().isEmpty() && geoHash.length() == this.precision) {
                 addNeighbors(geoHash, locations);
-            } else if (queryContext.getNeighbours().isEmpty() == false) {
+            } else if (!queryContext.getNeighbours().isEmpty()) {
                 queryContext.getNeighbours().stream()
                     .filter(neighbourPrecision -> neighbourPrecision < geoHash.length())
                     .forEach(neighbourPrecision -> {

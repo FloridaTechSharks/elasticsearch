@@ -419,7 +419,7 @@ public class Version implements Comparable<Version> {
             return bwcVersion == null ? this : bwcVersion;
         }
 
-        return Version.min(this, fromId((int) major * 1000000 + 0 * 10000 + 99));
+        return Version.min(this, fromId((int) major * 1000000 + 99));
     }
 
     /**
@@ -437,7 +437,7 @@ public class Version implements Comparable<Version> {
             bwcMajor = major - 1;
         }
         final int bwcMinor = 0;
-        return Version.min(this, fromId(bwcMajor * 1000000 + bwcMinor * 10000 + 99));
+        return Version.min(this, fromId(bwcMajor * 1000000 + 99));
     }
 
     /**
@@ -447,7 +447,7 @@ public class Version implements Comparable<Version> {
         boolean compatible = onOrAfter(version.minimumCompatibilityVersion())
             && version.onOrAfter(minimumCompatibilityVersion());
 
-        assert compatible == false || Math.max(major, version.major) - Math.min(major, version.major) <= 1;
+        assert !compatible || Math.max(major, version.major) - Math.min(major, version.major) <= 1;
         return compatible;
     }
 
@@ -497,11 +497,7 @@ public class Version implements Comparable<Version> {
 
         Version version = (Version) o;
 
-        if (id != version.id) {
-            return false;
-        }
-
-        return true;
+        return id == version.id;
     }
 
     @Override
@@ -519,10 +515,10 @@ public class Version implements Comparable<Version> {
      * have an alpha version.
      */
     public boolean isAlpha() {
-        return major < 5 ? false :  build < 25;
+        return major >= 5 && build < 25;
     }
 
-    public boolean isRC() {
+    boolean isRC() {
         return build > 50 && build < 99;
     }
 
@@ -540,7 +536,7 @@ public class Version implements Comparable<Version> {
         final List<Version> versions = new ArrayList<>(fields.length);
         for (final Field field : fields) {
             final int mod = field.getModifiers();
-            if (false == Modifier.isStatic(mod) && Modifier.isFinal(mod) && Modifier.isPublic(mod)) {
+            if (!Modifier.isStatic(mod) && Modifier.isFinal(mod) && Modifier.isPublic(mod)) {
                 continue;
             }
             if (field.getType() != Version.class) {

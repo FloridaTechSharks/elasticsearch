@@ -226,8 +226,7 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
         runDeferredCollections(survivingBucketOrds);
 
         //Now build the aggs
-        for (int i = 0; i < list.length; i++) {
-            StringTerms.Bucket bucket = list[i];
+        for (StringTerms.Bucket bucket : list) {
             bucket.aggregations = bucket.docCount == 0 ? bucketEmptyAggregations() : bucketAggregations(bucket.bucketOrd);
             bucket.docCountError = 0;
         }

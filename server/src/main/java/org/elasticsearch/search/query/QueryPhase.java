@@ -184,7 +184,7 @@ public class QueryPhase implements SearchPhase {
                 // this collector can filter documents during the collection
                 hasFilterCollector = true;
             }
-            if (searchContext.queryCollectors().isEmpty() == false) {
+            if (!searchContext.queryCollectors().isEmpty()) {
                 // plug in additional collectors, like aggregations
                 collectors.add(createMultiCollectorContext(searchContext.queryCollectors().values()));
             }
@@ -202,7 +202,7 @@ public class QueryPhase implements SearchPhase {
             }
 
             boolean timeoutSet = scrollContext == null && searchContext.timeout() != null &&
-                searchContext.timeout().equals(SearchService.NO_TIMEOUT) == false;
+                !searchContext.timeout().equals(SearchService.NO_TIMEOUT);
 
             final Runnable timeoutRunnable;
             if (timeoutSet) {

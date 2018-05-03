@@ -113,7 +113,7 @@ public class CollapseBuilder implements Writeable, ToXContentObject {
         if (out.getVersion().onOrAfter(Version.V_5_5_0)) {
             out.writeList(innerHits);
         } else {
-            boolean hasInnerHit = innerHits.isEmpty() == false;
+            boolean hasInnerHit = !innerHits.isEmpty();
             out.writeBoolean(hasInnerHit);
             if (hasInnerHit) {
                 innerHits.get(0).writeToCollapseBWC(out);
@@ -187,7 +187,7 @@ public class CollapseBuilder implements Writeable, ToXContentObject {
         if (maxConcurrentGroupRequests > 0) {
             builder.field(MAX_CONCURRENT_GROUP_REQUESTS_FIELD.getPreferredName(), maxConcurrentGroupRequests);
         }
-        if (innerHits.isEmpty() == false) {
+        if (!innerHits.isEmpty()) {
             if (innerHits.size() == 1) {
                 builder.field(INNER_HITS_FIELD.getPreferredName(), innerHits.get(0));
             } else {
@@ -226,7 +226,7 @@ public class CollapseBuilder implements Writeable, ToXContentObject {
         if (context.searchAfter() != null) {
             throw new SearchContextException(context, "cannot use `collapse` in conjunction with `search_after`");
         }
-        if (context.rescore() != null && context.rescore().isEmpty() == false) {
+        if (context.rescore() != null && !context.rescore().isEmpty()) {
             throw new SearchContextException(context, "cannot use `collapse` in conjunction with `rescore`");
         }
 
@@ -234,13 +234,13 @@ public class CollapseBuilder implements Writeable, ToXContentObject {
         if (fieldType == null) {
             throw new SearchContextException(context, "no mapping found for `" + field + "` in order to collapse on");
         }
-        if (fieldType instanceof KeywordFieldMapper.KeywordFieldType == false &&
-            fieldType instanceof NumberFieldMapper.NumberFieldType == false) {
+        if (!(fieldType instanceof KeywordFieldMapper.KeywordFieldType) &&
+            !(fieldType instanceof NumberFieldMapper.NumberFieldType)) {
             throw new SearchContextException(context, "unknown type for collapse field `" + field +
                 "`, only keywords and numbers are accepted");
         }
 
-        if (fieldType.hasDocValues() == false) {
+        if (!fieldType.hasDocValues()) {
             throw new SearchContextException(context, "cannot collapse on field `" + field + "` without `doc_values`");
         }
         if (fieldType.indexOptions() == IndexOptions.NONE && (innerHits != null && !innerHits.isEmpty())) {

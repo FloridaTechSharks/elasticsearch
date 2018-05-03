@@ -34,14 +34,14 @@ public final class FetchSourceSubPhase implements FetchSubPhase {
 
     @Override
     public void hitExecute(SearchContext context, HitContext hitContext) {
-        if (context.sourceRequested() == false) {
+        if (!context.sourceRequested()) {
             return;
         }
         final boolean nestedHit = hitContext.hit().getNestedIdentity() != null;
         SourceLookup source = context.lookup().source();
         FetchSourceContext fetchSourceContext = context.fetchSourceContext();
         assert fetchSourceContext.fetchSource();
-        if (nestedHit == false) {
+        if (!nestedHit) {
             if (fetchSourceContext.includes().length == 0 && fetchSourceContext.excludes().length == 0) {
                 hitContext.hit().sourceRef(source.internalSourceRef());
                 return;

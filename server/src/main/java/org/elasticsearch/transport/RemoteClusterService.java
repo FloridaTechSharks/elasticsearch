@@ -158,7 +158,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
                         if (countDown.fastForward()) {
                             connectionListener.onFailure(exception);
                         }
-                        if (finalRemote.isClosed() == false) {
+                        if (!finalRemote.isClosed()) {
                             logger.warn("failed to update seed list for cluster: " + entry.getKey(), exception);
                         }
                     }));
@@ -171,7 +171,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
      * Returns <code>true</code> if at least one remote cluster is configured
      */
     public boolean isCrossClusterSearchEnabled() {
-        return remoteClusters.isEmpty() == false;
+        return !remoteClusters.isEmpty();
     }
 
     boolean isRemoteNodeConnected(final String remoteCluster, final DiscoveryNode node) {
@@ -188,7 +188,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
                 originalIndicesMap.put(clusterAlias,
                     new OriginalIndices(originalIndices.toArray(new String[originalIndices.size()]), indicesOptions));
             }
-            if (originalIndicesMap.containsKey(LOCAL_CLUSTER_GROUP_KEY) == false) {
+            if (!originalIndicesMap.containsKey(LOCAL_CLUSTER_GROUP_KEY)) {
                 originalIndicesMap.put(LOCAL_CLUSTER_GROUP_KEY, new OriginalIndices(Strings.EMPTY_ARRAY, indicesOptions));
             }
         } else {
@@ -239,7 +239,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
                     public void onFailure(Exception e) {
                         TransportException exception = new TransportException("unable to communicate with remote cluster [" +
                                 clusterName + "]", e);
-                        if (transportException.compareAndSet(null, exception) == false) {
+                        if (!transportException.compareAndSet(null, exception)) {
                             exception = transportException.accumulateAndGet(exception, (previous, current) -> {
                                 current.addSuppressed(previous);
                                 return current;
@@ -366,7 +366,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
     public void collectNodes(Set<String> clusters, ActionListener<BiFunction<String, String, DiscoveryNode>> listener) {
         Map<String, RemoteClusterConnection> remoteClusters = this.remoteClusters;
         for (String cluster : clusters) {
-            if (remoteClusters.containsKey(cluster) == false) {
+            if (!remoteClusters.containsKey(cluster)) {
                 listener.onFailure(new IllegalArgumentException("no such remote cluster: [" + cluster + "]"));
                 return;
             }

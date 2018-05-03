@@ -116,10 +116,7 @@ public class JLHScore extends SignificanceHeuristic {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != getClass()) {
-            return false;
-        }
-        return true;
+        return obj != null && obj.getClass() == getClass();
     }
 
     @Override

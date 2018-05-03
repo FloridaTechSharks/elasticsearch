@@ -468,9 +468,7 @@ public class AggregatorFactories {
             Builder other = (Builder) obj;
             if (!Objects.equals(aggregationBuilders, other.aggregationBuilders))
                 return false;
-            if (!Objects.equals(pipelineAggregatorBuilders, other.pipelineAggregatorBuilders))
-                return false;
-            return true;
+            return Objects.equals(pipelineAggregatorBuilders, other.pipelineAggregatorBuilders);
         }
 
         /**

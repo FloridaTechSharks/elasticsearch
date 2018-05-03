@@ -90,7 +90,7 @@ public abstract class ValuesSourceAggregationBuilder<VS extends ValuesSource, AB
     protected ValuesSourceAggregationBuilder(StreamInput in, ValuesSourceType valuesSourceType, ValueType targetValueType)
             throws IOException {
         super(in);
-        assert false == serializeTargetValueType() : "Wrong read constructor called for subclass that provides its targetValueType";
+        assert !serializeTargetValueType() : "Wrong read constructor called for subclass that provides its targetValueType";
         this.valuesSourceType = valuesSourceType;
         this.targetValueType = targetValueType;
         read(in);

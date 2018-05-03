@@ -170,7 +170,7 @@ public interface TcpChannel extends Releasable {
             }
         }
 
-        if (allConnected == false) {
+        if (!allConnected) {
             if (connectionException == null) {
                 throw new ConnectTransportException(discoveryNode, "connect_timeout[" + connectTimeout + "]");
             } else {

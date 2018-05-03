@@ -391,7 +391,7 @@ public abstract class ValuesSource {
 
             @Override
             public boolean isFloatingPoint() {
-                return scriptValueType != null ? scriptValueType.isFloatingPoint() : true;
+                return scriptValueType == null || scriptValueType.isFloatingPoint();
             }
 
             @Override

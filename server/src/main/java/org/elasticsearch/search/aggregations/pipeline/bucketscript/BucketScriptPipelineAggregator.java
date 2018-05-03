@@ -116,7 +116,7 @@ public class BucketScriptPipelineAggregator extends PipelineAggregator {
                 if (returned == null) {
                     newBuckets.add(bucket);
                 } else {
-                    if ((returned instanceof Number) == false) {
+                    if (!(returned instanceof Number)) {
                         throw new AggregationExecutionException("series_arithmetic script for reducer [" + name()
                                 + "] must return a Number");
                     }

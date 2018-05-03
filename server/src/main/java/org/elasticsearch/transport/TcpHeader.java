@@ -25,7 +25,7 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 import java.io.IOException;
 
 public class TcpHeader {
-    public static final int MARKER_BYTES_SIZE = 2 * 1;
+    public static final int MARKER_BYTES_SIZE = 2;
 
     public static final int MESSAGE_LENGTH_SIZE = 4;
 

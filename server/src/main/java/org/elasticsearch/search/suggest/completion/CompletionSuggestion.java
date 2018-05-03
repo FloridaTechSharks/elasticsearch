@@ -106,7 +106,7 @@ public final class CompletionSuggestion extends Suggest.Suggestion<CompletionSug
      * @return the result options for the suggestion
      */
     public List<Entry.Option> getOptions() {
-        if (entries.isEmpty() == false) {
+        if (!entries.isEmpty()) {
             assert entries.size() == 1 : "CompletionSuggestion must have only one entry";
             return entries.get(0).getOptions();
         } else {
@@ -209,7 +209,7 @@ public final class CompletionSuggestion extends Suggest.Suggestion<CompletionSug
     }
 
     public void setShardIndex(int shardIndex) {
-        if (entries.isEmpty() == false) {
+        if (!entries.isEmpty()) {
             for (Entry.Option option : getOptions()) {
                 option.setShardIndex(shardIndex);
             }

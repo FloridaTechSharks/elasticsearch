@@ -66,7 +66,7 @@ public class CompletionSuggester extends Suggester<CompletionSuggestionContext> 
                 TopDocumentsCollector.SuggestDoc suggestDoc = (TopDocumentsCollector.SuggestDoc) suggestScoreDoc;
                 // collect contexts
                 Map<String, Set<CharSequence>> contexts = Collections.emptyMap();
-                if (fieldType.hasContextMappings() && suggestDoc.getContexts().isEmpty() == false) {
+                if (fieldType.hasContextMappings() && !suggestDoc.getContexts().isEmpty()) {
                     contexts = fieldType.getContextMappings().getNamedContexts(suggestDoc.getContexts());
                 }
                 if (numResult++ < suggestionContext.getSize()) {

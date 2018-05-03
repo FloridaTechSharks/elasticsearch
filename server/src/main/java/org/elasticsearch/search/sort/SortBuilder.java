@@ -164,11 +164,7 @@ public abstract class SortBuilder<T extends SortBuilder<T>> implements NamedWrit
                 sort = true;
             } else {
                 SortField sortField = sortFields.get(0);
-                if (sortField.getType() == SortField.Type.SCORE && !sortField.getReverse()) {
-                    sort = false;
-                } else {
-                    sort = true;
-                }
+                sort = sortField.getType() != SortField.Type.SCORE || sortField.getReverse();
             }
             if (sort) {
                 return Optional.of(new SortAndFormats(

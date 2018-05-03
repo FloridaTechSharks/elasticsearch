@@ -338,7 +338,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
 
             loadOrExecuteQueryPhase(request, context);
 
-            if (context.queryResult().hasSearchContext() == false && context.scrollContext() == null) {
+            if (!context.queryResult().hasSearchContext() && context.scrollContext() == null) {
                 freeContext(context.id());
             } else {
                 contextProcessedSuccessfully(context);
@@ -423,7 +423,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
             operationListener.onPreQueryPhase(context);
             long time = System.nanoTime();
             queryPhase.execute(context);
-            if (context.queryResult().hasSearchContext() == false && context.scrollContext() == null) {
+            if (!context.queryResult().hasSearchContext() && context.scrollContext() == null) {
                 // no hits, we can release the context since there will be no fetch phase
                 freeContext(context.id());
             } else {
@@ -611,7 +611,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
             assert searchContext.getQueryShardContext().isCachable();
             success = true;
         } finally {
-            if (success == false) {
+            if (!success) {
                 IOUtils.closeWhileHandlingException(searchContext);
             }
         }
@@ -730,7 +730,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
             }
         }
         context.trackScores(source.trackScores());
-        if (source.trackTotalHits() == false && context.scrollContext() != null) {
+        if (!source.trackTotalHits() && context.scrollContext() != null) {
             throw new SearchContextException(context, "disabling [track_total_hits] is not allowed in a scroll context");
         }
         context.trackTotalHits(source.trackTotalHits());

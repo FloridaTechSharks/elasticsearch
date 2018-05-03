@@ -198,7 +198,7 @@ public class InternalOrder extends BucketOrder {
                 }
                 lastElement = order;
             }
-            if (absoluteOrdering && isKeyOrder(lastElement) == false) {
+            if (absoluteOrdering && !isKeyOrder(lastElement)) {
                 // add key order ascending as a tie-breaker to avoid non-deterministic ordering
                 // if all user provided comparators return 0.
                 this.orderElements.add(KEY_ASC);
@@ -432,7 +432,7 @@ public class InternalOrder extends BucketOrder {
             if (in.getVersion().onOrAfter(Version.V_6_0_0_alpha2)) {
                 return Streams.readOrder(in);
             } else { // backwards compat logic
-                if (bwcOrderFlag == false || in.readBoolean()) {
+                if (!bwcOrderFlag || in.readBoolean()) {
                     // translate the old histogram order IDs to the new order objects
                     byte id = in.readByte();
                     switch (id) {

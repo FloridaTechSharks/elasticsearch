@@ -307,7 +307,7 @@ public final class InternalHistogram extends InternalMultiBucketAggregation<Inte
         };
         for (InternalAggregation aggregation : aggregations) {
             InternalHistogram histogram = (InternalHistogram) aggregation;
-            if (histogram.buckets.isEmpty() == false) {
+            if (!histogram.buckets.isEmpty()) {
                 pq.add(new IteratorAndCurrent(histogram.buckets.iterator()));
             }
         }
@@ -325,7 +325,7 @@ public final class InternalHistogram extends InternalMultiBucketAggregation<Inte
                     // The key changes, reduce what we already buffered and reset the buffer for current buckets.
                     // Using Double.compare instead of != to handle NaN correctly.
                     final Bucket reduced = currentBuckets.get(0).reduce(currentBuckets, reduceContext);
-                    if (reduced.getDocCount() >= minDocCount || reduceContext.isFinalReduce() == false) {
+                    if (reduced.getDocCount() >= minDocCount || !reduceContext.isFinalReduce()) {
                         reduceContext.consumeBucketsAndMaybeBreak(1);
                         reducedBuckets.add(reduced);
                     } else {
@@ -347,9 +347,9 @@ public final class InternalHistogram extends InternalMultiBucketAggregation<Inte
                 }
             } while (pq.size() > 0);
 
-            if (currentBuckets.isEmpty() == false) {
+            if (!currentBuckets.isEmpty()) {
                 final Bucket reduced = currentBuckets.get(0).reduce(currentBuckets, reduceContext);
-                if (reduced.getDocCount() >= minDocCount || reduceContext.isFinalReduce() == false) {
+                if (reduced.getDocCount() >= minDocCount || !reduceContext.isFinalReduce()) {
                     reduceContext.consumeBucketsAndMaybeBreak(1);
                     reducedBuckets.add(reduced);
                 } else {
@@ -377,7 +377,7 @@ public final class InternalHistogram extends InternalMultiBucketAggregation<Inte
                 Collections.singletonList(emptyBucketInfo.subAggregations),
                 reduceContext);
 
-        if (iter.hasNext() == false) {
+        if (!iter.hasNext()) {
             // fill with empty buckets
             for (double key = round(emptyBucketInfo.minBound); key <= emptyBucketInfo.maxBound; key = nextKey(key)) {
                 reduceContext.consumeBucketsAndMaybeBreak(1);
@@ -427,7 +427,7 @@ public final class InternalHistogram extends InternalMultiBucketAggregation<Inte
             addEmptyBuckets(reducedBuckets, reduceContext);
         }
 
-        if (InternalOrder.isKeyAsc(order) || reduceContext.isFinalReduce() == false) {
+        if (InternalOrder.isKeyAsc(order) || !reduceContext.isFinalReduce()) {
             // nothing to do, data are already sorted since shards return
             // sorted buckets and the merge-sort performed by reduceBuckets
             // maintains order

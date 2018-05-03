@@ -99,12 +99,7 @@ public class SignificantTermsAggregationBuilder extends ValuesSourceAggregationB
                     },
                     new ParseField(name));
         }
-        return new Aggregator.Parser() {
-            @Override
-            public AggregationBuilder parse(String aggregationName, XContentParser parser) throws IOException {
-                return aggregationParser.parse(parser, new SignificantTermsAggregationBuilder(aggregationName, null), null);
-            }
-        };
+        return (aggregationName, parser) -> aggregationParser.parse(parser, new SignificantTermsAggregationBuilder(aggregationName, null), null);
     }
 
     private IncludeExclude includeExclude = null;

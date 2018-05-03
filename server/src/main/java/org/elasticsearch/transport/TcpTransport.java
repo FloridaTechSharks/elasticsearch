@@ -462,7 +462,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                         });
                     }
 
-                    boolean block = lifecycle.stopped() && Transports.isTransportThread(Thread.currentThread()) == false;
+                    boolean block = lifecycle.stopped() && !Transports.isTransportThread(Thread.currentThread());
                     TcpChannel.closeChannels(channels, block);
                 } finally {
                     transportService.onConnectionClosed(this);
@@ -544,7 +544,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 } catch (Exception e) {
                     throw new ConnectTransportException(node, "general node connection failure", e);
                 } finally {
-                    if (success == false) { // close the connection if there is a failure
+                    if (!success) { // close the connection if there is a failure
                         logger.trace(
                             (Supplier<?>) () -> new ParameterizedMessage(
                                 "failed to connect to [{}], cleaning dangling connections", node));
@@ -641,7 +641,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 final NodeChannels finalNodeChannels = nodeChannels;
                 final AtomicBoolean runOnce = new AtomicBoolean(false);
                 Consumer<TcpChannel> onClose = c -> {
-                    assert c.isOpen() == false : "channel is still open when onClose is called";
+                    assert !c.isOpen() : "channel is still open when onClose is called";
                     // we only need to disconnect from the nodes once since all other channels
                     // will also try to run this we protect it from running multiple times.
                     if (runOnce.compareAndSet(false, true)) {
@@ -651,7 +651,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
 
                 nodeChannels.channels.forEach(ch -> ch.addCloseListener(ActionListener.wrap(() -> onClose.accept(ch))));
 
-                if (nodeChannels.allChannelsOpen() == false) {
+                if (!nodeChannels.allChannelsOpen()) {
                     throw new ConnectTransportException(node, "a channel closed while connecting");
                 }
                 success = true;
@@ -663,7 +663,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 // only relevant exceptions are logged on the caller end.. this is the same as in connectToNode
                 throw new ConnectTransportException(node, "general node connection failure", e);
             } finally {
-                if (success == false) {
+                if (!success) {
                     IOUtils.closeWhileHandlingException(nodeChannels);
                 }
             }
@@ -815,7 +815,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
         }
 
         List<String> publishHosts = profileSettings.publishHosts;
-        if (profileSettings.isDefaultProfile == false && publishHosts.isEmpty()) {
+        if (!profileSettings.isDefaultProfile && publishHosts.isEmpty()) {
             publishHosts = Arrays.asList(boundAddressesHostStrings);
         }
         if (publishHosts.isEmpty()) {
@@ -1485,7 +1485,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
         // handshake. This looks odd but it's required to establish the connection correctly we check for real compatibility
         // once the connection is established
         final Version compatibilityVersion = isHandshake ? currentVersion.minimumCompatibilityVersion() : currentVersion;
-        if (version.isCompatible(compatibilityVersion) == false) {
+        if (!version.isCompatible(compatibilityVersion)) {
             final Version minCompatibilityVersion = isHandshake ? compatibilityVersion : compatibilityVersion.minimumCompatibilityVersion();
             String msg = "Received " + (isHandshake ? "handshake " : "") + "message from unsupported version: [";
             throw new IllegalStateException(msg + version + "] minimal compatible version is: [" + minCompatibilityVersion + "]");
@@ -1671,7 +1671,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
         pendingHandshakes.put(requestId, handler);
         boolean success = false;
         try {
-            if (channel.isOpen() == false) {
+            if (!channel.isOpen()) {
                 // we have to protect us here since sendRequestToChannel won't barf if the channel is closed.
                 // it's weird but to change it will cause a lot of impact on the exception handling code all over the codebase.
                 // yet, if we don't check the state here we might have registered a pending handshake handler but the close
@@ -1684,7 +1684,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
             final Version minCompatVersion = getCurrentVersion().minimumCompatibilityVersion();
             sendRequestToChannel(node, channel, requestId, HANDSHAKE_ACTION_NAME, TransportRequest.Empty.INSTANCE,
                 TransportRequestOptions.EMPTY, minCompatVersion, TransportStatus.setHandshake((byte) 0));
-            if (handler.latch.await(timeout.millis(), TimeUnit.MILLISECONDS) == false) {
+            if (!handler.latch.await(timeout.millis(), TimeUnit.MILLISECONDS)) {
                 throw new ConnectTransportException(node, "handshake_timeout[" + timeout + "]");
             }
             success = true;
@@ -1692,7 +1692,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 throw new IllegalStateException("handshake failed", exceptionRef.get());
             } else {
                 Version version = versionRef.get();
-                if (getCurrentVersion().isCompatible(version) == false) {
+                if (!getCurrentVersion().isCompatible(version)) {
                     throw new IllegalStateException("Received message from unsupported version: [" + version
                         + "] minimal compatible version is: [" + getCurrentVersion().minimumCompatibilityVersion() + "]");
                 }
@@ -1702,7 +1702,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
             final TransportResponseHandler<?> removedHandler = pendingHandshakes.remove(requestId);
             // in the case of a timeout or an exception on the send part the handshake has not been removed yet.
             // but the timeout is tricky since it's basically a race condition so we only assert on the success case.
-            assert success && removedHandler == null || success == false : "handler for requestId [" + requestId + "] is not been removed";
+            assert success && removedHandler == null || !success : "handler for requestId [" + requestId + "] is not been removed";
         }
     }
 
@@ -1819,7 +1819,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 isDefaultSet = true;
             }
         }
-        if (isDefaultSet == false) {
+        if (!isDefaultSet) {
             profiles.add(new ProfileSettings(settings, DEFAULT_PROFILE));
         }
         return Collections.unmodifiableSet(profiles);
@@ -1854,7 +1854,7 @@ public abstract class TcpTransport extends AbstractLifecycleComponent implements
                 : profileBindHosts);
             publishHosts = PUBLISH_HOST_PROFILE.getConcreteSettingForNamespace(profileName).get(settings);
             Setting<String> concretePort = PORT_PROFILE.getConcreteSettingForNamespace(profileName);
-            if (concretePort.exists(settings) == false && isDefaultProfile == false) {
+            if (!concretePort.exists(settings) && !isDefaultProfile) {
                 throw new IllegalStateException("profile [" + profileName + "] has no port configured");
             }
             portOrRange = PORT_PROFILE.getConcreteSettingForNamespace(profileName).get(settings);

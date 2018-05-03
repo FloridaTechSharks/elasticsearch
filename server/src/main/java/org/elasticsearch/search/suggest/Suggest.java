@@ -540,9 +540,7 @@ public class Suggest implements Iterable<Suggest.Suggestion<? extends Entry<? ex
 
                 if (length != entry.length) return false;
                 if (offset != entry.offset) return false;
-                if (!this.text.equals(entry.text)) return false;
-
-                return true;
+                return this.text.equals(entry.text);
             }
 
             @Override

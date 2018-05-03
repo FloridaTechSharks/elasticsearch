@@ -87,7 +87,7 @@ public abstract class ParsedPercentiles extends ParsedAggregation implements Ite
 
     @Override
     protected XContentBuilder doXContentBody(XContentBuilder builder, Params params) throws IOException {
-        final boolean valuesAsString = (percentilesAsString.isEmpty() == false);
+        final boolean valuesAsString = (!percentilesAsString.isEmpty());
         if (keyed) {
             builder.startObject(CommonFields.VALUES.getPreferredName());
             for (Map.Entry<Double, Double> percentile : percentiles.entrySet()) {

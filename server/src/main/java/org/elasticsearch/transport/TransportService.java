@@ -331,7 +331,7 @@ public class TransportService extends AbstractLifecycleComponent {
         transport.connectToNode(node, connectionProfile, (newConnection, actualProfile) -> {
             // We don't validate cluster names to allow for tribe node connections.
             final DiscoveryNode remote = handshake(newConnection, actualProfile.getHandshakeTimeout().millis(), cn -> true);
-            if (node.equals(remote) == false) {
+            if (!node.equals(remote)) {
                 throw new ConnectTransportException(node, "handshake failed. unexpected remote node " + remote);
             }
         });
@@ -404,7 +404,7 @@ public class TransportService extends AbstractLifecycleComponent {
 
         if (!clusterNamePredicate.test(response.clusterName)) {
             throw new IllegalStateException("handshake failed, mismatched cluster name [" + response.clusterName + "] - " + node);
-        } else if (response.version.isCompatible(localNode.getVersion()) == false) {
+        } else if (!response.version.isCompatible(localNode.getVersion())) {
             throw new IllegalStateException("handshake failed, incompatible version [" + response.version + "] - " + node);
         }
 
@@ -689,7 +689,7 @@ public class TransportService extends AbstractLifecycleComponent {
 
     private boolean shouldTraceAction(String action) {
         if (tracerLogInclude.length > 0) {
-            if (Regex.simpleMatch(tracerLogInclude, action) == false) {
+            if (!Regex.simpleMatch(tracerLogInclude, action)) {
                 return false;
             }
         }
@@ -875,7 +875,7 @@ public class TransportService extends AbstractLifecycleComponent {
             sourceNode = null;
         }
         // call tracer out of lock
-        if (traceEnabled() == false) {
+        if (!traceEnabled()) {
             return;
         }
         if (action == null) {

@@ -44,7 +44,7 @@ import java.util.Set;
 public final class ParentFieldSubFetchPhase implements FetchSubPhase {
     @Override
     public void hitsExecute(SearchContext context, SearchHit[] hits) throws IOException {
-        if (context.storedFieldsContext() != null && context.storedFieldsContext().fetchFields() == false) {
+        if (context.storedFieldsContext() != null && !context.storedFieldsContext().fetchFields()) {
             return ;
         }
 
@@ -64,7 +64,7 @@ public final class ParentFieldSubFetchPhase implements FetchSubPhase {
         Map<String, SortedDocValues> docValuesMap = new HashMap<>();
         for (SearchHit hit : hits) {
             ParentFieldMapper parentFieldMapper = mapperService.documentMapper(hit.getType()).parentFieldMapper();
-            if (parentFieldMapper.active() == false) {
+            if (!parentFieldMapper.active()) {
                 continue;
             }
             int readerId = ReaderUtil.subIndex(hit.docId(), context.searcher().getIndexReader().leaves());
@@ -98,7 +98,7 @@ public final class ParentFieldSubFetchPhase implements FetchSubPhase {
     public static String getParentId(ParentFieldMapper fieldMapper, LeafReader reader, int docId) {
         try {
             SortedDocValues docValues = reader.getSortedDocValues(fieldMapper.name());
-            if (docValues == null || docValues.advanceExact(docId) == false) {
+            if (docValues == null || !docValues.advanceExact(docId)) {
                 // hit has no _parent field.
                 return null;
             }

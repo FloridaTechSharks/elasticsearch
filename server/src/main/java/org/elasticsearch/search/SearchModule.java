@@ -417,7 +417,7 @@ public class SearchModule {
     }
 
     private void registerAggregation(AggregationSpec spec) {
-        if (false == transportClient) {
+        if (!transportClient) {
             namedXContents.add(new NamedXContentRegistry.Entry(BaseAggregationBuilder.class, spec.getName(), (p, c) -> {
                 AggregatorFactories.AggParseContext context = (AggregatorFactories.AggParseContext) c;
                 return spec.getParser().parse(context.name, p);

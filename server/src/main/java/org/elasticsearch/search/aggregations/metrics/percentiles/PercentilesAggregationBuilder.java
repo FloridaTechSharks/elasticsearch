@@ -332,7 +332,7 @@ public class PercentilesAggregationBuilder extends LeafOnly<ValuesSource.Numeric
 
         @Override
         public InternalBuilder method(PercentilesMethod method) {
-            if (setOnce == false) {
+            if (!setOnce) {
                 super.method(method);
                 setOnce = true;
                 return this;

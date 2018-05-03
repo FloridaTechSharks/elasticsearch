@@ -94,7 +94,7 @@ final class CompressibleBytesOutputStream extends StreamOutput {
     @Override
     public void close() throws IOException {
         if (stream == bytesStreamOutput) {
-            assert shouldCompress == false : "If the streams are the same we should not be compressing";
+            assert !shouldCompress : "If the streams are the same we should not be compressing";
             IOUtils.close(stream);
         } else {
             assert shouldCompress : "If the streams are different we should be compressing";

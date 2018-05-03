@@ -301,7 +301,7 @@ abstract class TopDocsCollectorContext extends QueryCollectorContext {
         }
         if (query.getClass() == MatchAllDocsQuery.class) {
             return reader.numDocs();
-        } else if (query.getClass() == TermQuery.class && reader.hasDeletions() == false) {
+        } else if (query.getClass() == TermQuery.class && !reader.hasDeletions()) {
             final Term term = ((TermQuery) query).getTerm();
             int count = 0;
             for (LeafReaderContext context : reader.leaves()) {
@@ -333,13 +333,13 @@ abstract class TopDocsCollectorContext extends QueryCollectorContext {
                 searchContext.sort(), numDocs, searchContext.trackScores(), searchContext.numberOfShards(),
                 searchContext.trackTotalHits(), hasFilterCollector);
         } else if (searchContext.collapse() != null) {
-            boolean trackScores = searchContext.sort() == null ? true : searchContext.trackScores();
+            boolean trackScores = searchContext.sort() == null || searchContext.trackScores();
             int numDocs = Math.min(searchContext.from() + searchContext.size(), totalNumDocs);
             return new CollapsingTopDocsCollectorContext(searchContext.collapse(),
                 searchContext.sort(), numDocs, trackScores);
         } else {
             int numDocs = Math.min(searchContext.from() + searchContext.size(), totalNumDocs);
-            final boolean rescore = searchContext.rescore().isEmpty() == false;
+            final boolean rescore = !searchContext.rescore().isEmpty();
             if (rescore) {
                 assert searchContext.sort() == null;
                 for (RescoreContext rescoreContext : searchContext.rescore()) {

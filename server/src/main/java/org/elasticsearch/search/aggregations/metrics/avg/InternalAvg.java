@@ -97,7 +97,7 @@ public class InternalAvg extends InternalNumericMetricsAggregation.SingleValue i
         for (InternalAggregation aggregation : aggregations) {
             InternalAvg avg = (InternalAvg) aggregation;
             count += avg.count;
-            if (Double.isFinite(avg.sum) == false) {
+            if (!Double.isFinite(avg.sum)) {
                 sum += avg.sum;
             } else if (Double.isFinite(sum)) {
                 double corrected = avg.sum - compensation;

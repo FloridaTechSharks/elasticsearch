@@ -134,7 +134,7 @@ public class TaskManager extends AbstractComponent implements ClusterStateApplie
         CancellableTaskHolder oldHolder = cancellableTasks.put(task.getId(), holder);
         assert oldHolder == null;
         // Check if this task was banned before we start it
-        if (task.getParentTaskId().isSet() && banedParents.isEmpty() == false) {
+        if (task.getParentTaskId().isSet() && !banedParents.isEmpty()) {
             String reason = banedParents.get(task.getParentTaskId());
             if (reason != null) {
                 try {
@@ -352,7 +352,7 @@ public class TaskManager extends AbstractComponent implements ClusterStateApplie
                 Iterator<TaskId> banIterator = banedParents.keySet().iterator();
                 while (banIterator.hasNext()) {
                     TaskId taskId = banIterator.next();
-                    if (lastDiscoveryNodes.nodeExists(taskId.getNodeId()) == false) {
+                    if (!lastDiscoveryNodes.nodeExists(taskId.getNodeId())) {
                         logger.debug("Removing ban for the parent [{}] on the node [{}], reason: the parent node is gone", taskId,
                             event.state().getNodes().getLocalNode());
                         banIterator.remove();
@@ -364,7 +364,7 @@ public class TaskManager extends AbstractComponent implements ClusterStateApplie
                 CancellableTaskHolder holder = taskEntry.getValue();
                 CancellableTask task = holder.getTask();
                 TaskId parentTaskId = task.getParentTaskId();
-                if (parentTaskId.isSet() && lastDiscoveryNodes.nodeExists(parentTaskId.getNodeId()) == false) {
+                if (parentTaskId.isSet() && !lastDiscoveryNodes.nodeExists(parentTaskId.getNodeId())) {
                     if (task.cancelOnParentLeaving()) {
                         holder.cancel("Coordinating node [" + parentTaskId.getNodeId() + "] left the cluster");
                     }

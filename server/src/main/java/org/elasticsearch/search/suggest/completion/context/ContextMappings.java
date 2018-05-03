@@ -156,7 +156,7 @@ public class ContextMappings implements ToXContent {
      */
     public ContextQuery toContextQuery(CompletionQuery query, Map<String, List<ContextMapping.InternalQueryContext>> queryContexts) {
         ContextQuery typedContextQuery = new ContextQuery(query);
-        if (queryContexts.isEmpty() == false) {
+        if (!queryContexts.isEmpty()) {
             CharsRefBuilder scratch = new CharsRefBuilder();
             scratch.grow(1);
             for (int typeId = 0; typeId < contextMappings.size(); typeId++) {
@@ -275,7 +275,7 @@ public class ContextMappings implements ToXContent {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || (obj instanceof ContextMappings) == false) {
+        if (obj == null || !(obj instanceof ContextMappings)) {
             return false;
         }
         ContextMappings other = ((ContextMappings) obj);

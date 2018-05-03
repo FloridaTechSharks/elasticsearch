@@ -66,7 +66,7 @@ public class RequestHandlerRegistry<Request extends TransportRequest> {
                 handler.messageReceived(request, new TaskTransportChannel(taskManager, task, channel), task);
                 success = true;
             } finally {
-                if (success == false) {
+                if (!success) {
                     taskManager.unregister(task);
                 }
             }

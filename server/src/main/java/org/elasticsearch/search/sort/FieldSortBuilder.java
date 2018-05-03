@@ -339,7 +339,7 @@ public class FieldSortBuilder extends SortBuilder<FieldSortBuilder> {
             }
 
             IndexFieldData<?> fieldData = context.getForField(fieldType);
-            if (fieldData instanceof IndexNumericFieldData == false
+            if (!(fieldData instanceof IndexNumericFieldData)
                     && (sortMode == SortMode.SUM || sortMode == SortMode.AVG || sortMode == SortMode.MEDIAN)) {
                 throw new QueryShardException(context, "we only support AVG, MEDIAN and SUM on number based fields");
             }

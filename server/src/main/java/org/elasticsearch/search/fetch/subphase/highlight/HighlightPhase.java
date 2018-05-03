@@ -85,8 +85,8 @@ public class HighlightPhase extends AbstractComponent implements FetchSubPhase {
                 // If the field was explicitly given we assume that whoever issued the query knew
                 // what they were doing and try to highlight anyway.
                 if (fieldNameContainsWildcards) {
-                    if (fieldMapper.fieldType().typeName().equals(TextFieldMapper.CONTENT_TYPE) == false &&
-                        fieldMapper.fieldType().typeName().equals(KeywordFieldMapper.CONTENT_TYPE) == false) {
+                    if (!fieldMapper.fieldType().typeName().equals(TextFieldMapper.CONTENT_TYPE) &&
+                        !fieldMapper.fieldType().typeName().equals(KeywordFieldMapper.CONTENT_TYPE)) {
                         continue;
                     }
                 }
@@ -107,7 +107,7 @@ public class HighlightPhase extends AbstractComponent implements FetchSubPhase {
                 HighlighterContext highlighterContext = new HighlighterContext(fieldName, field, fieldMapper, context,
                         hitContext, highlightQuery);
 
-                if ((highlighter.canHighlight(fieldMapper) == false) && fieldNameContainsWildcards) {
+                if ((!highlighter.canHighlight(fieldMapper)) && fieldNameContainsWildcards) {
                     // if several fieldnames matched the wildcard then we want to skip those that we cannot highlight
                     continue;
                 }

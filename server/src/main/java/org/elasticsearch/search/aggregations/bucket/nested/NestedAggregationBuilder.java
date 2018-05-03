@@ -83,7 +83,7 @@ public class NestedAggregationBuilder extends AbstractAggregationBuilder<NestedA
             return new NestedAggregatorFactory(name, null, null, context, parent, subFactoriesBuilder, metaData);
         }
 
-        if (childObjectMapper.nested().isNested() == false) {
+        if (!childObjectMapper.nested().isNested()) {
             throw new AggregationExecutionException("[nested] nested path [" + path + "] is not nested");
         }
         try {

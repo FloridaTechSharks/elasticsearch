@@ -595,8 +595,8 @@ public final class SearchHit implements Streamable, ToXContentObject, Iterable<D
      */
     private static void declareMetaDataFields(ObjectParser<Map<String, Object>, Void> parser) {
         for (String metadatafield : MapperService.getAllMetaFields()) {
-            if (metadatafield.equals(Fields._ID) == false && metadatafield.equals(Fields._INDEX) == false
-                    && metadatafield.equals(Fields._TYPE) == false) {
+            if (!metadatafield.equals(Fields._ID) && !metadatafield.equals(Fields._INDEX)
+                    && !metadatafield.equals(Fields._TYPE)) {
                 parser.declareField((map, field) -> {
                     @SuppressWarnings("unchecked")
                     Map<String, DocumentField> fieldMap = (Map<String, DocumentField>) map.computeIfAbsent(Fields.FIELDS,

@@ -308,7 +308,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
     }
 
     private static void validate(final String repositoryName, final String snapshotName) {
-        if (Strings.hasLength(snapshotName) == false) {
+        if (!Strings.hasLength(snapshotName)) {
             throw new InvalidSnapshotNameException(repositoryName, snapshotName, "cannot be empty");
         }
         if (snapshotName.contains(" ")) {
@@ -323,10 +323,10 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
         if (snapshotName.charAt(0) == '_') {
             throw new InvalidSnapshotNameException(repositoryName, snapshotName, "must not start with '_'");
         }
-        if (snapshotName.toLowerCase(Locale.ROOT).equals(snapshotName) == false) {
+        if (!snapshotName.toLowerCase(Locale.ROOT).equals(snapshotName)) {
             throw new InvalidSnapshotNameException(repositoryName, snapshotName, "must be lowercase");
         }
-        if (Strings.validFileName(snapshotName) == false) {
+        if (!Strings.validFileName(snapshotName)) {
             throw new InvalidSnapshotNameException(repositoryName,
                                                    snapshotName,
                                                    "must not contain the following characters " + Strings.INVALID_FILENAME_CHARS);
@@ -381,7 +381,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                     SnapshotsInProgress snapshots = currentState.custom(SnapshotsInProgress.TYPE);
                     List<SnapshotsInProgress.Entry> entries = new ArrayList<>();
                     for (SnapshotsInProgress.Entry entry : snapshots.entries()) {
-                        if (entry.snapshot().equals(snapshot.snapshot()) == false) {
+                        if (!entry.snapshot().equals(snapshot.snapshot())) {
                             entries.add(entry);
                             continue;
                         }
@@ -393,16 +393,16 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                                 Tuple<Set<String>, Set<String>> indicesWithMissingShards = indicesWithMissingShards(shards, currentState.metaData());
                                 Set<String> missing = indicesWithMissingShards.v1();
                                 Set<String> closed = indicesWithMissingShards.v2();
-                                if (missing.isEmpty() == false || closed.isEmpty() == false) {
+                                if (!missing.isEmpty() || !closed.isEmpty()) {
                                     endSnapshot = new SnapshotsInProgress.Entry(entry, State.FAILED, shards);
                                     entries.add(endSnapshot);
 
                                     final StringBuilder failureMessage = new StringBuilder();
-                                    if (missing.isEmpty() == false) {
+                                    if (!missing.isEmpty()) {
                                         failureMessage.append("Indices don't have primary shards ");
                                         failureMessage.append(missing);
                                     }
-                                    if (closed.isEmpty() == false) {
+                                    if (!closed.isEmpty()) {
                                         if (failureMessage.length() > 0) {
                                             failureMessage.append("; ");
                                         }
@@ -547,10 +547,10 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
             // Most likely scenario - one snapshot is currently running
             // Check this snapshot against the query
             SnapshotsInProgress.Entry entry = snapshotsInProgress.entries().get(0);
-            if (entry.snapshot().getRepository().equals(repository) == false) {
+            if (!entry.snapshot().getRepository().equals(repository)) {
                 return Collections.emptyList();
             }
-            if (snapshots.isEmpty() == false) {
+            if (!snapshots.isEmpty()) {
                 for (String snapshot : snapshots) {
                     if (entry.snapshot().getSnapshotId().getName().equals(snapshot)) {
                         return snapshotsInProgress.entries();
@@ -563,10 +563,10 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
         }
         List<SnapshotsInProgress.Entry> builder = new ArrayList<>();
         for (SnapshotsInProgress.Entry entry : snapshotsInProgress.entries()) {
-            if (entry.snapshot().getRepository().equals(repository) == false) {
+            if (!entry.snapshot().getRepository().equals(repository)) {
                 continue;
             }
-            if (snapshots.isEmpty() == false) {
+            if (!snapshots.isEmpty()) {
                 for (String snapshot : snapshots) {
                     if (entry.snapshot().getSnapshotId().getName().equals(snapshot)) {
                         builder.add(entry);
@@ -649,7 +649,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
         try {
             if (event.localNodeMaster()) {
                 // We don't remove old master when master flips anymore. So, we need to check for change in master
-                if (event.nodesRemoved() || event.previousState().nodes().isLocalNodeElectedMaster() == false) {
+                if (event.nodesRemoved() || !event.previousState().nodes().isLocalNodeElectedMaster()) {
                     processSnapshotsOnRemovedNodes(event);
                 }
                 if (event.routingTableChanged()) {
@@ -1088,11 +1088,11 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                                                 .filter(s -> s.getName().equals(snapshotName))
                                                 .findFirst();
         // if nothing found by the same name, then look in the cluster state for current in progress snapshots
-        if (matchedEntry.isPresent() == false) {
+        if (!matchedEntry.isPresent()) {
             matchedEntry = currentSnapshots(repositoryName, Collections.emptyList()).stream()
                                .map(e -> e.snapshot().getSnapshotId()).filter(s -> s.getName().equals(snapshotName)).findFirst();
         }
-        if (matchedEntry.isPresent() == false) {
+        if (!matchedEntry.isPresent()) {
             throw new SnapshotMissingException(repositoryName, snapshotName);
         }
         deleteSnapshot(new Snapshot(repositoryName, matchedEntry.get()), listener, repositoryData.getGenId(), immediatePriority);
@@ -1125,7 +1125,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                     // don't allow snapshot deletions while a restore is taking place,
                     // otherwise we could end up deleting a snapshot that is being restored
                     // and the files the restore depends on would all be gone
-                    if (restoreInProgress.entries().isEmpty() == false) {
+                    if (!restoreInProgress.entries().isEmpty()) {
                         throw new ConcurrentSnapshotExecutionException(snapshot, "cannot delete snapshot during a restore");
                     }
                 }
@@ -1166,7 +1166,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                         final ImmutableOpenMap.Builder<ShardId, ShardSnapshotStatus> shardsBuilder = ImmutableOpenMap.builder();
                         for (ObjectObjectCursor<ShardId, ShardSnapshotStatus> shardEntry : snapshotEntry.shards()) {
                             ShardSnapshotStatus status = shardEntry.value;
-                            if (status.state().completed() == false) {
+                            if (!status.state().completed()) {
                                 status = new ShardSnapshotStatus(status.nodeId(), State.ABORTED, "aborted by snapshot deletion");
                             }
                             shardsBuilder.put(shardEntry.key, status);
@@ -1178,7 +1178,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
                         // Cleanup in case a node gone missing and snapshot wasn't updated for some reason
                         for (ObjectCursor<ShardSnapshotStatus> shardStatus : snapshotEntry.shards().values()) {
                             // Check if we still have shard running on existing nodes
-                            if (shardStatus.value.state().completed() == false && shardStatus.value.nodeId() != null
+                            if (!shardStatus.value.state().completed() && shardStatus.value.nodeId() != null
                                     && currentState.nodes().get(shardStatus.value.nodeId()) != null) {
                                 hasUncompletedShards = true;
                                 break;
@@ -1434,7 +1434,7 @@ public class SnapshotsService extends AbstractLifecycleComponent implements Clus
         Set<Index> indicesToFail = null;
         if (snapshots != null) {
             for (final SnapshotsInProgress.Entry entry : snapshots.entries()) {
-                if (entry.partial() == false) {
+                if (!entry.partial()) {
                     if (entry.state() == State.INIT) {
                         for (IndexId index : entry.indices()) {
                             IndexMetaData indexMetaData = currentState.metaData().index(index.getName());

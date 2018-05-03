@@ -106,7 +106,7 @@ public class LongTermsAggregator extends TermsAggregator {
     public InternalAggregation buildAggregation(long owningBucketOrdinal) throws IOException {
         assert owningBucketOrdinal == 0;
 
-        if (bucketCountThresholds.getMinDocCount() == 0 && (InternalOrder.isCountDesc(order) == false || bucketOrds.size() < bucketCountThresholds.getRequiredSize())) {
+        if (bucketCountThresholds.getMinDocCount() == 0 && (!InternalOrder.isCountDesc(order) || bucketOrds.size() < bucketCountThresholds.getRequiredSize())) {
             // we need to fill-in the blanks
             for (LeafReaderContext ctx : context.searcher().getTopReaderContext().leaves()) {
                 final SortedNumericDocValues values = getValues(valuesSource, ctx);
@@ -157,9 +157,9 @@ public class LongTermsAggregator extends TermsAggregator {
         runDeferredCollections(survivingBucketOrds);
 
         // Now build the aggs
-        for (int i = 0; i < list.length; i++) {
-            list[i].aggregations = bucketAggregations(list[i].bucketOrd);
-            list[i].docCountError = 0;
+        for (LongTerms.Bucket aList : list) {
+            aList.aggregations = bucketAggregations(aList.bucketOrd);
+            aList.docCountError = 0;
         }
 
         return new LongTerms(name, order, bucketCountThresholds.getRequiredSize(), bucketCountThresholds.getMinDocCount(),

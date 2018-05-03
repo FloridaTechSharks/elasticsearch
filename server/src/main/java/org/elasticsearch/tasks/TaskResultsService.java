@@ -85,7 +85,7 @@ public class TaskResultsService extends AbstractComponent {
 
         ClusterState state = clusterService.state();
 
-        if (state.routingTable().hasIndex(TASK_INDEX) == false) {
+        if (!state.routingTable().hasIndex(TASK_INDEX)) {
             CreateIndexRequest createIndexRequest = new CreateIndexRequest();
             createIndexRequest.settings(taskResultIndexSettings());
             createIndexRequest.index(TASK_INDEX);
@@ -143,7 +143,7 @@ public class TaskResultsService extends AbstractComponent {
             return 0;
         }
         @SuppressWarnings("unchecked") Map<String, Object> meta = (Map<String, Object>) mappingMetaData.sourceAsMap().get("_meta");
-        if (meta == null || meta.containsKey(TASK_RESULT_MAPPING_VERSION_META_FIELD) == false) {
+        if (meta == null || !meta.containsKey(TASK_RESULT_MAPPING_VERSION_META_FIELD)) {
             return 1; // The mapping was created before meta field was introduced
         }
         return (int) meta.get(TASK_RESULT_MAPPING_VERSION_META_FIELD);

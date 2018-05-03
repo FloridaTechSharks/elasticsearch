@@ -101,7 +101,7 @@ public class BucketSortPipelineAggregator extends PipelineAggregator {
         PriorityQueue<ComparableBucket> ordered = new TopNPriorityQueue(queueSize);
         for (InternalMultiBucketAggregation.InternalBucket bucket : buckets) {
             ComparableBucket comparableBucket = new ComparableBucket(originalAgg, bucket);
-            if (comparableBucket.skip() == false) {
+            if (!comparableBucket.skip()) {
                 ordered.insertWithOverflow(new ComparableBucket(originalAgg, bucket));
             }
         }

@@ -178,7 +178,7 @@ public class SignificantTermsAggregatorFactory extends ValuesSourceAggregatorFac
     @Override
     protected Aggregator doCreateInternal(ValuesSource valuesSource, Aggregator parent, boolean collectsFromSingleBucket,
             List<PipelineAggregator> pipelineAggregators, Map<String, Object> metaData) throws IOException {
-        if (collectsFromSingleBucket == false) {
+        if (!collectsFromSingleBucket) {
             return asMultiBucketAggregator(this, context, parent);
         }
 
@@ -206,7 +206,7 @@ public class SignificantTermsAggregatorFactory extends ValuesSourceAggregatorFac
             if (executionHint != null) {
                 execution = ExecutionMode.fromString(executionHint, DEPRECATION_LOGGER);
             }
-            if (valuesSource instanceof ValuesSource.Bytes.WithOrdinals == false) {
+            if (!(valuesSource instanceof ValuesSource.Bytes.WithOrdinals)) {
                 execution = ExecutionMode.MAP;
             }
             if (execution == null) {

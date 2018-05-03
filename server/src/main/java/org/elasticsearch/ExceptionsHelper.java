@@ -201,7 +201,7 @@ public final class ExceptionsHelper {
         Set<GroupBy> reasons = new HashSet<>();
         for (ShardOperationFailedException failure : failures) {
             GroupBy reason = new GroupBy(failure.getCause());
-            if (reasons.contains(reason) == false) {
+            if (!reasons.contains(reason)) {
                 reasons.add(reason);
                 uniqueFailures.add(failure);
             }
@@ -238,9 +238,7 @@ public final class ExceptionsHelper {
 
             if (!causeType.equals(groupBy.causeType)) return false;
             if (index != null ? !index.equals(groupBy.index) : groupBy.index != null) return false;
-            if (reason != null ? !reason.equals(groupBy.reason) : groupBy.reason != null) return false;
-
-            return true;
+            return reason != null ? reason.equals(groupBy.reason) : groupBy.reason == null;
         }
 
         @Override

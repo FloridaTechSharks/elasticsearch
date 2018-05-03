@@ -134,9 +134,6 @@ public class LinearModel extends MovAvgModel {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        return true;
+        return getClass() == obj.getClass();
     }
 }

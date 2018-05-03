@@ -756,7 +756,7 @@ public class ThreadPool extends AbstractComponent implements Scheduler, Closeabl
     }
 
     public static boolean assertNotScheduleThread(String reason) {
-        assert Thread.currentThread().getName().contains("scheduler") == false :
+        assert !Thread.currentThread().getName().contains("scheduler") :
             "Expected current thread [" + Thread.currentThread() + "] to not be the scheduler thread. Reason: [" + reason + "]";
         return true;
     }

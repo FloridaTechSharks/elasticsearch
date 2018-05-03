@@ -62,7 +62,7 @@ public class ScriptedMetricAggregatorFactory extends AggregatorFactory<ScriptedM
     @Override
     public Aggregator createInternal(Aggregator parent, boolean collectsFromSingleBucket, List<PipelineAggregator> pipelineAggregators,
             Map<String, Object> metaData) throws IOException {
-        if (collectsFromSingleBucket == false) {
+        if (!collectsFromSingleBucket) {
             return asMultiBucketAggregator(this, context, parent);
         }
         Map<String, Object> params = this.params;
@@ -71,7 +71,7 @@ public class ScriptedMetricAggregatorFactory extends AggregatorFactory<ScriptedM
         } else {
             params = new HashMap<>();
         }
-        if (params.containsKey("_agg") == false) {
+        if (!params.containsKey("_agg")) {
             params.put("_agg", new HashMap<String, Object>());
         }
 

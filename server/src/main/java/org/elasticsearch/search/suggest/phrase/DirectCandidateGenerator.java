@@ -285,11 +285,10 @@ public final class DirectCandidateGenerator extends CandidateGenerator {
             if (getClass() != obj.getClass()) return false;
             Candidate other = (Candidate) obj;
             if (term == null) {
-                if (other.term != null) return false;
+                return other.term == null;
             } else {
-                if (!term.equals(other.term)) return false;
+                return term.equals(other.term);
             }
-            return true;
         }
 
         /** Lower scores sort first; if scores are equal, then later (zzz) terms sort first */

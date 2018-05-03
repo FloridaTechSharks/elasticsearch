@@ -180,7 +180,7 @@ public class RestoreService extends AbstractComponent implements ClusterStateApp
             }
             final Optional<SnapshotId> matchingSnapshotId = repositoryData.getSnapshotIds().stream()
                 .filter(s -> request.snapshotName.equals(s.getName())).findFirst();
-            if (matchingSnapshotId.isPresent() == false) {
+            if (!matchingSnapshotId.isPresent()) {
                 throw new SnapshotRestoreException(request.repositoryName, request.snapshotName, "snapshot does not exist");
             }
             final SnapshotId snapshotId = matchingSnapshotId.get();
@@ -592,12 +592,12 @@ public class RestoreService extends AbstractComponent implements ClusterStateApp
         }
 
         public RestoreInProgress applyChanges(final RestoreInProgress oldRestore) {
-            if (shardChanges.isEmpty() == false) {
+            if (!shardChanges.isEmpty()) {
                 final List<RestoreInProgress.Entry> entries = new ArrayList<>();
                 for (RestoreInProgress.Entry entry : oldRestore.entries()) {
                     Snapshot snapshot = entry.snapshot();
                     Updates updates = shardChanges.get(snapshot);
-                    if (updates.shards.isEmpty() == false) {
+                    if (!updates.shards.isEmpty()) {
                         ImmutableOpenMap.Builder<ShardId, ShardRestoreStatus> shardsBuilder = ImmutableOpenMap.builder(entry.shards());
                         for (Map.Entry<ShardId, ShardRestoreStatus> shard : updates.shards.entrySet()) {
                             shardsBuilder.put(shard.getKey(), shard.getValue());
@@ -659,14 +659,14 @@ public class RestoreService extends AbstractComponent implements ClusterStateApp
             boolean changed = false;
             if (restoreInProgress != null) {
                 for (RestoreInProgress.Entry entry : restoreInProgress.entries()) {
-                    if (completedSnapshots.contains(entry.snapshot()) == false) {
+                    if (!completedSnapshots.contains(entry.snapshot())) {
                         entries.add(entry);
                     } else {
                         changed = true;
                     }
                 }
             }
-            if (changed == false) {
+            if (!changed) {
                 return resultBuilder.build(currentState);
             }
             RestoreInProgress updatedRestoreInProgress = new RestoreInProgress(entries.toArray(new RestoreInProgress.Entry[entries.size()]));

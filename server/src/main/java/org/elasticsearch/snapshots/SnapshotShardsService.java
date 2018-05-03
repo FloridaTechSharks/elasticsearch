@@ -164,13 +164,13 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
             SnapshotsInProgress previousSnapshots = event.previousState().custom(SnapshotsInProgress.TYPE);
             SnapshotsInProgress currentSnapshots = event.state().custom(SnapshotsInProgress.TYPE);
             if ((previousSnapshots == null && currentSnapshots != null)
-                || (previousSnapshots != null && previousSnapshots.equals(currentSnapshots) == false)) {
+                || (previousSnapshots != null && !previousSnapshots.equals(currentSnapshots))) {
                 processIndexShardSnapshots(event);
             }
 
             String previousMasterNodeId = event.previousState().nodes().getMasterNodeId();
             String currentMasterNodeId = event.state().nodes().getMasterNodeId();
-            if (currentMasterNodeId != null && currentMasterNodeId.equals(previousMasterNodeId) == false) {
+            if (currentMasterNodeId != null && !currentMasterNodeId.equals(previousMasterNodeId)) {
                 syncShardStatsOnNewMaster(event);
             }
 
@@ -317,7 +317,7 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
         }
 
         // We have new shards to starts
-        if (newSnapshots.isEmpty() == false) {
+        if (!newSnapshots.isEmpty()) {
             Executor executor = threadPool.executor(ThreadPool.Names.SNAPSHOT);
             for (final Map.Entry<Snapshot, Map<ShardId, IndexShardSnapshotStatus>> entry : newSnapshots.entrySet()) {
                 final Snapshot snapshot = entry.getKey();
@@ -373,7 +373,7 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
      */
     private void snapshot(final IndexShard indexShard, final Snapshot snapshot, final IndexId indexId, final IndexShardSnapshotStatus snapshotStatus) {
         final ShardId shardId = indexShard.shardId();
-        if (indexShard.routingEntry().primary() == false) {
+        if (!indexShard.routingEntry().primary()) {
             throw new IndexShardSnapshotFailedException(shardId, "snapshot should be performed only on primary");
         }
         if (indexShard.routingEntry().relocating()) {
@@ -422,7 +422,7 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
                     for(Map.Entry<ShardId, IndexShardSnapshotStatus> localShard : localShards.entrySet()) {
                         ShardId shardId = localShard.getKey();
                         ShardSnapshotStatus masterShard = masterShards.get(shardId);
-                        if (masterShard != null && masterShard.state().completed() == false) {
+                        if (masterShard != null && !masterShard.state().completed()) {
                             final IndexShardSnapshotStatus.Copy indexShardSnapshotStatus = localShard.getValue().asCopy();
                             final Stage stage = indexShardSnapshotStatus.getStage();
                             // Master knows about the shard and thinks it has not completed
@@ -575,7 +575,7 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
                     for (UpdateIndexShardSnapshotStatusRequest updateSnapshotState : tasks) {
                         if (entry.snapshot().equals(updateSnapshotState.snapshot())) {
                             logger.trace("[{}] Updating shard [{}] with status [{}]", updateSnapshotState.snapshot(), updateSnapshotState.shardId(), updateSnapshotState.status().state());
-                            if (updated == false) {
+                            if (!updated) {
                                 shards.putAll(entry.shards());
                                 updated = true;
                             }
@@ -585,7 +585,7 @@ public class SnapshotShardsService extends AbstractLifecycleComponent implements
                     }
 
                     if (updated) {
-                        if (completed(shards.values()) == false) {
+                        if (!completed(shards.values())) {
                             entries.add(new SnapshotsInProgress.Entry(entry, shards.build()));
                         } else {
                             // Snapshot is finished - mark it as done

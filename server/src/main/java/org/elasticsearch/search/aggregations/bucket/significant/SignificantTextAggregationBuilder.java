@@ -113,14 +113,8 @@ public class SignificantTextAggregationBuilder extends AbstractAggregationBuilde
                         return significanceHeuristicParser.parse(p);
                     }, new ParseField(name));
         }
-        return new Aggregator.Parser() {
-            @Override
-            public AggregationBuilder parse(String aggregationName, XContentParser parser)
-                    throws IOException {
-                return PARSER.parse(parser,
-                        new SignificantTextAggregationBuilder(aggregationName, null), null);
-            }
-        };
+        return (aggregationName, parser) -> PARSER.parse(parser,
+                new SignificantTextAggregationBuilder(aggregationName, null), null);
     }
 
     protected TermsAggregator.BucketCountThresholds getBucketCountThresholds() {

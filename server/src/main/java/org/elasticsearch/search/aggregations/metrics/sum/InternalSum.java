@@ -79,7 +79,7 @@ public class InternalSum extends InternalNumericMetricsAggregation.SingleValue i
         double compensation = 0;
         for (InternalAggregation aggregation : aggregations) {
             double value = ((InternalSum) aggregation).sum;
-            if (Double.isFinite(value) == false) {
+            if (!Double.isFinite(value)) {
                 sum += value;
             } else if (Double.isFinite(sum)) {
                 double corrected = value - compensation;

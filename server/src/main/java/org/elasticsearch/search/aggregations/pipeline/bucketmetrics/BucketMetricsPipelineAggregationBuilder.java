@@ -123,7 +123,7 @@ public abstract class BucketMetricsPipelineAggregationBuilder<AF extends BucketM
         Optional<AggregationBuilder> aggBuilder = aggBuilders.stream().filter((builder) -> builder.getName().equals(firstAgg))
                 .findAny();
         if (aggBuilder.isPresent()) {
-            if ((aggBuilder.get() instanceof MultiBucketAggregationBuilder) == false) {
+            if (!(aggBuilder.get() instanceof MultiBucketAggregationBuilder)) {
                 throw new IllegalArgumentException("The first aggregation in " + PipelineAggregator.Parser.BUCKETS_PATH.getPreferredName()
                         + " must be a multi-bucket aggregation for aggregation [" + name + "] found :"
                         + aggBuilder.get().getClass().getName() + " for buckets path: " + bucketsPaths[0]);

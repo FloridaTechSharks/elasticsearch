@@ -124,10 +124,9 @@ public final class SearchShardTarget implements Writeable, Comparable<SearchShar
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SearchShardTarget that = (SearchShardTarget) o;
-        if (shardId.equals(that.shardId) == false) return false;
+        if (!shardId.equals(that.shardId)) return false;
         if (nodeId != null ? !nodeId.equals(that.nodeId) : that.nodeId != null) return false;
-        if (clusterAlias != null ? !clusterAlias.equals(that.clusterAlias) : that.clusterAlias != null) return false;
-        return true;
+        return clusterAlias != null ? clusterAlias.equals(that.clusterAlias) : that.clusterAlias == null;
     }
 
     @Override

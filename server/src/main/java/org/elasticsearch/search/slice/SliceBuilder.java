@@ -203,11 +203,11 @@ public class SliceBuilder implements Writeable, ToXContentObject {
                 field = IdFieldMapper.NAME;
             }
             useTermQuery = true;
-        } else if (type.hasDocValues() == false) {
+        } else if (!type.hasDocValues()) {
             throw new IllegalArgumentException("cannot load numeric doc values on " + field);
         } else {
             IndexFieldData ifm = context.getForField(type);
-            if (ifm instanceof IndexNumericFieldData == false) {
+            if (!(ifm instanceof IndexNumericFieldData)) {
                 throw new IllegalArgumentException("cannot load numeric doc values on " + field);
             }
         }

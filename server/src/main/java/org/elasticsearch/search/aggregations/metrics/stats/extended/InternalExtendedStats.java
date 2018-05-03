@@ -149,7 +149,7 @@ public class InternalExtendedStats extends InternalStats implements ExtendedStat
                 throw new IllegalStateException("Cannot reduce other stats aggregations that have a different sigma");
             }
             double value = stats.getSumOfSquares();
-            if (Double.isFinite(value) == false) {
+            if (!Double.isFinite(value)) {
                 sumOfSqrs += value;
             } else if (Double.isFinite(sumOfSqrs)) {
                 double correctedOfSqrs = value - compensationOfSqrs;

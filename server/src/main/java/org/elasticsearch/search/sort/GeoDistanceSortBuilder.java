@@ -509,7 +509,7 @@ public class GeoDistanceSortBuilder extends SortBuilder<GeoDistanceSortBuilder> 
                     DEPRECATION_LOGGER.deprecated("[nested_path] has been deprecated in favour of the [nested] parameter");
                     nestedPath = parser.text();
                 } else if (token == Token.VALUE_STRING){
-                    if (fieldName != null && fieldName.equals(currentName) == false) {
+                    if (fieldName != null && !fieldName.equals(currentName)) {
                         throw new ParsingException(
                                 parser.getTokenLocation(),
                                 "Trying to reset fieldName to [{}], already set to [{}].",
@@ -562,7 +562,7 @@ public class GeoDistanceSortBuilder extends SortBuilder<GeoDistanceSortBuilder> 
         // validation was not available prior to 2.x, so to support bwc percolation queries we only ignore_malformed
         // on 2.x created indexes
         GeoPoint[] localPoints =  points.toArray(new GeoPoint[points.size()]);
-        if (GeoValidationMethod.isIgnoreMalformed(validation) == false) {
+        if (!GeoValidationMethod.isIgnoreMalformed(validation)) {
             for (GeoPoint point : localPoints) {
                 if (GeoUtils.isValidLatitude(point.lat()) == false) {
                     throw new ElasticsearchParseException(
@@ -570,7 +570,7 @@ public class GeoDistanceSortBuilder extends SortBuilder<GeoDistanceSortBuilder> 
                             point.lat(),
                             fieldName);
                 }
-                if (GeoUtils.isValidLongitude(point.lon()) == false) {
+                if (!GeoUtils.isValidLongitude(point.lon())) {
                     throw new ElasticsearchParseException(
                             "illegal longitude value [{}] for [GeoDistanceSort] for field [{}].",
                             point.lon(),
@@ -612,7 +612,7 @@ public class GeoDistanceSortBuilder extends SortBuilder<GeoDistanceSortBuilder> 
                 && nested == null
                 && finalSortMode == MultiValueMode.MIN // LatLonDocValuesField internally picks the closest point
                 && unit == DistanceUnit.METERS
-                && reverse == false
+                && !reverse
                 && localPoints.length == 1) {
             return new SortFieldAndFormat(
                     LatLonDocValuesField.newDistanceSort(fieldName, localPoints[0].lat(), localPoints[0].lon()),

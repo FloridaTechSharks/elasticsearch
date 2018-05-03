@@ -326,7 +326,7 @@ public final class InternalDateHistogram extends InternalMultiBucketAggregation<
         };
         for (InternalAggregation aggregation : aggregations) {
             InternalDateHistogram histogram = (InternalDateHistogram) aggregation;
-            if (histogram.buckets.isEmpty() == false) {
+            if (!histogram.buckets.isEmpty()) {
                 pq.add(new IteratorAndCurrent(histogram.buckets.iterator()));
             }
         }
@@ -343,7 +343,7 @@ public final class InternalDateHistogram extends InternalMultiBucketAggregation<
                 if (top.current.key != key) {
                     // the key changes, reduce what we already buffered and reset the buffer for current buckets
                     final Bucket reduced = currentBuckets.get(0).reduce(currentBuckets, reduceContext);
-                    if (reduced.getDocCount() >= minDocCount || reduceContext.isFinalReduce() == false) {
+                    if (reduced.getDocCount() >= minDocCount || !reduceContext.isFinalReduce()) {
                         reduceContext.consumeBucketsAndMaybeBreak(1);
                         reducedBuckets.add(reduced);
                     } else {
@@ -365,9 +365,9 @@ public final class InternalDateHistogram extends InternalMultiBucketAggregation<
                 }
             } while (pq.size() > 0);
 
-            if (currentBuckets.isEmpty() == false) {
+            if (!currentBuckets.isEmpty()) {
                 final Bucket reduced = currentBuckets.get(0).reduce(currentBuckets, reduceContext);
-                if (reduced.getDocCount() >= minDocCount || reduceContext.isFinalReduce() == false) {
+                if (reduced.getDocCount() >= minDocCount || !reduceContext.isFinalReduce()) {
                     reduceContext.consumeBucketsAndMaybeBreak(1);
                     reducedBuckets.add(reduced);
                 } else {
@@ -450,7 +450,7 @@ public final class InternalDateHistogram extends InternalMultiBucketAggregation<
             addEmptyBuckets(reducedBuckets, reduceContext);
         }
 
-        if (InternalOrder.isKeyAsc(order) || reduceContext.isFinalReduce() == false) {
+        if (InternalOrder.isKeyAsc(order) || !reduceContext.isFinalReduce()) {
             // nothing to do, data are already sorted since shards return
             // sorted buckets and the merge-sort performed by reduceBuckets
             // maintains order

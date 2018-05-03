@@ -264,10 +264,7 @@ public class DerivativePipelineAggregationBuilder extends AbstractPipelineAggreg
         if (!Objects.equals(gapPolicy, other.gapPolicy)) {
             return false;
         }
-        if (!Objects.equals(units, other.units)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(units, other.units);
     }
 
     @Override

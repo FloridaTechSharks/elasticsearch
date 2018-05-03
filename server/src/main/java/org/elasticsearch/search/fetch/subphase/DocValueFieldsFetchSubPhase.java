@@ -49,7 +49,7 @@ public final class DocValueFieldsFetchSubPhase implements FetchSubPhase {
             String name = context.collapse().getFieldType().name();
             if (context.docValueFieldsContext() == null) {
                 context.docValueFieldsContext(new DocValueFieldsContext(Collections.singletonList(name)));
-            } else if (context.docValueFieldsContext().fields().contains(name) == false) {
+            } else if (!context.docValueFieldsContext().fields().contains(name)) {
                 context.docValueFieldsContext().fields().add(name);
             }
         }

@@ -346,11 +346,11 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
             final boolean runConnect;
             final Collection<ActionListener<Void>> toNotify;
             synchronized (queue) {
-                if (connectListener != null && queue.offer(connectListener) == false) {
+                if (connectListener != null && !queue.offer(connectListener)) {
                     connectListener.onFailure(new RejectedExecutionException("connect queue is full"));
                     return;
                 }
-                if (forceRun == false && queue.isEmpty()) {
+                if (!forceRun && queue.isEmpty()) {
                     return;
                 }
                 runConnect = running.tryAcquire();
@@ -431,7 +431,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
                         try {
                             try {
                                 handshakeNode = transportService.handshake(connection, remoteProfile.getHandshakeTimeout().millis(),
-                                    (c) -> remoteClusterName.get() == null ? true : c.equals(remoteClusterName.get()));
+                                    (c) -> remoteClusterName.get() == null || c.equals(remoteClusterName.get()));
                             } catch (IllegalStateException ex) {
                                 logger.warn((Supplier<?>) () -> new ParameterizedMessage("seed node {} cluster name mismatch expected " +
                                     "cluster name {}", connection.getNode(), remoteClusterName.get()), ex);
@@ -462,7 +462,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
                             }
                             success = true;
                         } finally {
-                            if (success == false) {
+                            if (!success) {
                                 connection.close();
                             }
                         }
@@ -528,7 +528,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
 
             @Override
             public void handleResponse(ClusterStateResponse response) {
-                assert transportService.getThreadPool().getThreadContext().isSystemContext() == false : "context is a system context";
+                assert !transportService.getThreadPool().getThreadContext().isSystemContext() : "context is a system context";
                 try {
                     if (remoteClusterName.get() == null) {
                         assert response.getClusterName().value() != null;
@@ -571,7 +571,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
 
             @Override
             public void handleException(TransportException exp) {
-                assert transportService.getThreadPool().getThreadContext().isSystemContext() == false : "context is a system context";
+                assert !transportService.getThreadPool().getThreadContext().isSystemContext() : "context is a system context";
                 logger.warn((Supplier<?>)
                     () -> new ParameterizedMessage("fetching nodes from external cluster {} failed", clusterAlias),
                     exp);
@@ -612,7 +612,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
      */
     public void getConnectionInfo(ActionListener<RemoteConnectionInfo> listener) {
         final Optional<DiscoveryNode> anyNode = connectedNodes.getAny();
-        if (anyNode.isPresent() == false) {
+        if (!anyNode.isPresent()) {
             // not connected we return immediately
             RemoteConnectionInfo remoteConnectionStats = new RemoteConnectionInfo(clusterAlias,
                 Collections.emptyList(), Collections.emptyList(), maxNumRemoteConnections, 0,
@@ -731,7 +731,7 @@ final class RemoteClusterConnection extends AbstractComponent implements Transpo
         private synchronized void ensureIteratorAvailable() {
             if (currentIterator == null) {
                 currentIterator = nodeSet.iterator();
-            } else if (currentIterator.hasNext() == false && nodeSet.isEmpty() == false) {
+            } else if (!currentIterator.hasNext() && !nodeSet.isEmpty()) {
                 // iterator rollover
                 currentIterator = nodeSet.iterator();
             }
