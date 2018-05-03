@@ -142,7 +142,7 @@ public class RestAnalyzeAction extends BaseRestHandler {
                 } else if (Fields.ATTRIBUTES.match(currentFieldName) && token == XContentParser.Token.START_ARRAY) {
                     List<String> attributes = new ArrayList<>();
                     while ((token = parser.nextToken()) != XContentParser.Token.END_ARRAY) {
-                        if (token.isValue() == false) {
+                        if (!token.isValue()) {
                             throw new IllegalArgumentException(currentFieldName + " array element should only contain attribute name");
                         }
                         attributes.add(parser.text());

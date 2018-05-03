@@ -215,7 +215,7 @@ public final class ScriptMetaData implements MetaData.Custom, Writeable, ToXCont
 
                     if (exists == null) {
                         scripts.put(id, source);
-                    } else if (exists.getLang().equals(lang) == false) {
+                    } else if (!exists.getLang().equals(lang)) {
                         throw new IllegalArgumentException("illegal stored script, id [" + id + "] used for multiple scripts with " +
                             "different languages [" + exists.getLang() + "] and [" + lang + "]; scripts using the old namespace " +
                             "of [lang#id] as a stored script id will have to be updated to use only the new namespace of [id]");
@@ -235,7 +235,7 @@ public final class ScriptMetaData implements MetaData.Custom, Writeable, ToXCont
 
                     if (exists == null) {
                         scripts.put(id, source);
-                    } else if (exists.getLang().equals(source.getLang()) == false) {
+                    } else if (!exists.getLang().equals(source.getLang())) {
                         throw new IllegalArgumentException("illegal stored script, id [" + id + "] used for multiple scripts with " +
                             "different languages [" + exists.getLang() + "] and [" + source.getLang() + "]; scripts using the old " +
                             "namespace of [lang#id] as a stored script id will have to be updated to use only the new namespace of [id]");

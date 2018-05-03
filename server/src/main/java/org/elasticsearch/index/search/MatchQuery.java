@@ -260,7 +260,7 @@ public class MatchQuery {
          * passing through QueryBuilder.
          */
         boolean noForcedAnalyzer = this.analyzer == null;
-        if (fieldType.tokenized() == false && noForcedAnalyzer) {
+        if (!fieldType.tokenized() && noForcedAnalyzer) {
             return blendTermQuery(new Term(fieldName, value.toString()), fieldType);
         }
 
@@ -342,7 +342,7 @@ public class MatchQuery {
 
         @Override
         protected Query analyzePhrase(String field, TokenStream stream, int slop) throws IOException {
-            if (hasPositions(mapper) == false) {
+            if (!hasPositions(mapper)) {
                 IllegalStateException exc =
                     new IllegalStateException("field:[" + field + "] was indexed without position data; cannot run PhraseQuery");
                 if (lenient) {

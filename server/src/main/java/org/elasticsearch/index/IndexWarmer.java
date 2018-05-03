@@ -64,7 +64,7 @@ public final class IndexWarmer extends AbstractComponent {
         if (shard.state() == IndexShardState.CLOSED) {
             return;
         }
-        if (settings.isWarmerEnabled() == false) {
+        if (!settings.isWarmerEnabled()) {
             return;
         }
         if (logger.isTraceEnabled()) {
@@ -126,7 +126,7 @@ public final class IndexWarmer extends AbstractComponent {
                 for (FieldMapper fieldMapper : docMapper.mappers()) {
                     final MappedFieldType fieldType = fieldMapper.fieldType();
                     final String indexName = fieldType.name();
-                    if (fieldType.eagerGlobalOrdinals() == false) {
+                    if (!fieldType.eagerGlobalOrdinals()) {
                         continue;
                     }
                     warmUpGlobalOrdinals.put(indexName, fieldType);
@@ -140,7 +140,7 @@ public final class IndexWarmer extends AbstractComponent {
                         IndexFieldData.Global ifd = indexFieldDataService.getForField(fieldType);
                         DirectoryReader reader = searcher.getDirectoryReader();
                         IndexFieldData<?> global = ifd.loadGlobal(reader);
-                        if (reader.leaves().isEmpty() == false) {
+                        if (!reader.leaves().isEmpty()) {
                             global.load(reader.leaves().get(0));
                         }
 

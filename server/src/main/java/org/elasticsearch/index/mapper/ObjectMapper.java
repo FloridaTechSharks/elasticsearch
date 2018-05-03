@@ -173,30 +173,31 @@ public class ObjectMapper extends Mapper implements Cloneable {
         }
 
         protected static boolean parseObjectOrDocumentTypeProperties(String fieldName, Object fieldNode, ParserContext parserContext, ObjectMapper.Builder builder) {
-            if (fieldName.equals("dynamic")) {
-                String value = fieldNode.toString();
-                if (value.equalsIgnoreCase("strict")) {
-                    builder.dynamic(Dynamic.STRICT);
-                } else {
-                    boolean dynamic = TypeParsers.nodeBooleanValue(fieldName, "dynamic", fieldNode, parserContext);
-                    builder.dynamic(dynamic ? Dynamic.TRUE : Dynamic.FALSE);
-                }
-                return true;
-            } else if (fieldName.equals("enabled")) {
-                builder.enabled(TypeParsers.nodeBooleanValue(fieldName, "enabled", fieldNode, parserContext));
-                return true;
-            } else if (fieldName.equals("properties")) {
-                if (fieldNode instanceof Collection && ((Collection) fieldNode).isEmpty()) {
-                    // nothing to do here, empty (to support "properties: []" case)
-                } else if (!(fieldNode instanceof Map)) {
-                    throw new ElasticsearchParseException("properties must be a map type");
-                } else {
-                    parseProperties(builder, (Map<String, Object>) fieldNode, parserContext);
-                }
-                return true;
-            } else if (fieldName.equals("include_in_all")) {
-                deprecationLogger.deprecated("[include_in_all] is deprecated, the _all field have been removed in this version");
-                return true;
+            switch (fieldName) {
+                case "dynamic":
+                    String value = fieldNode.toString();
+                    if (value.equalsIgnoreCase("strict")) {
+                        builder.dynamic(Dynamic.STRICT);
+                    } else {
+                        boolean dynamic = TypeParsers.nodeBooleanValue(fieldName, "dynamic", fieldNode, parserContext);
+                        builder.dynamic(dynamic ? Dynamic.TRUE : Dynamic.FALSE);
+                    }
+                    return true;
+                case "enabled":
+                    builder.enabled(TypeParsers.nodeBooleanValue(fieldName, "enabled", fieldNode, parserContext));
+                    return true;
+                case "properties":
+                    if (fieldNode instanceof Collection && ((Collection) fieldNode).isEmpty()) {
+                        // nothing to do here, empty (to support "properties: []" case)
+                    } else if (!(fieldNode instanceof Map)) {
+                        throw new ElasticsearchParseException("properties must be a map type");
+                    } else {
+                        parseProperties(builder, (Map<String, Object>) fieldNode, parserContext);
+                    }
+                    return true;
+                case "include_in_all":
+                    deprecationLogger.deprecated("[include_in_all] is deprecated, the _all field have been removed in this version");
+                    return true;
             }
             return false;
         }
@@ -209,12 +210,15 @@ public class ObjectMapper extends Mapper implements Cloneable {
             Object fieldNode = node.get("type");
             if (fieldNode!=null) {
                 String type = fieldNode.toString();
-                if (type.equals(CONTENT_TYPE)) {
-                    builder.nested = Nested.NO;
-                } else if (type.equals(NESTED_CONTENT_TYPE)) {
-                    nested = true;
-                } else {
-                    throw new MapperParsingException("Trying to parse an object but has a different type [" + type + "] for [" + name + "]");
+                switch (type) {
+                    case CONTENT_TYPE:
+                        builder.nested = Nested.NO;
+                        break;
+                    case NESTED_CONTENT_TYPE:
+                        nested = true;
+                        break;
+                    default:
+                        throw new MapperParsingException("Trying to parse an object but has a different type [" + type + "] for [" + name + "]");
                 }
             }
             fieldNode = node.get("include_in_parent");
@@ -417,7 +421,7 @@ public class ObjectMapper extends Mapper implements Cloneable {
              parent != null;
              parent = parent.getParentObjectMapper(mapperService)) {
 
-            if (parent.nested().isNested() == false) {
+            if (!parent.nested().isNested()) {
                 return false;
             }
         }

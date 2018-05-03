@@ -114,7 +114,7 @@ public class SpanFirstQueryBuilder extends AbstractQueryBuilder<SpanFirstQueryBu
             } else if (token == XContentParser.Token.START_OBJECT) {
                 if (MATCH_FIELD.match(currentFieldName)) {
                     QueryBuilder query = parseInnerQueryBuilder(parser);
-                    if (query instanceof SpanQueryBuilder == false) {
+                    if (!(query instanceof SpanQueryBuilder)) {
                         throw new ParsingException(parser.getTokenLocation(), "spanFirst [match] must be of type span query");
                     }
                     match = (SpanQueryBuilder) query;

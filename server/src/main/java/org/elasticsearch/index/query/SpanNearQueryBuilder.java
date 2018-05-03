@@ -162,7 +162,7 @@ public class SpanNearQueryBuilder extends AbstractQueryBuilder<SpanNearQueryBuil
                 if (CLAUSES_FIELD.match(currentFieldName)) {
                     while ((token = parser.nextToken()) != XContentParser.Token.END_ARRAY) {
                         QueryBuilder query = parseInnerQueryBuilder(parser);
-                        if (query instanceof SpanQueryBuilder == false) {
+                        if (!(query instanceof SpanQueryBuilder)) {
                             throw new ParsingException(parser.getTokenLocation(), "spanNear [clauses] must be of type span query");
                         }
                         clauses.add((SpanQueryBuilder) query);

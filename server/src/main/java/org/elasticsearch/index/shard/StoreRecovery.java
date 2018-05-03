@@ -117,7 +117,7 @@ final class StoreRecovery {
             Sort indexSort = indexShard.getIndexSort();
             final boolean hasNested = indexShard.mapperService().hasNested();
             final boolean isSplit = sourceMetaData.getNumberOfShards() < indexShard.indexSettings().getNumberOfShards();
-            assert isSplit == false || sourceMetaData.getCreationVersion().onOrAfter(Version.V_6_0_0_alpha1) : "for split we require a " +
+            assert !isSplit || sourceMetaData.getCreationVersion().onOrAfter(Version.V_6_0_0_alpha1) : "for split we require a " +
                 "single type but the index is created before 6.0.0";
             return executeRecovery(indexShard, () -> {
                 logger.debug("starting recovery from local shards {}", shards);
@@ -250,7 +250,7 @@ final class StoreRecovery {
                     };
                 }
             }, src, dest, context);
-            if (copies.get() == false) {
+            if (!copies.get()) {
                 index.addFileDetail(dest, l, true); // hardlinked - we treat it as reused since the file was already somewhat there
             } else {
                 assert index.getFileDetails(dest) != null : "File [" + dest + "] has no file details";
@@ -286,7 +286,7 @@ final class StoreRecovery {
             // got closed on us, just ignore this recovery
             return false;
         }
-        if (indexShard.routingEntry().primary() == false) {
+        if (!indexShard.routingEntry().primary()) {
             throw new IndexShardRecoveryException(shardId, "Trying to recover when the shard is in backup state", null);
         }
         return true;

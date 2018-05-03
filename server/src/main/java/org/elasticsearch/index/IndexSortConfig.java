@@ -86,7 +86,7 @@ public final class IndexSortConfig {
             IndexSortConfig::validateMissingValue, Setting.Property.IndexScope, Setting.Property.Final);
 
     private static String validateMissingValue(String missing) {
-        if ("_last".equals(missing) == false && "_first".equals(missing) == false) {
+        if (!"_last".equals(missing) && !"_first".equals(missing)) {
             throw new IllegalArgumentException("Illegal missing value:[" + missing + "], " +
                 "must be one of [_last, _first]");
         }
@@ -177,7 +177,7 @@ public final class IndexSortConfig {
      */
     public Sort buildIndexSort(Function<String, MappedFieldType> fieldTypeLookup,
                                Function<MappedFieldType, IndexFieldData<?>> fieldDataLookup) {
-        if (hasIndexSort() == false) {
+        if (!hasIndexSort()) {
             return null;
         }
 
@@ -188,7 +188,7 @@ public final class IndexSortConfig {
             if (ft == null) {
                 throw new IllegalArgumentException("unknown index sort field:[" + sortSpec.field + "]");
             }
-            boolean reverse = sortSpec.order == null ? false : (sortSpec.order == SortOrder.DESC);
+            boolean reverse = sortSpec.order != null && (sortSpec.order == SortOrder.DESC);
             MultiValueMode mode = sortSpec.mode;
             if (mode == null) {
                 mode = reverse ? MultiValueMode.MAX : MultiValueMode.MIN;
@@ -210,7 +210,7 @@ public final class IndexSortConfig {
 
     private void validateIndexSortField(SortField sortField) {
         SortField.Type type = getSortFieldType(sortField);
-        if (ALLOWED_INDEX_SORT_TYPES.contains(type) == false) {
+        if (!ALLOWED_INDEX_SORT_TYPES.contains(type)) {
             throw new IllegalArgumentException("invalid index sort field:[" + sortField.getField() + "]");
         }
     }

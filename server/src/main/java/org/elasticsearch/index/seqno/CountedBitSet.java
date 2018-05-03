@@ -43,7 +43,7 @@ public final class CountedBitSet {
     public boolean get(int index) {
         assert 0 <= index && index < this.length();
         assert bitset == null || onBits < bitset.length() : "Bitset should be released when all bits are set";
-        return bitset == null ? true : bitset.get(index);
+        return bitset == null || bitset.get(index);
     }
 
     public void set(int index) {
@@ -53,7 +53,7 @@ public final class CountedBitSet {
         // Ignore set when bitset is full.
         if (bitset != null) {
             final boolean wasOn = bitset.getAndSet(index);
-            if (wasOn == false) {
+            if (!wasOn) {
                 onBits++;
                 // Once all bits are set, we can simply just return YES for all indexes.
                 // This allows us to clear the internal bitset and use null check as the guard.

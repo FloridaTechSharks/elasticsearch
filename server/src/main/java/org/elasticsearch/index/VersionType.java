@@ -56,12 +56,9 @@ public enum VersionType implements Writeable {
                 return false;
             }
             if (expectedVersion == Versions.MATCH_DELETED) {
-                return deleted == false;
+                return !deleted;
             }
-            if (currentVersion != expectedVersion) {
-                return true;
-            }
-            return false;
+            return currentVersion != expectedVersion;
         }
 
         @Override
@@ -96,10 +93,7 @@ public enum VersionType implements Writeable {
             if (expectedVersion == Versions.MATCH_ANY) {
                 return true;
             }
-            if (currentVersion >= expectedVersion) {
-                return true;
-            }
-            return false;
+            return currentVersion >= expectedVersion;
         }
 
         @Override
@@ -115,10 +109,7 @@ public enum VersionType implements Writeable {
             if (currentVersion == Versions.NOT_FOUND) {
                 return true;
             }
-            if (currentVersion != expectedVersion) {
-                return true;
-            }
-            return false;
+            return currentVersion != expectedVersion;
         }
 
         @Override
@@ -151,10 +142,7 @@ public enum VersionType implements Writeable {
             if (expectedVersion == Versions.MATCH_ANY) {
                 return true;
             }
-            if (currentVersion > expectedVersion) {
-                return true;
-            }
-            return false;
+            return currentVersion > expectedVersion;
         }
 
         @Override
@@ -170,10 +158,7 @@ public enum VersionType implements Writeable {
             if (currentVersion == Versions.NOT_FOUND) {
                 return true;
             }
-            if (currentVersion != expectedVersion) {
-                return true;
-            }
-            return false;
+            return currentVersion != expectedVersion;
         }
 
         @Override

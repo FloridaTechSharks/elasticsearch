@@ -130,7 +130,7 @@ public class HotThreads {
 
     private String innerDetect() throws Exception {
         ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-        if (threadBean.isThreadCpuTimeSupported() == false) {
+        if (!threadBean.isThreadCpuTimeSupported()) {
             throw new ElasticsearchException("thread CPU time is not supported on this JDK");
         }
 
@@ -261,8 +261,8 @@ public class HotThreads {
                     final StackTraceElement[] show = allInfos[i][t].getStackTrace();
                     if (count == 1) {
                         sb.append(String.format(Locale.ROOT, "  unique snapshot%n"));
-                        for (int l = 0; l < show.length; l++) {
-                            sb.append(String.format(Locale.ROOT, "    %s%n", show[l]));
+                        for (StackTraceElement aShow : show) {
+                            sb.append(String.format(Locale.ROOT, "    %s%n", aShow));
                         }
                     } else {
                         sb.append(String.format(Locale.ROOT, "  %d/%d snapshots sharing following %d elements%n", count, threadElementsSnapshotCount, maxSim));

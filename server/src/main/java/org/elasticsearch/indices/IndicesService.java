@@ -232,7 +232,7 @@ public class IndicesService extends AbstractLifecycleComponent
             });
         }
         try {
-            if (latch.await(shardsClosedTimeout.seconds(), TimeUnit.SECONDS) == false) {
+            if (!latch.await(shardsClosedTimeout.seconds(), TimeUnit.SECONDS)) {
               logger.warn("Not all shards are closed yet, waited {}sec - stopping service", shardsClosedTimeout.seconds());
             }
         } catch (InterruptedException e) {
@@ -303,7 +303,7 @@ public class IndicesService extends AbstractLifecycleComponent
                         continue;
                     }
 
-                    if (statsByShard.containsKey(indexService.index()) == false) {
+                    if (!statsByShard.containsKey(indexService.index())) {
                         statsByShard.put(indexService.index(), arrayAsArrayList(indexShardStats));
                     } else {
                         statsByShard.get(indexService.index()).add(indexShardStats);
@@ -339,7 +339,7 @@ public class IndicesService extends AbstractLifecycleComponent
      * @throws IllegalStateException if no changes allowed.
      */
     private void ensureChangesAllowed() {
-        if (lifecycle.started() == false) {
+        if (!lifecycle.started()) {
             throw new IllegalStateException("Can't make changes to indices service, node is closed");
         }
     }
@@ -417,7 +417,7 @@ public class IndicesService extends AbstractLifecycleComponent
             success = true;
             return indexService;
         } finally {
-            if (success == false) {
+            if (!success) {
                 indexService.close("plugins_failed", true);
             }
         }
@@ -496,7 +496,7 @@ public class IndicesService extends AbstractLifecycleComponent
                 createIndexService("metadata verification", metaData, indicesQueryCache, indicesFieldDataCache, emptyList());
             closeables.add(() -> service.close("metadata verification", false));
             service.mapperService().merge(metaData, MapperService.MergeReason.MAPPING_RECOVERY);
-            if (metaData.equals(metaDataUpdate) == false) {
+            if (!metaData.equals(metaDataUpdate)) {
                 service.updateMetaData(metaDataUpdate);
             }
         } finally {
@@ -537,7 +537,7 @@ public class IndicesService extends AbstractLifecycleComponent
             final IndexService indexService;
             final IndexEventListener listener;
             synchronized (this) {
-                if (hasIndex(index) == false) {
+                if (!hasIndex(index)) {
                     return;
                 }
 
@@ -636,7 +636,7 @@ public class IndicesService extends AbstractLifecycleComponent
                     throw new IllegalStateException("Can't delete index store for [" + index.getName() + "] - it's still part of the indices service [" + localUUid + "] [" + metaData.getIndexUUID() + "]");
                 }
 
-                if (clusterState.metaData().hasIndex(index.getName()) && (clusterState.nodes().getLocalNode().isMasterNode() == true)) {
+                if (clusterState.metaData().hasIndex(index.getName()) && (clusterState.nodes().getLocalNode().isMasterNode())) {
                     // we do not delete the store if it is a master eligible node and the index is still in the cluster state
                     // because we want to keep the meta data for indices around even if no shards are left here
                     final IndexMetaData idxMeta = clusterState.metaData().index(index.getName());
@@ -672,7 +672,7 @@ public class IndicesService extends AbstractLifecycleComponent
         } catch (Exception ex) {
             logger.warn((Supplier<?>) () -> new ParameterizedMessage("{} failed to delete index", index), ex);
         } finally {
-            if (success == false) {
+            if (!success) {
                 addPendingDelete(index, indexSettings);
             }
             // this is a pure protection to make sure this index doesn't get re-imported as a dangling index.
@@ -719,7 +719,7 @@ public class IndicesService extends AbstractLifecycleComponent
         nodeEnv.deleteShardDirectorySafe(shardId, indexSettings);
         logger.debug("{} deleted shard reason [{}]", shardId, reason);
 
-        if (clusterState.nodes().getLocalNode().isMasterNode() == false && // master nodes keep the index meta data, even if having no shards..
+        if (!clusterState.nodes().getLocalNode().isMasterNode() && // master nodes keep the index meta data, even if having no shards..
                 canDeleteIndexContents(shardId.getIndex(), indexSettings)) {
             if (nodeEnv.findAllShardIds(shardId.getIndex()).isEmpty()) {
                 try {
@@ -747,10 +747,7 @@ public class IndicesService extends AbstractLifecycleComponent
         // index contents can be deleted if its an already closed index (so all its resources have
         // already been relinquished)
         final IndexService indexService = indexService(index);
-        if (indexService == null && nodeEnv.hasNodeFile()) {
-            return true;
-        }
-        return false;
+        return indexService == null && nodeEnv.hasNodeFile();
     }
 
     /**
@@ -977,7 +974,7 @@ public class IndicesService extends AbstractLifecycleComponent
                             }
                         }
                     }
-                    if (remove.isEmpty() == false) {
+                    if (!remove.isEmpty()) {
                         logger.warn("{} still pending deletes present for shards {} - retrying", index, remove.toString());
                         Thread.sleep(sleepTime);
                         sleepTime = Math.min(maxSleepTimeMs, sleepTime * 2); // increase the sleep time gradually
@@ -1094,26 +1091,23 @@ public class IndicesService extends AbstractLifecycleComponent
         IndexSettings settings = context.indexShard().indexSettings();
         // if not explicitly set in the request, use the index setting, if not, use the request
         if (request.requestCache() == null) {
-            if (settings.getValue(IndicesRequestCache.INDEX_CACHE_REQUEST_ENABLED_SETTING) == false) {
+            if (!settings.getValue(IndicesRequestCache.INDEX_CACHE_REQUEST_ENABLED_SETTING)) {
                 return false;
             } else if (context.size() != 0) {
                 // If no request cache query parameter and shard request cache
                 // is enabled in settings don't cache for requests with size > 0
                 return false;
             }
-        } else if (request.requestCache() == false) {
+        } else if (!request.requestCache()) {
             return false;
         }
         // if the reader is not a directory reader, we can't get the version from it
-        if ((context.searcher().getIndexReader() instanceof DirectoryReader) == false) {
+        if (!(context.searcher().getIndexReader() instanceof DirectoryReader)) {
             return false;
         }
         // if now in millis is used (or in the future, a more generic "isDeterministic" flag
         // then we can't cache based on "now" key within the search request, as it is not deterministic
-        if (context.getQueryShardContext().isCachable() == false) {
-            return false;
-        }
-        return true;
+        return context.getQueryShardContext().isCachable() != false;
 
     }
 
@@ -1261,7 +1255,7 @@ public class IndicesService extends AbstractLifecycleComponent
         if (service != null) {
             IndexShard shard = service.getShardOrNull(shardId.id());
             final boolean clearedAtLeastOne = service.clearCaches(queryCache, fieldDataCache, fields);
-            if ((requestCache || (clearedAtLeastOne == false && fields.length == 0)) && shard != null) {
+            if ((requestCache || (!clearedAtLeastOne && fields.length == 0)) && shard != null) {
                 indicesRequestCache.clear(new IndexShardCacheEntity(shard));
             }
         }

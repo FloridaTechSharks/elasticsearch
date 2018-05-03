@@ -191,7 +191,7 @@ public class SeqNoFieldMapper extends MetadataFieldMapper {
             long u = Long.MAX_VALUE;
             if (lowerTerm != null) {
                 l = parse(lowerTerm);
-                if (includeLower == false) {
+                if (!includeLower) {
                     if (l == Long.MAX_VALUE) {
                         return new MatchNoDocsQuery();
                     }
@@ -200,7 +200,7 @@ public class SeqNoFieldMapper extends MetadataFieldMapper {
             }
             if (upperTerm != null) {
                 u = parse(upperTerm);
-                if (includeUpper == false) {
+                if (!includeUpper) {
                     if (u == Long.MIN_VALUE) {
                         return new MatchNoDocsQuery();
                     }

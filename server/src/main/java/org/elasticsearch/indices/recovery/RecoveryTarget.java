@@ -403,7 +403,7 @@ public class RecoveryTarget extends AbstractRefCounted implements RecoveryTarget
             Engine.Result result = indexShard().applyTranslogOperation(operation, Engine.Operation.Origin.PEER_RECOVERY, update -> {
                 throw new MapperException("mapping updates are not allowed [" + operation + "]");
             });
-            assert result.hasFailure() == false : "unexpected failure while replicating translog entry: " + result.getFailure();
+            assert !result.hasFailure() : "unexpected failure while replicating translog entry: " + result.getFailure();
             ExceptionsHelper.reThrowIfNotNull(result.getFailure());
         }
         // update stats only after all operations completed (to ensure that mapping updates don't mess with stats)

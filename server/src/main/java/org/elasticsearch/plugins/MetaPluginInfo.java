@@ -127,9 +127,7 @@ public class MetaPluginInfo {
 
         MetaPluginInfo that = (MetaPluginInfo) o;
 
-        if (!name.equals(that.name)) return false;
-
-        return true;
+        return name.equals(that.name);
     }
 
     @Override

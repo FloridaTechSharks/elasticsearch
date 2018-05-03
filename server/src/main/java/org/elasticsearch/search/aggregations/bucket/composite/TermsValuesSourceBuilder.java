@@ -93,7 +93,7 @@ public class TermsValuesSourceBuilder extends CompositeValuesSourceBuilder<Terms
         final FieldContext fieldContext = config.fieldContext();
         if (sortField != null && config.fieldContext() != null) {
             canEarlyTerminate = checkCanEarlyTerminate(context.searcher().getIndexReader(),
-                fieldContext.field(), order() == SortOrder.ASC ? false : true, sortField);
+                fieldContext.field(), order() != SortOrder.ASC, sortField);
         }
         return new CompositeValuesSourceConfig(name, vs, config.format(), order(), canEarlyTerminate);
     }

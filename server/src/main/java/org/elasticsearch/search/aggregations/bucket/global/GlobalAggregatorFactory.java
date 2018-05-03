@@ -44,7 +44,7 @@ public class GlobalAggregatorFactory extends AggregatorFactory<GlobalAggregatorF
             throw new AggregationExecutionException("Aggregation [" + parent.name() + "] cannot have a global " + "sub-aggregation [" + name
                     + "]. Global aggregations can only be defined as top level aggregations");
         }
-        if (collectsFromSingleBucket == false) {
+        if (!collectsFromSingleBucket) {
             throw new IllegalStateException();
         }
         return new GlobalAggregator(name, factories, context, pipelineAggregators, metaData);

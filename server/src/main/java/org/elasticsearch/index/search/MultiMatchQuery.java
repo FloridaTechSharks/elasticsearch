@@ -60,7 +60,7 @@ public class MultiMatchQuery extends MatchQuery {
     private Query parseAndApply(Type type, String fieldName, Object value, String minimumShouldMatch, Float boostValue) throws IOException {
         Query query = parse(type, fieldName, value);
         query = Queries.maybeApplyMinimumShouldMatch(query, minimumShouldMatch);
-        if (query != null && boostValue != null && boostValue != AbstractQueryBuilder.DEFAULT_BOOST && query instanceof MatchNoDocsQuery == false) {
+        if (query != null && boostValue != null && boostValue != AbstractQueryBuilder.DEFAULT_BOOST && !(query instanceof MatchNoDocsQuery)) {
             query = new BoostQuery(query, boostValue);
         }
         return query;
@@ -277,7 +277,7 @@ public class MultiMatchQuery extends MatchQuery {
                     blendedBoost[i] = boost;
                     i++;
                 } else {
-                    if (boost != 1f && query instanceof MatchNoDocsQuery == false) {
+                    if (boost != 1f && !(query instanceof MatchNoDocsQuery)) {
                         query = new BoostQuery(query, boost);
                     }
                     queries.add(query);

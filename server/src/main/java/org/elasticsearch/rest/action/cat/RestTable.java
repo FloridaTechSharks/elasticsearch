@@ -126,8 +126,8 @@ public class RestTable {
         if (columnOrdering != null) {
             Map<String, String> headerAliasMap = table.getAliasMap();
             List<ColumnOrderElement> ordering = new ArrayList<>();
-            for (int i = 0; i < columnOrdering.length; i++) {
-                String columnHeader = columnOrdering[i];
+            for (String aColumnOrdering : columnOrdering) {
+                String columnHeader = aColumnOrdering;
                 boolean reverse = false;
                 if (columnHeader.endsWith(":desc")) {
                     columnHeader = columnHeader.substring(0, columnHeader.length() - ":desc".length());
@@ -136,7 +136,7 @@ public class RestTable {
                     columnHeader = columnHeader.substring(0, columnHeader.length() - ":asc".length());
                 }
                 if (headerAliasMap.containsKey(columnHeader)) {
-                        ordering.add(new ColumnOrderElement(headerAliasMap.get(columnHeader), reverse));
+                    ordering.add(new ColumnOrderElement(headerAliasMap.get(columnHeader), reverse));
                 } else {
                     throw new UnsupportedOperationException(
                         String.format(Locale.ROOT, "Unable to sort by unknown sort key `%s`", columnHeader));

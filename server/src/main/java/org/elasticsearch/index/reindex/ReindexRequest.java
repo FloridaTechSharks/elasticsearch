@@ -70,7 +70,7 @@ public class ReindexRequest extends AbstractBulkIndexByScrollRequest<ReindexRequ
         if (getSearchRequest().indices() == null || getSearchRequest().indices().length == 0) {
             e = addValidationError("use _all if you really want to copy from all existing indexes", e);
         }
-        if (getSearchRequest().source().fetchSource() != null && getSearchRequest().source().fetchSource().fetchSource() == false) {
+        if (getSearchRequest().source().fetchSource() != null && !getSearchRequest().source().fetchSource().fetchSource()) {
             e = addValidationError("_source:false is not supported in this context", e);
         }
         /*

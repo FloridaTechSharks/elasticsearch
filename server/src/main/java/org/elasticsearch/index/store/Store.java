@@ -279,7 +279,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
     public MetadataSnapshot getMetadata(IndexCommit commit, boolean lockDirectory) throws IOException {
         ensureOpen();
         failIfCorrupted();
-        assert lockDirectory ? commit == null : true : "IW lock should not be obtained if there is a commit point available";
+        assert !lockDirectory || commit == null : "IW lock should not be obtained if there is a commit point available";
         // if we lock the directory we also acquire the write lock since that makes sure that nobody else tries to lock the IW
         // on this store at the same time.
         java.util.concurrent.locks.Lock lock = lockDirectory ? metadataLock.writeLock() : metadataLock.readLock();
@@ -308,9 +308,9 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 String left = o1.getValue();
                 String right = o2.getValue();
                 if (left.startsWith(IndexFileNames.SEGMENTS) || right.startsWith(IndexFileNames.SEGMENTS)) {
-                    if (left.startsWith(IndexFileNames.SEGMENTS) == false) {
+                    if (!left.startsWith(IndexFileNames.SEGMENTS)) {
                         return -1;
-                    } else if (right.startsWith(IndexFileNames.SEGMENTS) == false) {
+                    } else if (!right.startsWith(IndexFileNames.SEGMENTS)) {
                         return 1;
                     }
                 }
@@ -510,7 +510,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
             output = new LuceneVerifyingIndexOutput(metadata, output);
             success = true;
         } finally {
-            if (success == false) {
+            if (!success) {
                 IOUtils.closeWhileHandlingException(output);
             }
         }
@@ -643,7 +643,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 }
             }
         }
-        if (ex.isEmpty() == false) {
+        if (!ex.isEmpty()) {
             ExceptionsHelper.rethrowAndSuppress(ex);
         }
     }
@@ -701,7 +701,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     // different in the diff. That's why we have to double check here again if the rest of it matches.
 
                     // all is fine this file is just part of a commit or a segment that is different
-                    if (local.isSame(remote) == false) {
+                    if (!local.isSame(remote)) {
                         logger.debug("Files are different on the recovery target: {} ", recoveryDiff);
                         throw new IllegalStateException("local version: " + local + " is different from remote version after recovery: " + remote, null);
                     }
@@ -1023,7 +1023,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     if (storeFileMetaData == null) {
                         consistent = false;
                         missing.add(meta);
-                    } else if (storeFileMetaData.isSame(meta) == false) {
+                    } else if (!storeFileMetaData.isSame(meta)) {
                         consistent = false;
                         different.add(meta);
                     } else {

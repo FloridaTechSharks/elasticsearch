@@ -166,7 +166,7 @@ public class HunspellService extends AbstractComponent {
             logger.debug("Loading hunspell dictionary [{}]...", locale);
         }
         Path dicDir = hunspellDir.resolve(locale);
-        if (FileSystemUtils.isAccessibleDirectory(dicDir, logger) == false) {
+        if (!FileSystemUtils.isAccessibleDirectory(dicDir, logger)) {
             throw new ElasticsearchException(String.format(Locale.ROOT, "Could not find hunspell dictionary [%s]", locale));
         }
 
@@ -189,8 +189,8 @@ public class HunspellService extends AbstractComponent {
         List<InputStream> dicStreams = new ArrayList<>(dicFiles.length);
         try {
 
-            for (int i = 0; i < dicFiles.length; i++) {
-                dicStreams.add(Files.newInputStream(dicFiles[i]));
+            for (Path dicFile : dicFiles) {
+                dicStreams.add(Files.newInputStream(dicFile));
             }
 
             affixStream = Files.newInputStream(affixFiles[0]);

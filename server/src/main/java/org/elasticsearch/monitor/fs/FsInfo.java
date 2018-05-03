@@ -367,8 +367,8 @@ public class FsInfo implements Iterable<FsInfo.Path>, Writeable, ToXContentFragm
         @Override
         public void writeTo(StreamOutput out) throws IOException {
             out.writeVInt(devicesStats.length);
-            for (int i = 0; i < devicesStats.length; i++) {
-                devicesStats[i].writeTo(out);
+            for (DeviceStats devicesStat : devicesStats) {
+                devicesStat.writeTo(out);
             }
             out.writeLong(totalOperations);
             out.writeLong(totalReadOperations);

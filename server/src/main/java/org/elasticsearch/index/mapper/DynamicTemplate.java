@@ -201,7 +201,7 @@ public class DynamicTemplate implements ToXContentObject {
         }
 
         XContentFieldType xcontentFieldType = null;
-        if (matchMappingType != null && matchMappingType.equals("*") == false) {
+        if (matchMappingType != null && !matchMappingType.equals("*")) {
             try {
                 xcontentFieldType = XContentFieldType.fromString(matchMappingType);
             } catch (IllegalArgumentException e) {
@@ -264,10 +264,7 @@ public class DynamicTemplate implements ToXContentObject {
         if (unmatch != null && matchType.matches(unmatch, name)) {
             return false;
         }
-        if (this.xcontentFieldType != null && this.xcontentFieldType != xcontentFieldType) {
-            return false;
-        }
-        return true;
+        return this.xcontentFieldType == null || this.xcontentFieldType == xcontentFieldType;
     }
 
     public String mappingType(String dynamicType) {
@@ -279,7 +276,7 @@ public class DynamicTemplate implements ToXContentObject {
         } else {
             type = dynamicType;
         }
-        if (type.equals(mapping.get("type")) == false // either the type was not set, or we updated it through replacements
+        if (!type.equals(mapping.get("type")) // either the type was not set, or we updated it through replacements
                 && "text".equals(type)) { // and the result is "text"
             // now that string has been splitted into text and keyword, we use text for
             // dynamic mappings. However before it used to be possible to index as a keyword

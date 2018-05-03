@@ -70,7 +70,7 @@ class FieldTypeLookup implements Iterable<MappedFieldType> {
             } else {
                 // modification of an existing field
                 checkCompatibility(fullNameFieldType, fieldType);
-                if (fieldType.equals(fullNameFieldType) == false) {
+                if (!fieldType.equals(fullNameFieldType)) {
                     fullName = fullName.copyAndPut(fieldType.name(), fieldMapper.fieldType());
                 }
             }
@@ -85,7 +85,7 @@ class FieldTypeLookup implements Iterable<MappedFieldType> {
     private void checkCompatibility(MappedFieldType existingFieldType, MappedFieldType newFieldType) {
         List<String> conflicts = new ArrayList<>();
         existingFieldType.checkCompatibility(newFieldType, conflicts);
-        if (conflicts.isEmpty() == false) {
+        if (!conflicts.isEmpty()) {
             throw new IllegalArgumentException("Mapper for [" + newFieldType.name() + "] conflicts with existing mapping:\n" + conflicts.toString());
         }
     }

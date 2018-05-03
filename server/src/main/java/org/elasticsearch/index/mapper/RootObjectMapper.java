@@ -138,55 +138,57 @@ public class RootObjectMapper extends ObjectMapper {
 
         protected boolean processField(RootObjectMapper.Builder builder, String fieldName, Object fieldNode,
                 Version indexVersionCreated) {
-            if (fieldName.equals("date_formats") || fieldName.equals("dynamic_date_formats")) {
-                if (fieldNode instanceof List) {
-                    List<FormatDateTimeFormatter> formatters = new ArrayList<>();
-                    for (Object formatter : (List<?>) fieldNode) {
-                        if (formatter.toString().startsWith("epoch_")) {
-                            throw new MapperParsingException("Epoch ["+ formatter +"] is not supported as dynamic date format");
+            switch (fieldName) {
+                case "date_formats":
+                case "dynamic_date_formats":
+                    if (fieldNode instanceof List) {
+                        List<FormatDateTimeFormatter> formatters = new ArrayList<>();
+                        for (Object formatter : (List<?>) fieldNode) {
+                            if (formatter.toString().startsWith("epoch_")) {
+                                throw new MapperParsingException("Epoch [" + formatter + "] is not supported as dynamic date format");
+                            }
+                            formatters.add(parseDateTimeFormatter(formatter));
                         }
-                        formatters.add(parseDateTimeFormatter(formatter));
+                        builder.dynamicDateTimeFormatter(formatters);
+                    } else if ("none".equals(fieldNode.toString())) {
+                        builder.dynamicDateTimeFormatter(Collections.emptyList());
+                    } else {
+                        builder.dynamicDateTimeFormatter(Collections.singleton(parseDateTimeFormatter(fieldNode)));
                     }
-                    builder.dynamicDateTimeFormatter(formatters);
-                } else if ("none".equals(fieldNode.toString())) {
-                    builder.dynamicDateTimeFormatter(Collections.emptyList());
-                } else {
-                    builder.dynamicDateTimeFormatter(Collections.singleton(parseDateTimeFormatter(fieldNode)));
-                }
-                return true;
-            } else if (fieldName.equals("dynamic_templates")) {
-                //  "dynamic_templates" : [
-                //      {
-                //          "template_1" : {
-                //              "match" : "*_test",
-                //              "match_mapping_type" : "string",
-                //              "mapping" : { "type" : "string", "store" : "yes" }
-                //          }
-                //      }
-                //  ]
-                List<?> tmplNodes = (List<?>) fieldNode;
-                List<DynamicTemplate> templates = new ArrayList<>();
-                for (Object tmplNode : tmplNodes) {
-                    Map<String, Object> tmpl = (Map<String, Object>) tmplNode;
-                    if (tmpl.size() != 1) {
-                        throw new MapperParsingException("A dynamic template must be defined with a name");
+                    return true;
+                case "dynamic_templates":
+                    //  "dynamic_templates" : [
+                    //      {
+                    //          "template_1" : {
+                    //              "match" : "*_test",
+                    //              "match_mapping_type" : "string",
+                    //              "mapping" : { "type" : "string", "store" : "yes" }
+                    //          }
+                    //      }
+                    //  ]
+                    List<?> tmplNodes = (List<?>) fieldNode;
+                    List<DynamicTemplate> templates = new ArrayList<>();
+                    for (Object tmplNode : tmplNodes) {
+                        Map<String, Object> tmpl = (Map<String, Object>) tmplNode;
+                        if (tmpl.size() != 1) {
+                            throw new MapperParsingException("A dynamic template must be defined with a name");
+                        }
+                        Map.Entry<String, Object> entry = tmpl.entrySet().iterator().next();
+                        String templateName = entry.getKey();
+                        Map<String, Object> templateParams = (Map<String, Object>) entry.getValue();
+                        DynamicTemplate template = DynamicTemplate.parse(templateName, templateParams, indexVersionCreated);
+                        if (template != null) {
+                            templates.add(template);
+                        }
                     }
-                    Map.Entry<String, Object> entry = tmpl.entrySet().iterator().next();
-                    String templateName = entry.getKey();
-                    Map<String, Object> templateParams = (Map<String, Object>) entry.getValue();
-                    DynamicTemplate template = DynamicTemplate.parse(templateName, templateParams, indexVersionCreated);
-                    if (template != null) {
-                        templates.add(template);
-                    }
-                }
-                builder.dynamicTemplates(templates);
-                return true;
-            } else if (fieldName.equals("date_detection")) {
-                builder.dateDetection = new Explicit<>(nodeBooleanValue(fieldNode, "date_detection"), true);
-                return true;
-            } else if (fieldName.equals("numeric_detection")) {
-                builder.numericDetection = new Explicit<>(nodeBooleanValue(fieldNode, "numeric_detection"), true);
-                return true;
+                    builder.dynamicTemplates(templates);
+                    return true;
+                case "date_detection":
+                    builder.dateDetection = new Explicit<>(nodeBooleanValue(fieldNode, "date_detection"), true);
+                    return true;
+                case "numeric_detection":
+                    builder.numericDetection = new Explicit<>(nodeBooleanValue(fieldNode, "numeric_detection"), true);
+                    return true;
             }
             return false;
         }

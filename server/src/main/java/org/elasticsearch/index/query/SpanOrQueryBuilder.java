@@ -112,7 +112,7 @@ public class SpanOrQueryBuilder extends AbstractQueryBuilder<SpanOrQueryBuilder>
                 if (CLAUSES_FIELD.match(currentFieldName)) {
                     while ((token = parser.nextToken()) != XContentParser.Token.END_ARRAY) {
                         QueryBuilder query = parseInnerQueryBuilder(parser);
-                        if (query instanceof SpanQueryBuilder == false) {
+                        if (!(query instanceof SpanQueryBuilder)) {
                             throw new ParsingException(parser.getTokenLocation(), "spanOr [clauses] must be of type span query");
                         }
                         clauses.add((SpanQueryBuilder) query);

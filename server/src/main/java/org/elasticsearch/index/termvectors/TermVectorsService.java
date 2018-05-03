@@ -165,15 +165,12 @@ public class TermVectorsService  {
 
     private static boolean isValidField(MappedFieldType fieldType) {
         // must be a string
-        if (fieldType instanceof KeywordFieldMapper.KeywordFieldType == false
-                && fieldType instanceof TextFieldMapper.TextFieldType == false) {
+        if (!(fieldType instanceof KeywordFieldMapper.KeywordFieldType)
+                && !(fieldType instanceof TextFieldMapper.TextFieldType)) {
             return false;
         }
         // and must be indexed
-        if (fieldType.indexOptions() == IndexOptions.NONE) {
-            return false;
-        }
-        return true;
+        return fieldType.indexOptions() != IndexOptions.NONE;
     }
 
     private static Fields addGeneratedTermVectors(IndexShard indexShard, Engine.GetResult get, Fields termVectorsByField, TermVectorsRequest request, Set<String> selectedFields) throws IOException {
@@ -251,9 +248,9 @@ public class TermVectorsService  {
         }
         if (source != null) {
             for (String field : fields) {
-                if (values.containsKey(field) == false) {
+                if (!values.containsKey(field)) {
                     List<Object> v = XContentMapValues.extractRawValues(field, source);
-                    if (v.isEmpty() == false) {
+                    if (!v.isEmpty()) {
                         values.put(field, v);
                     }
                 }

@@ -213,7 +213,7 @@ public class GeoShapeFieldMapper extends FieldMapper {
                     builder.coerce(TypeParsers.nodeBooleanValue(fieldName, Names.COERCE, fieldNode, parserContext));
                     iterator.remove();
                 } else if (Names.STRATEGY_POINTS_ONLY.equals(fieldName)
-                    && builder.fieldType().strategyName.equals(SpatialStrategy.TERM.getStrategyName()) == false) {
+                    && !builder.fieldType().strategyName.equals(SpatialStrategy.TERM.getStrategyName())) {
                     boolean pointsOnly = TypeParsers.nodeBooleanValue(fieldName, Names.STRATEGY_POINTS_ONLY, fieldNode, parserContext);
                     builder.fieldType().setPointsOnly(pointsOnly);
                     iterator.remove();
@@ -313,12 +313,12 @@ public class GeoShapeFieldMapper extends FieldMapper {
             super.checkCompatibility(fieldType, conflicts);
             GeoShapeFieldType other = (GeoShapeFieldType)fieldType;
             // prevent user from changing strategies
-            if (strategyName().equals(other.strategyName()) == false) {
+            if (!strategyName().equals(other.strategyName())) {
                 conflicts.add("mapper [" + name() + "] has different [strategy]");
             }
 
             // prevent user from changing trees (changes encoding)
-            if (tree().equals(other.tree()) == false) {
+            if (!tree().equals(other.tree())) {
                 conflicts.add("mapper [" + name() + "] has different [tree]");
             }
 
@@ -466,7 +466,7 @@ public class GeoShapeFieldMapper extends FieldMapper {
                 }
                 shape = shapeBuilder.build();
             }
-            if (fieldType().pointsOnly() == true) {
+            if (fieldType().pointsOnly()) {
                 // index configured for pointsOnly
                 if (shape instanceof XShapeCollection && XShapeCollection.class.cast(shape).pointsOnly()) {
                     // MULTIPOINT data: index each point separately
@@ -474,7 +474,7 @@ public class GeoShapeFieldMapper extends FieldMapper {
                     for (Shape s : shapes) {
                         indexShape(context, s);
                     }
-                } else if (shape instanceof Point == false) {
+                } else if (!(shape instanceof Point)) {
                     throw new MapperParsingException("[{" + fieldType().name() + "}] is configured for points only but a " +
                         ((shape instanceof JtsGeometry) ? ((JtsGeometry)shape).getGeom().getGeometryType() : shape.getClass()) + " was found");
                 }
@@ -482,7 +482,7 @@ public class GeoShapeFieldMapper extends FieldMapper {
                 indexShape(context, shape);
             }
         } catch (Exception e) {
-            if (ignoreMalformed.value() == false) {
+            if (!ignoreMalformed.value()) {
                 throw new MapperParsingException("failed to parse [" + fieldType().name() + "]", e);
             }
         }
@@ -518,7 +518,7 @@ public class GeoShapeFieldMapper extends FieldMapper {
     protected void doXContentBody(XContentBuilder builder, boolean includeDefaults, Params params) throws IOException {
         builder.field("type", contentType());
 
-        if (includeDefaults || fieldType().tree().equals(Defaults.TREE) == false) {
+        if (includeDefaults || !fieldType().tree().equals(Defaults.TREE)) {
             builder.field(Names.TREE, fieldType().tree());
         }
         if (includeDefaults || fieldType().treeLevels() != 0) {

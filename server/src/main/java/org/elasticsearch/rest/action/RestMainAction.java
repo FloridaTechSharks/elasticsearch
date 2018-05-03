@@ -63,7 +63,7 @@ public class RestMainAction extends BaseRestHandler {
         RestStatus status = response.isAvailable() ? RestStatus.OK : RestStatus.SERVICE_UNAVAILABLE;
 
         // Default to pretty printing, but allow ?pretty=false to disable
-        if (request.hasParam("pretty") == false) {
+        if (!request.hasParam("pretty")) {
             builder.prettyPrint().lfAtEnd();
         }
         response.toXContent(builder, request);

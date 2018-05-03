@@ -131,7 +131,7 @@ public class IndicesStore extends AbstractComponent implements ClusterStateListe
         // - closed indices don't need to be removed from the cache but we do it anyway for code simplicity
         for (Iterator<ShardId> it = folderNotFoundCache.iterator(); it.hasNext(); ) {
             ShardId shardId = it.next();
-            if (routingTable.hasIndex(shardId.getIndex()) == false) {
+            if (!routingTable.hasIndex(shardId.getIndex())) {
                 it.remove();
             }
         }
@@ -148,7 +148,7 @@ public class IndicesStore extends AbstractComponent implements ClusterStateListe
             // Note, closed indices will not have any routing information, so won't be deleted
             for (IndexShardRoutingTable indexShardRoutingTable : indexRoutingTable) {
                 ShardId shardId = indexShardRoutingTable.shardId();
-                if (folderNotFoundCache.contains(shardId) == false && shardCanBeDeleted(localNodeId, indexShardRoutingTable)) {
+                if (!folderNotFoundCache.contains(shardId) && shardCanBeDeleted(localNodeId, indexShardRoutingTable)) {
                     IndexService indexService = indicesService.indexService(indexRoutingTable.getIndex());
                     final IndexSettings indexSettings;
                     if (indexService == null) {
@@ -190,7 +190,7 @@ public class IndicesStore extends AbstractComponent implements ClusterStateListe
 
         for (ShardRouting shardRouting : indexShardRoutingTable) {
             // be conservative here, check on started, not even active
-            if (shardRouting.started() == false) {
+            if (!shardRouting.started()) {
                 return false;
             }
 

@@ -498,7 +498,7 @@ public class QueryStringQueryParser extends XQueryParser {
             }
             setAnalyzer(forceAnalyzer == null ? queryBuilder.context.getSearchAnalyzer(currentFieldType) : forceAnalyzer);
             Query query = null;
-            if (currentFieldType instanceof StringFieldType == false) {
+            if (!(currentFieldType instanceof StringFieldType)) {
                 query = currentFieldType.prefixQuery(termStr, getMultiTermRewriteMethod(), context);
             } else {
                 query = getPossiblyAnalyzedPrefixQuery(currentFieldType.name(), termStr);
@@ -515,7 +515,7 @@ public class QueryStringQueryParser extends XQueryParser {
     }
 
     private Query getPossiblyAnalyzedPrefixQuery(String field, String termStr) throws ParseException {
-        if (analyzeWildcard == false) {
+        if (!analyzeWildcard) {
             return super.getPrefixQuery(field, termStr);
         }
         List<List<String> > tlist;
@@ -539,13 +539,13 @@ public class QueryStringQueryParser extends XQueryParser {
                 } catch (IOException e) {
                     break;
                 }
-                if (currentPos.isEmpty() == false && posAtt.getPositionIncrement() > 0) {
+                if (!currentPos.isEmpty() && posAtt.getPositionIncrement() > 0) {
                     tlist.add(currentPos);
                     currentPos = new ArrayList<>();
                 }
                 currentPos.add(termAtt.toString());
             }
-            if (currentPos.isEmpty() == false) {
+            if (!currentPos.isEmpty()) {
                 tlist.add(currentPos);
             }
         } finally {
@@ -574,7 +574,7 @@ public class QueryStringQueryParser extends XQueryParser {
                 } else {
                     posQuery = newTermQuery(new Term(field, plist.get(0)));
                 }
-            } else if (isLastPos == false) {
+            } else if (!isLastPos) {
                 // build a synonym query for terms in the same position.
                 Term[] terms = new Term[plist.size()];
                 for (int i = 0; i < plist.size(); i++) {
@@ -601,7 +601,7 @@ public class QueryStringQueryParser extends XQueryParser {
         if (fieldNamesFieldType == null) {
             return new MatchNoDocsQuery("No mappings yet");
         }
-        if (fieldNamesFieldType.isEnabled() == false) {
+        if (!fieldNamesFieldType.isEnabled()) {
             // The field_names_field is disabled so we switch to a wildcard query that matches all terms
             return new WildcardQuery(new Term(fieldName, "*"));
         }
@@ -716,7 +716,7 @@ public class QueryStringQueryParser extends XQueryParser {
     private Query applySlop(Query q, int slop) {
         if (q instanceof PhraseQuery) {
             //make sure that the boost hasn't been set beforehand, otherwise we'd lose it
-            assert q instanceof BoostQuery == false;
+            assert !(q instanceof BoostQuery);
             return addSlopToPhrase((PhraseQuery) q, slop);
         } else if (q instanceof MultiPhraseQuery) {
             MultiPhraseQuery.Builder builder = new MultiPhraseQuery.Builder((MultiPhraseQuery) q);

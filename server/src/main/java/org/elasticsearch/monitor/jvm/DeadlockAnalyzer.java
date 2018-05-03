@@ -160,9 +160,7 @@ public class DeadlockAnalyzer {
 
             Deadlock deadlock = (Deadlock) o;
 
-            if (memberIds != null ? !memberIds.equals(deadlock.memberIds) : deadlock.memberIds != null) return false;
-
-            return true;
+            return memberIds != null ? memberIds.equals(deadlock.memberIds) : deadlock.memberIds == null;
         }
 
         @Override

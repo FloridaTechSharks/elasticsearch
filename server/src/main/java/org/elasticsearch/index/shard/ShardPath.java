@@ -157,7 +157,7 @@ public final class ShardPath {
             // EMPTY is safe here because we never call namedObject
             ShardStateMetaData load = ShardStateMetaData.FORMAT.loadLatestState(logger, NamedXContentRegistry.EMPTY, path);
             if (load != null) {
-                if (load.indexUUID.equals(indexUUID) == false && IndexMetaData.INDEX_UUID_NA_VALUE.equals(load.indexUUID) == false) {
+                if (!load.indexUUID.equals(indexUUID) && !IndexMetaData.INDEX_UUID_NA_VALUE.equals(load.indexUUID)) {
                     logger.warn("{} deleting leftover shard on path: [{}] with a different index UUID", lock.getShardId(), path);
                     assert Files.isDirectory(path) : path + " is not a directory";
                     NodeEnvironment.acquireFSLockForPaths(indexSettings, paths);
@@ -265,11 +265,7 @@ public final class ShardPath {
         if (shardId != null ? !shardId.equals(shardPath.shardId) : shardPath.shardId != null) {
             return false;
         }
-        if (path != null ? !path.equals(shardPath.path) : shardPath.path != null) {
-            return false;
-        }
-
-        return true;
+        return path != null ? path.equals(shardPath.path) : shardPath.path == null;
     }
 
     @Override

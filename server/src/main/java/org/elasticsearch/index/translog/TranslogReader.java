@@ -102,7 +102,7 @@ public class TranslogReader extends BaseTranslogReader implements Closeable {
                 byte b3 = headerStream.readByte();
                 byte b4 = headerStream.readByte();
                 // Convert the 4 bytes that were read into an integer
-                int header = ((b1 & 0xFF) << 24) + ((b2 & 0xFF) << 16) + ((b3 & 0xFF) << 8) + ((b4 & 0xFF) << 0);
+                int header = ((b1 & 0xFF) << 24) + ((b2 & 0xFF) << 16) + ((b3 & 0xFF) << 8) + ((b4 & 0xFF));
                 // We confirm CodecUtil's CODEC_MAGIC number (0x3FD76C17)
                 // ourselves here, because it allows us to read the first
                 // byte separately
@@ -127,7 +127,7 @@ public class TranslogReader extends BaseTranslogReader implements Closeable {
                         ref.length = len;
                         headerStream.read(ref.bytes, ref.offset, ref.length);
                         BytesRef uuidBytes = new BytesRef(translogUUID);
-                        if (uuidBytes.bytesEquals(ref) == false) {
+                        if (!uuidBytes.bytesEquals(ref)) {
                             throw new TranslogCorruptedException("expected shard UUID " + uuidBytes + " but got: " + ref +
                                             " this translog file belongs to a different translog. path:" + path);
                         }

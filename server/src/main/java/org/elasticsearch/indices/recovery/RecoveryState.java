@@ -604,7 +604,7 @@ public class RecoveryState implements ToXContentFragment, Streamable {
         }
 
         boolean fullyRecovered() {
-            return reused == false && length == recovered;
+            return !reused && length == recovered;
         }
 
         public static File readFile(StreamInput in) throws IOException {
@@ -812,7 +812,7 @@ public class RecoveryState implements ToXContentFragment, Streamable {
         public synchronized long totalRecoverBytes() {
             long total = 0;
             for (File file : fileDetails.values()) {
-                if (file.reused() == false) {
+                if (!file.reused()) {
                     total += file.length();
                 }
             }
@@ -836,7 +836,7 @@ public class RecoveryState implements ToXContentFragment, Streamable {
             long total = 0;
             long recovered = 0;
             for (File file : fileDetails.values()) {
-                if (file.reused() == false) {
+                if (!file.reused()) {
                     total += file.length();
                     recovered += file.recovered();
                 }

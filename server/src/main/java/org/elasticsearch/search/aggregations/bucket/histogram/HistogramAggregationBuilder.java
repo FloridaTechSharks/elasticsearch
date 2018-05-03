@@ -166,10 +166,10 @@ public class HistogramAggregationBuilder extends ValuesSourceAggregationBuilder<
      *             are not finite.
      */
     public HistogramAggregationBuilder extendedBounds(double minBound, double maxBound) {
-        if (Double.isFinite(minBound) == false) {
+        if (!Double.isFinite(minBound)) {
             throw new IllegalArgumentException("minBound must be finite, got: " + minBound);
         }
-        if (Double.isFinite(maxBound) == false) {
+        if (!Double.isFinite(maxBound)) {
             throw new IllegalArgumentException("maxBound must be finite, got: " + maxBound);
         }
         if (maxBound < minBound) {

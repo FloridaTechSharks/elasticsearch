@@ -449,13 +449,13 @@ public class SimpleQueryStringBuilder extends AbstractQueryBuilder<SimpleQuerySt
     protected Query doToQuery(QueryShardContext context) throws IOException {
         Settings newSettings = new Settings(settings);
         final Map<String, Float> resolvedFieldsAndWeights;
-        if (fieldsAndWeights.isEmpty() == false) {
+        if (!fieldsAndWeights.isEmpty()) {
             resolvedFieldsAndWeights = QueryParserHelper.resolveMappingFields(context, fieldsAndWeights);
         } else {
             List<String> defaultFields = context.defaultFields();
             boolean isAllField = defaultFields.size() == 1 && Regex.isMatchAllPattern(defaultFields.get(0));
             if (isAllField) {
-                newSettings.lenient(lenientSet ? settings.lenient() : true);
+                newSettings.lenient(!lenientSet || settings.lenient());
             }
             resolvedFieldsAndWeights = QueryParserHelper.resolveMappingFields(context,
                 QueryParserHelper.parseFieldsAndWeights(defaultFields));

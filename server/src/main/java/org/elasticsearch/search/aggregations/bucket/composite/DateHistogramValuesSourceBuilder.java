@@ -236,7 +236,7 @@ public class DateHistogramValuesSourceBuilder extends CompositeValuesSourceBuild
                     pos == numPos-1 &&
                     fieldContext != null)  {
                 canEarlyTerminate = checkCanEarlyTerminate(context.searcher().getIndexReader(),
-                    fieldContext.field(), order() == SortOrder.ASC ? false : true, sortField);
+                    fieldContext.field(), order() != SortOrder.ASC, sortField);
             }
             // dates are returned as timestamp in milliseconds-since-the-epoch unless a specific date format
             // is specified in the builder.

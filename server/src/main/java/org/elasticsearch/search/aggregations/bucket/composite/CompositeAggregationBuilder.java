@@ -162,7 +162,7 @@ public class CompositeAggregationBuilder extends AbstractAggregationBuilder<Comp
             Comparable<?>[] values = new Comparable<?>[sources.size()];
             for (int i = 0; i < sources.size(); i++) {
                 String sourceName = sources.get(i).name();
-                if (after.containsKey(sourceName) == false) {
+                if (!after.containsKey(sourceName)) {
                     throw new IllegalArgumentException("Missing value for [after." + sources.get(i).name() + "]");
                 }
                 Object obj = after.get(sourceName);

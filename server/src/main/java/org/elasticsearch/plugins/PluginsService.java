@@ -157,7 +157,7 @@ public class PluginsService extends AbstractComponent {
 
         // Checking expected plugins
         List<String> mandatoryPlugins = MANDATORY_SETTING.get(settings);
-        if (mandatoryPlugins.isEmpty() == false) {
+        if (!mandatoryPlugins.isEmpty()) {
             Set<String> missingPlugins = new HashSet<>();
             for (String mandatoryPlugin : mandatoryPlugins) {
                 if (!pluginsNames.contains(mandatoryPlugin) && !missingPlugins.contains(mandatoryPlugin)) {
@@ -255,7 +255,7 @@ public class PluginsService extends AbstractComponent {
                 for (Path jar : jarStream) {
                     // normalize with toRealPath to get symlinks out of our hair
                     URL url = jar.toRealPath().toUri().toURL();
-                    if (urls.add(url) == false) {
+                    if (!urls.add(url)) {
                         throw new IllegalStateException("duplicate codebase: " + url);
                     }
                 }
@@ -288,7 +288,7 @@ public class PluginsService extends AbstractComponent {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(modulesDirectory)) {
             for (Path module : stream) {
                 PluginInfo info = PluginInfo.readFromProperties(module);
-                if (bundles.add(new Bundle(info, module)) == false) {
+                if (!bundles.add(new Bundle(info, module))) {
                     throw new IllegalStateException("duplicate module: " + info);
                 }
             }
@@ -331,7 +331,7 @@ public class PluginsService extends AbstractComponent {
                 throw new IllegalStateException("Could not load plugin descriptor for existing plugin ["
                     + plugin.getFileName() + "]. Was the plugin built before 2.0?", e);
             }
-            if (bundles.add(new Bundle(info, plugin)) == false) {
+            if (!bundles.add(new Bundle(info, plugin))) {
                 throw new IllegalStateException("duplicate plugin: " + info);
             }
         }
@@ -420,14 +420,14 @@ public class PluginsService extends AbstractComponent {
 
                 Set<URL> intersection = new HashSet<>(urls);
                 intersection.retainAll(pluginUrls);
-                if (intersection.isEmpty() == false) {
+                if (!intersection.isEmpty()) {
                     throw new IllegalStateException("jar hell! extended plugins " + exts +
                                                     " have duplicate codebases with each other: " + intersection);
                 }
 
                 intersection = new HashSet<>(bundle.urls);
                 intersection.retainAll(pluginUrls);
-                if (intersection.isEmpty() == false) {
+                if (!intersection.isEmpty()) {
                     throw new IllegalStateException("jar hell! duplicate codebases with extended plugin [" +
                                                     extendedPlugin + "]: " + intersection);
                 }
@@ -464,7 +464,7 @@ public class PluginsService extends AbstractComponent {
         for (String extendedPluginName : bundle.plugin.getExtendedPlugins()) {
             Plugin extendedPlugin = loaded.get(extendedPluginName);
             assert extendedPlugin != null;
-            if (ExtensiblePlugin.class.isInstance(extendedPlugin) == false) {
+            if (!ExtensiblePlugin.class.isInstance(extendedPlugin)) {
                 throw new IllegalStateException("Plugin [" + name + "] cannot extend non-extensible plugin [" + extendedPluginName + "]");
             }
             extendedLoaders.add(extendedPlugin.getClass().getClassLoader());

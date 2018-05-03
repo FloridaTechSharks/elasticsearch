@@ -124,12 +124,12 @@ public abstract class BaseRestHandler extends AbstractComponent implements RestH
                 if (compare != 0) return -compare;
                 else return a.v2().compareTo(b.v2());
             });
-            if (first == false) {
+            if (!first) {
                 message.append(", ");
             }
             message.append("[").append(invalid).append("]");
             final List<String> keys = scoredParams.stream().map(Tuple::v2).collect(Collectors.toList());
-            if (keys.isEmpty() == false) {
+            if (!keys.isEmpty()) {
                 message.append(" -> did you mean ");
                 if (keys.size() == 1) {
                     message.append("[").append(keys.get(0)).append("]");

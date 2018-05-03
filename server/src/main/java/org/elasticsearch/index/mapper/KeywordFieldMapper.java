@@ -130,30 +130,36 @@ public final class KeywordFieldMapper extends FieldMapper {
                 Map.Entry<String, Object> entry = iterator.next();
                 String propName = entry.getKey();
                 Object propNode = entry.getValue();
-                if (propName.equals("null_value")) {
-                    if (propNode == null) {
-                        throw new MapperParsingException("Property [null_value] cannot be null.");
-                    }
-                    builder.nullValue(propNode.toString());
-                    iterator.remove();
-                } else if (propName.equals("ignore_above")) {
-                    builder.ignoreAbove(XContentMapValues.nodeIntegerValue(propNode, -1));
-                    iterator.remove();
-                } else if (propName.equals("norms")) {
-                    builder.omitNorms(XContentMapValues.nodeBooleanValue(propNode, "norms") == false);
-                    iterator.remove();
-                } else if (propName.equals("eager_global_ordinals")) {
-                    builder.eagerGlobalOrdinals(XContentMapValues.nodeBooleanValue(propNode, "eager_global_ordinals"));
-                    iterator.remove();
-                } else if (propName.equals("normalizer")) {
-                    if (propNode != null) {
-                        NamedAnalyzer normalizer = parserContext.getIndexAnalyzers().getNormalizer(propNode.toString());
-                        if (normalizer == null) {
-                            throw new MapperParsingException("normalizer [" + propNode.toString() + "] not found for field [" + name + "]");
+                switch (propName) {
+                    case "null_value":
+                        if (propNode == null) {
+                            throw new MapperParsingException("Property [null_value] cannot be null.");
                         }
-                        builder.normalizer(normalizer);
-                    }
-                    iterator.remove();
+                        builder.nullValue(propNode.toString());
+                        iterator.remove();
+                        break;
+                    case "ignore_above":
+                        builder.ignoreAbove(XContentMapValues.nodeIntegerValue(propNode, -1));
+                        iterator.remove();
+                        break;
+                    case "norms":
+                        builder.omitNorms(!XContentMapValues.nodeBooleanValue(propNode, "norms"));
+                        iterator.remove();
+                        break;
+                    case "eager_global_ordinals":
+                        builder.eagerGlobalOrdinals(XContentMapValues.nodeBooleanValue(propNode, "eager_global_ordinals"));
+                        iterator.remove();
+                        break;
+                    case "normalizer":
+                        if (propNode != null) {
+                            NamedAnalyzer normalizer = parserContext.getIndexAnalyzers().getNormalizer(propNode.toString());
+                            if (normalizer == null) {
+                                throw new MapperParsingException("normalizer [" + propNode.toString() + "] not found for field [" + name + "]");
+                            }
+                            builder.normalizer(normalizer);
+                        }
+                        iterator.remove();
+                        break;
                 }
             }
             return builder;
@@ -180,7 +186,7 @@ public final class KeywordFieldMapper extends FieldMapper {
 
         @Override
         public boolean equals(Object o) {
-            if (super.equals(o) == false) {
+            if (!super.equals(o)) {
                 return false;
             }
             return Objects.equals(normalizer, ((KeywordFieldType) o).normalizer);
@@ -190,7 +196,7 @@ public final class KeywordFieldMapper extends FieldMapper {
         public void checkCompatibility(MappedFieldType otherFT, List<String> conflicts) {
             super.checkCompatibility(otherFT, conflicts);
             KeywordFieldType other = (KeywordFieldType) otherFT;
-            if (Objects.equals(normalizer, other.normalizer) == false) {
+            if (!Objects.equals(normalizer, other.normalizer)) {
                 conflicts.add("mapper [" + name() + "] has different [normalizer]");
             }
         }
@@ -317,7 +323,7 @@ public final class KeywordFieldMapper extends FieldMapper {
             try (TokenStream ts = normalizer.tokenStream(name(), value)) {
                 final CharTermAttribute termAtt = ts.addAttribute(CharTermAttribute.class);
                 ts.reset();
-                if (ts.incrementToken() == false) {
+                if (!ts.incrementToken()) {
                   throw new IllegalStateException("The normalization token stream is "
                       + "expected to produce exactly 1 token, but got 0 for analyzer "
                       + normalizer + " and input \"" + value + "\"");

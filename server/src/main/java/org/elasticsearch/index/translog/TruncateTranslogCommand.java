@@ -99,11 +99,11 @@ public class TruncateTranslogCommand extends EnvironmentAwareCommand {
         Path translogPath = getTranslogPath(options);
         Path idxLocation = translogPath.getParent().resolve("index");
 
-        if (Files.exists(translogPath) == false || Files.isDirectory(translogPath) == false) {
+        if (!Files.exists(translogPath) || !Files.isDirectory(translogPath)) {
             throw new ElasticsearchException("translog directory [" + translogPath + "], must exist and be a directory");
         }
 
-        if (Files.exists(idxLocation) == false || Files.isDirectory(idxLocation) == false) {
+        if (!Files.exists(idxLocation) || !Files.isDirectory(idxLocation)) {
             throw new ElasticsearchException("unable to find a shard at [" + idxLocation + "], which must exist and be a directory");
         }
         try (Directory dir = FSDirectory.open(idxLocation, NativeFSLockFactory.INSTANCE)) {
@@ -235,7 +235,7 @@ public class TruncateTranslogCommand extends EnvironmentAwareCommand {
             terminal.println("--> " + file);
         }
         terminal.println("");
-        if (batchMode == false) {
+        if (!batchMode) {
             String text = terminal.readText("Continue and DELETE files? [y/N] ");
             if (!text.equalsIgnoreCase("y")) {
                 throw new ElasticsearchException("aborted by user");

@@ -93,9 +93,9 @@ public class FsDirectoryService extends DirectoryService {
 
     private static Directory setPreload(Directory directory, Path location, LockFactory lockFactory,
             Set<String> preLoadExtensions) throws IOException {
-        if (preLoadExtensions.isEmpty() == false
+        if (!preLoadExtensions.isEmpty()
                 && directory instanceof MMapDirectory
-                && ((MMapDirectory) directory).getPreload() == false) {
+                && !((MMapDirectory) directory).getPreload()) {
             if (preLoadExtensions.contains("*")) {
                 ((MMapDirectory) directory).setPreload(true);
                 return directory;

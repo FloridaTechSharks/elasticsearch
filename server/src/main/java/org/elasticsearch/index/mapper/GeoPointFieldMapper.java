@@ -252,7 +252,7 @@ public class GeoPointFieldMapper extends FieldMapper implements ArrayValueMapper
                         try {
                             parse(context, GeoUtils.parseGeoPoint(context.parser(), sparse));
                         } catch (ElasticsearchParseException e) {
-                            if (ignoreMalformed.value() == false) {
+                            if (!ignoreMalformed.value()) {
                                 throw e;
                             }
                         }
@@ -274,7 +274,7 @@ public class GeoPointFieldMapper extends FieldMapper implements ArrayValueMapper
                                 try {
                                     parse(context, GeoUtils.parseGeoPoint(context.parser(), sparse));
                                 } catch (ElasticsearchParseException e) {
-                                    if (ignoreMalformed.value() == false) {
+                                    if (!ignoreMalformed.value()) {
                                         throw e;
                                     }
                                 }
@@ -289,7 +289,7 @@ public class GeoPointFieldMapper extends FieldMapper implements ArrayValueMapper
                 try {
                     parse(context, GeoUtils.parseGeoPoint(context.parser(), sparse));
                 } catch (ElasticsearchParseException e) {
-                    if (ignoreMalformed.value() == false) {
+                    if (!ignoreMalformed.value()) {
                         throw e;
                     }
                 }

@@ -80,13 +80,8 @@ public final class ElasticsearchMergePolicy extends MergePolicy {
             // Always upgrade segment if Lucene's major version is too old
             return true;
         }
-        if (upgradeOnlyAncientSegments == false && cur.minor > old.minor) {
-            // If it's only a minor version difference, and we are not upgrading only ancient segments,
-            // also upgrade:
-            return true;
-        }
+        return upgradeOnlyAncientSegments == false && cur.minor > old.minor;
         // Version matches, or segment is not ancient and we are only upgrading ancient segments:
-        return false;
     }
 
     @Override
@@ -116,7 +111,7 @@ public final class ElasticsearchMergePolicy extends MergePolicy {
             }
 
             // We must have less than our max upgrade merges, so the next return will be our last in upgrading mode.
-            if (spec.merges.isEmpty() == false) {
+            if (!spec.merges.isEmpty()) {
                 logger.debug("Returning {} merges for end of upgrade", spec.merges.size());
                 return spec;
             }

@@ -82,7 +82,7 @@ public final class SimilarityService extends AbstractIndexComponent {
             String typeName = providerSettings.get("type");
             if (typeName == null) {
                 throw new IllegalArgumentException("Similarity [" + name + "] must have an associated type");
-            } else if ((similarities.containsKey(typeName) || BUILT_IN.containsKey(typeName)) == false) {
+            } else if (!(similarities.containsKey(typeName) || BUILT_IN.containsKey(typeName))) {
                 throw new IllegalArgumentException("Unknown Similarity type [" + typeName + "] for [" + name + "]");
             }
             SimilarityProvider.Factory defaultFactory = BUILT_IN.get(typeName);

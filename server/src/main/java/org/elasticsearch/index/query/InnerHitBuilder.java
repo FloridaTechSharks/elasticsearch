@@ -157,7 +157,7 @@ public final class InnerHitBuilder implements Writeable, ToXContentObject {
              */
             in.readNamedWriteable(QueryBuilder.class);
             boolean hasChildren = in.readBoolean();
-            assert hasChildren == false;
+            assert !hasChildren;
         }
     }
 

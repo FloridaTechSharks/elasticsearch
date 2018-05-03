@@ -143,24 +143,29 @@ public class TextFieldMapper extends FieldMapper {
                 Map.Entry<String, Object> entry = iterator.next();
                 String propName = entry.getKey();
                 Object propNode = entry.getValue();
-                if (propName.equals("position_increment_gap")) {
-                    int newPositionIncrementGap = XContentMapValues.nodeIntegerValue(propNode, -1);
-                    builder.positionIncrementGap(newPositionIncrementGap);
-                    iterator.remove();
-                } else if (propName.equals("fielddata")) {
-                    builder.fielddata(XContentMapValues.nodeBooleanValue(propNode, "fielddata"));
-                    iterator.remove();
-                } else if (propName.equals("eager_global_ordinals")) {
-                    builder.eagerGlobalOrdinals(XContentMapValues.nodeBooleanValue(propNode, "eager_global_ordinals"));
-                    iterator.remove();
-                } else if (propName.equals("fielddata_frequency_filter")) {
-                    Map<?,?> frequencyFilter = (Map<?, ?>) propNode;
-                    double minFrequency = XContentMapValues.nodeDoubleValue(frequencyFilter.remove("min"), 0);
-                    double maxFrequency = XContentMapValues.nodeDoubleValue(frequencyFilter.remove("max"), Integer.MAX_VALUE);
-                    int minSegmentSize = XContentMapValues.nodeIntegerValue(frequencyFilter.remove("min_segment_size"), 0);
-                    builder.fielddataFrequencyFilter(minFrequency, maxFrequency, minSegmentSize);
-                    DocumentMapperParser.checkNoRemainingFields(propName, frequencyFilter, parserContext.indexVersionCreated());
-                    iterator.remove();
+                switch (propName) {
+                    case "position_increment_gap":
+                        int newPositionIncrementGap = XContentMapValues.nodeIntegerValue(propNode, -1);
+                        builder.positionIncrementGap(newPositionIncrementGap);
+                        iterator.remove();
+                        break;
+                    case "fielddata":
+                        builder.fielddata(XContentMapValues.nodeBooleanValue(propNode, "fielddata"));
+                        iterator.remove();
+                        break;
+                    case "eager_global_ordinals":
+                        builder.eagerGlobalOrdinals(XContentMapValues.nodeBooleanValue(propNode, "eager_global_ordinals"));
+                        iterator.remove();
+                        break;
+                    case "fielddata_frequency_filter":
+                        Map<?, ?> frequencyFilter = (Map<?, ?>) propNode;
+                        double minFrequency = XContentMapValues.nodeDoubleValue(frequencyFilter.remove("min"), 0);
+                        double maxFrequency = XContentMapValues.nodeDoubleValue(frequencyFilter.remove("max"), Integer.MAX_VALUE);
+                        int minSegmentSize = XContentMapValues.nodeIntegerValue(frequencyFilter.remove("min_segment_size"), 0);
+                        builder.fielddataFrequencyFilter(minFrequency, maxFrequency, minSegmentSize);
+                        DocumentMapperParser.checkNoRemainingFields(propName, frequencyFilter, parserContext.indexVersionCreated());
+                        iterator.remove();
+                        break;
                 }
             }
             return builder;
@@ -196,7 +201,7 @@ public class TextFieldMapper extends FieldMapper {
 
         @Override
         public boolean equals(Object o) {
-            if (super.equals(o) == false) {
+            if (!super.equals(o)) {
                 return false;
             }
             TextFieldType that = (TextFieldType) o;
@@ -272,7 +277,7 @@ public class TextFieldMapper extends FieldMapper {
 
         @Override
         public IndexFieldData.Builder fielddataBuilder(String fullyQualifiedIndexName) {
-            if (fielddata == false) {
+            if (!fielddata) {
                 throw new IllegalArgumentException("Fielddata is disabled on text fields by default. Set fielddata=true on [" + name()
                         + "] in order to load fielddata in memory by uninverting the inverted index. Note that this can however "
                                 + "use significant memory. Alternatively use a keyword field instead.");
@@ -288,7 +293,7 @@ public class TextFieldMapper extends FieldMapper {
                                 Settings indexSettings, MultiFields multiFields, CopyTo copyTo) {
         super(simpleName, fieldType, defaultFieldType, indexSettings, multiFields, copyTo);
         assert fieldType.tokenized();
-        assert fieldType.hasDocValues() == false;
+        assert !fieldType.hasDocValues();
         if (fieldType().indexOptions() == IndexOptions.NONE && fieldType().fielddata()) {
             throw new IllegalArgumentException("Cannot enable fielddata on a [text] field that is not indexed: [" + name() + "]");
         }

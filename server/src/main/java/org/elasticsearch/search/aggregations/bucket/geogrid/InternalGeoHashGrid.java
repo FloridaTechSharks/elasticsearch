@@ -207,7 +207,7 @@ public class InternalGeoHashGrid extends InternalMultiBucketAggregation<Internal
             }
         }
 
-        final int size = Math.toIntExact(reduceContext.isFinalReduce() == false ? buckets.size() : Math.min(requiredSize, buckets.size()));
+        final int size = Math.toIntExact(!reduceContext.isFinalReduce() ? buckets.size() : Math.min(requiredSize, buckets.size()));
         BucketPriorityQueue ordered = new BucketPriorityQueue(size);
         for (LongObjectPagedHashMap.Cursor<List<Bucket>> cursor : buckets) {
             List<Bucket> sameCellBuckets = cursor.value;

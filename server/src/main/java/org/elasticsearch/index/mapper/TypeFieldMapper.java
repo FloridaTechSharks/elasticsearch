@@ -233,7 +233,7 @@ public class TypeFieldMapper extends MetadataFieldMapper {
 
         @Override
         public boolean equals(Object obj) {
-            if (sameClassAs(obj) == false) {
+            if (!sameClassAs(obj)) {
                 return false;
             }
             TypesQuery that = (TypesQuery) obj;

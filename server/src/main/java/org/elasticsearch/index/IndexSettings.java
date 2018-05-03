@@ -412,7 +412,7 @@ public final class IndexSettings {
         this.indexSortConfig = new IndexSortConfig(this);
         searchIdleAfter = scopedSettings.get(INDEX_SEARCH_IDLE_AFTER);
         singleType = INDEX_MAPPING_SINGLE_TYPE_SETTING.get(indexMetaData.getSettings()); // get this from metadata - it's not registered
-        if ((singleType || version.before(Version.V_6_0_0_alpha1)) == false) {
+        if (!(singleType || version.before(Version.V_6_0_0_alpha1))) {
             throw new AssertionError(index.toString()  + "multiple types are only allowed on pre 6.x indices but version is: ["
                 + version + "]");
         }
@@ -569,11 +569,11 @@ public final class IndexSettings {
      */
     public synchronized boolean updateIndexMetaData(IndexMetaData indexMetaData) {
         final Settings newSettings = indexMetaData.getSettings();
-        if (version.equals(Version.indexCreated(newSettings)) == false) {
+        if (!version.equals(Version.indexCreated(newSettings))) {
             throw new IllegalArgumentException("version mismatch on settings update expected: " + version + " but was: " + Version.indexCreated(newSettings));
         }
         final String newUUID = newSettings.get(IndexMetaData.SETTING_INDEX_UUID, IndexMetaData.INDEX_UUID_NA_VALUE);
-        if (newUUID.equals(getUUID()) == false) {
+        if (!newUUID.equals(getUUID())) {
             throw new IllegalArgumentException("uuid mismatch on settings update expected: " + getUUID() + " but was: " + newUUID);
         }
         this.indexMetaData = indexMetaData;

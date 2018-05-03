@@ -149,18 +149,22 @@ public class NumberFieldMapper extends FieldMapper {
                 Map.Entry<String, Object> entry = iterator.next();
                 String propName = entry.getKey();
                 Object propNode = entry.getValue();
-                if (propName.equals("null_value")) {
-                    if (propNode == null) {
-                        throw new MapperParsingException("Property [null_value] cannot be null.");
-                    }
-                    builder.nullValue(type.parse(propNode, false));
-                    iterator.remove();
-                } else if (propName.equals("ignore_malformed")) {
-                    builder.ignoreMalformed(TypeParsers.nodeBooleanValue(name,"ignore_malformed", propNode, parserContext));
-                    iterator.remove();
-                } else if (propName.equals("coerce")) {
-                    builder.coerce(TypeParsers.nodeBooleanValue(name, "coerce", propNode, parserContext));
-                    iterator.remove();
+                switch (propName) {
+                    case "null_value":
+                        if (propNode == null) {
+                            throw new MapperParsingException("Property [null_value] cannot be null.");
+                        }
+                        builder.nullValue(type.parse(propNode, false));
+                        iterator.remove();
+                        break;
+                    case "ignore_malformed":
+                        builder.ignoreMalformed(TypeParsers.nodeBooleanValue(name, "ignore_malformed", propNode, parserContext));
+                        iterator.remove();
+                        break;
+                    case "coerce":
+                        builder.coerce(TypeParsers.nodeBooleanValue(name, "coerce", propNode, parserContext));
+                        iterator.remove();
+                        break;
                 }
             }
             return builder;
@@ -307,13 +311,13 @@ public class NumberFieldMapper extends FieldMapper {
                 float u = Float.POSITIVE_INFINITY;
                 if (lowerTerm != null) {
                     l = parse(lowerTerm, false);
-                    if (includeLower == false) {
+                    if (!includeLower) {
                         l = FloatPoint.nextUp(l);
                     }
                 }
                 if (upperTerm != null) {
                     u = parse(upperTerm, false);
-                    if (includeUpper == false) {
+                    if (!includeUpper) {
                         u = FloatPoint.nextDown(u);
                     }
                 }
@@ -388,13 +392,13 @@ public class NumberFieldMapper extends FieldMapper {
                 double u = Double.POSITIVE_INFINITY;
                 if (lowerTerm != null) {
                     l = parse(lowerTerm, false);
-                    if (includeLower == false) {
+                    if (!includeLower) {
                         l = DoublePoint.nextUp(l);
                     }
                 }
                 if (upperTerm != null) {
                     u = parse(upperTerm, false);
-                    if (includeUpper == false) {
+                    if (!includeUpper) {
                         u = DoublePoint.nextDown(u);
                     }
                 }
@@ -577,8 +581,7 @@ public class NumberFieldMapper extends FieldMapper {
                 int[] v = new int[values.size()];
                 int upTo = 0;
 
-                for (int i = 0; i < values.size(); i++) {
-                    Object value = values.get(i);
+                for (Object value : values) {
                     if (!hasDecimalPart(value)) {
                         v[upTo++] = parse(value, true);
                     }
@@ -618,7 +621,7 @@ public class NumberFieldMapper extends FieldMapper {
                 if (upperTerm != null) {
                     u = parse(upperTerm, true);
                     boolean upperTermHasDecimalPart = hasDecimalPart(upperTerm);
-                    if ((upperTermHasDecimalPart == false && includeUpper == false) ||
+                    if ((!upperTermHasDecimalPart && !includeUpper) ||
                             (upperTermHasDecimalPart && signum(upperTerm) < 0)) {
                         if (u == Integer.MIN_VALUE) {
                             return new MatchNoDocsQuery();
@@ -691,8 +694,7 @@ public class NumberFieldMapper extends FieldMapper {
                 long[] v = new long[values.size()];
                 int upTo = 0;
 
-                for (int i = 0; i < values.size(); i++) {
-                    Object value = values.get(i);
+                for (Object value : values) {
                     if (!hasDecimalPart(value)) {
                         v[upTo++] = parse(value, true);
                     }
@@ -732,7 +734,7 @@ public class NumberFieldMapper extends FieldMapper {
                 if (upperTerm != null) {
                     u = parse(upperTerm, true);
                     boolean upperTermHasDecimalPart = hasDecimalPart(upperTerm);
-                    if ((upperTermHasDecimalPart == false && includeUpper == false) ||
+                    if ((!upperTermHasDecimalPart && !includeUpper) ||
                             (upperTermHasDecimalPart && signum(upperTerm) < 0)) {
                         if (u == Long.MIN_VALUE) {
                             return new MatchNoDocsQuery();
@@ -1013,7 +1015,7 @@ public class NumberFieldMapper extends FieldMapper {
         boolean docValued = fieldType().hasDocValues();
         boolean stored = fieldType().stored();
         fields.addAll(fieldType().type.createFields(fieldType().name(), numericValue, indexed, docValued, stored));
-        if (docValued == false && (stored || indexed)) {
+        if (!docValued && (stored || indexed)) {
             createFieldNamesField(context, fields);
         }
     }

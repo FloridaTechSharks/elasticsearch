@@ -123,7 +123,7 @@ public final class Pipeline {
             List<Map<String, Object>> onFailureProcessorConfigs =
                     ConfigurationUtils.readOptionalList(null, null, config, ON_FAILURE_KEY);
             List<Processor> onFailureProcessors = ConfigurationUtils.readProcessorConfigs(onFailureProcessorConfigs, processorFactories);
-            if (config.isEmpty() == false) {
+            if (!config.isEmpty()) {
                 throw new ElasticsearchParseException("pipeline [" + id +
                         "] doesn't support one or more provided configuration parameters " + Arrays.toString(config.keySet().toArray()));
             }

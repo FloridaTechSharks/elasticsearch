@@ -152,7 +152,7 @@ public abstract class AbstractBulkByScrollRequest<Self extends AbstractBulkByScr
         if (maxRetries < 0) {
             e = addValidationError("retries cannnot be negative", e);
         }
-        if (false == (size == -1 || size > 0)) {
+        if (!(size == -1 || size > 0)) {
             e = addValidationError(
                     "size should be greater than 0 if the request is limited to some number of documents or -1 if it isn't but it was ["
                             + size + "]",

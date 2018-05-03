@@ -239,7 +239,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             // refresh mapping can happen when the parsing/merging of the mapping from the metadata doesn't result in the same
             // mapping, in this case, we send to the master to refresh its own version of the mappings (to conform with the
             // merge version of it, which it does when refreshing the mappings), and warn log it.
-            if (documentMapper(mappingType).mappingSource().equals(incomingMappingSource) == false) {
+            if (!documentMapper(mappingType).mappingSource().equals(incomingMappingSource)) {
                 logger.debug("[{}] parsed mapping [{}], and got different sources\noriginal:\n{}\nparsed:\n{}", index(), mappingType,
                     incomingMappingSource, documentMapper(mappingType).mappingSource());
 
@@ -277,7 +277,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             MappingMetaData mappingMetaData = cursor.value;
             if (onlyUpdateIfNeeded) {
                 DocumentMapper existingMapper = documentMapper(mappingMetaData.type());
-                if (existingMapper == null || mappingMetaData.source().equals(existingMapper.mappingSource()) == false) {
+                if (existingMapper == null || !mappingMetaData.source().equals(existingMapper.mappingSource())) {
                     map.put(mappingMetaData.type(), mappingMetaData.source());
                 }
             } else {
@@ -324,7 +324,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
                 // the default was already applied if we are recovering
                 reason != MergeReason.MAPPING_RECOVERY
                     // only apply the default mapping if we don't have the type yet
-                    && mappers.containsKey(type) == false;
+                    && !mappers.containsKey(type);
 
             try {
                 DocumentMapper documentMapper =
@@ -345,7 +345,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         if (type.length() > 255) {
             throw new InvalidTypeNameException("mapping type name [" + type + "] is too long; limit is length 255 but was [" + type.length() + "]");
         }
-        if (type.charAt(0) == '_' && SINGLE_MAPPING_NAME.equals(type) == false) {
+        if (type.charAt(0) == '_' && !SINGLE_MAPPING_NAME.equals(type)) {
             throw new InvalidTypeNameException("mapping type name [" + type + "] can't start with '_' unless it is called [" + SINGLE_MAPPING_NAME + "]");
         }
         if (type.contains("#")) {
@@ -528,7 +528,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         final CompressedXContent mappingSource = mapper.mappingSource();
         DocumentMapper newMapper = parse(mapper.type(), mappingSource, false);
 
-        if (newMapper.mappingSource().equals(mappingSource) == false) {
+        if (!newMapper.mappingSource().equals(mappingSource)) {
             throw new IllegalStateException("DocumentMapper serialization result is different from source. \n--> Source ["
                 + mappingSource + "]\n--> Result ["
                 + newMapper.mappingSource() + "]");
@@ -543,7 +543,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         final Set<String> objectFullNames = new HashSet<>();
         for (ObjectMapper objectMapper : objectMappers) {
             final String fullPath = objectMapper.fullPath();
-            if (objectFullNames.add(fullPath) == false) {
+            if (!objectFullNames.add(fullPath)) {
                 throw new IllegalArgumentException("Object mapper [" + fullPath + "] is defined twice in mapping for type [" + type + "]");
             }
         }
@@ -553,7 +553,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             final String name = fieldMapper.name();
             if (objectFullNames.contains(name)) {
                 throw new IllegalArgumentException("Field [" + name + "] is defined both as an object and a field in [" + type + "]");
-            } else if (fieldNames.add(name) == false) {
+            } else if (!fieldNames.add(name)) {
                 throw new IllegalArgumentException("Field [" + name + "] is defined twice in [" + type + "]");
             }
         }
@@ -650,7 +650,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
     private static void validateCopyTo(List<FieldMapper> fieldMappers, Map<String, ObjectMapper> fullPathObjectMappers,
             FieldTypeLookup fieldTypes) {
         for (FieldMapper mapper : fieldMappers) {
-            if (mapper.copyTo() != null && mapper.copyTo().copyToFields().isEmpty() == false) {
+            if (mapper.copyTo() != null && !mapper.copyTo().copyToFields().isEmpty()) {
                 String sourceParent = parentObject(mapper.name());
                 if (sourceParent != null && fieldTypes.get(sourceParent) != null) {
                     throw new IllegalArgumentException("[copy_to] may not be used to copy from a multi-field: [" + mapper.name() + "]");
@@ -691,7 +691,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         } else {
             targetIsParentOfSource = source.equals(target) || source.startsWith(target + ".");
         }
-        if (targetIsParentOfSource == false) {
+        if (!targetIsParentOfSource) {
             throw new IllegalArgumentException(
                     "Illegal combination of [copy_to] and [nested] mappings: [copy_to] may only copy data to the current nested " +
                             "document or any of its parents, however one [copy_to] directive is trying to copy data from nested object [" +
@@ -761,7 +761,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
      * then the fields will be returned with a type prefix.
      */
     public Collection<String> simpleMatchToIndexNames(String pattern) {
-        if (Regex.isSimpleMatchPattern(pattern) == false) {
+        if (!Regex.isSimpleMatchPattern(pattern)) {
             // no wildcards
             return Collections.singletonList(pattern);
         }
@@ -859,7 +859,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
 
     /** Return a term that uniquely identifies the document, or {@code null} if the type is not allowed. */
     public Term createUidTerm(String type, String id) {
-        if (hasMapping(type) == false) {
+        if (!hasMapping(type)) {
             return null;
         }
         if (indexSettings.getIndexVersionCreated().onOrAfter(Version.V_6_0_0_beta1)) {

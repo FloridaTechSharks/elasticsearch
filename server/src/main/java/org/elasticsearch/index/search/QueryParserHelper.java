@@ -172,7 +172,7 @@ public final class QueryParserHelper {
                 fields.put(fieldOrPattern, weight);
                 continue;
             }
-            if (acceptMetadataField == false && mapper instanceof MetadataFieldMapper) {
+            if (!acceptMetadataField && mapper instanceof MetadataFieldMapper) {
                 // Ignore metadata fields
                 continue;
             }
@@ -180,7 +180,7 @@ public final class QueryParserHelper {
             // types do not support term queries, and thus we cannot generate
             // a special query for them.
             String mappingType = mapper.fieldType().typeName();
-            if (acceptAllTypes == false && ALLOWED_QUERY_MAPPER_TYPES.contains(mappingType) == false) {
+            if (!acceptAllTypes && !ALLOWED_QUERY_MAPPER_TYPES.contains(mappingType)) {
                 continue;
             }
             fields.put(fieldName, weight);

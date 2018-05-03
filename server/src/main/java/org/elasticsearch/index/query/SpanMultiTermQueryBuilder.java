@@ -93,7 +93,7 @@ public class SpanMultiTermQueryBuilder extends AbstractQueryBuilder<SpanMultiTer
             } else if (token == XContentParser.Token.START_OBJECT) {
                 if (MATCH_FIELD.match(currentFieldName)) {
                     QueryBuilder query = parseInnerQueryBuilder(parser);
-                    if (query instanceof MultiTermQueryBuilder == false) {
+                    if (!(query instanceof MultiTermQueryBuilder)) {
                         throw new ParsingException(parser.getTokenLocation(),
                                 "[span_multi] [" + MATCH_FIELD.getPreferredName() + "] must be of type multi term query");
                     }
@@ -130,8 +130,8 @@ public class SpanMultiTermQueryBuilder extends AbstractQueryBuilder<SpanMultiTer
             boost = boostQuery.getBoost();
         }
         //no MultiTermQuery extends SpanQuery, so SpanBoostQuery is not supported here
-        assert subQuery instanceof SpanBoostQuery == false;
-        if (subQuery instanceof MultiTermQuery == false) {
+        assert !(subQuery instanceof SpanBoostQuery);
+        if (!(subQuery instanceof MultiTermQuery)) {
             throw new UnsupportedOperationException("unsupported inner query, should be " + MultiTermQuery.class.getName() +" but was "
                     + subQuery.getClass().getName());
         }

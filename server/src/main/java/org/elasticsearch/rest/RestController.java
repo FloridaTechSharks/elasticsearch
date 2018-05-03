@@ -100,7 +100,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
      */
     public void registerAsDeprecatedHandler(RestRequest.Method method, String path, RestHandler handler,
                                             String deprecationMessage, DeprecationLogger logger) {
-        assert (handler instanceof DeprecationRestHandler) == false;
+        assert !(handler instanceof DeprecationRestHandler);
 
         registerHandler(method, path, new DeprecationRestHandler(handler, deprecationMessage, logger));
     }
@@ -216,7 +216,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
         // Indicator of whether a response was sent or not
         boolean requestHandled;
 
-        if (contentLength > 0 && mHandler.map(h -> hasContentType(request, h) == false).orElse(false)) {
+        if (contentLength > 0 && mHandler.map(h -> !hasContentType(request, h)).orElse(false)) {
             sendContentTypeErrorMessage(request, channel);
             requestHandled = true;
         } else if (contentLength > 0 && mHandler.map(h -> h.supportsContentStream()).orElse(false) &&
@@ -248,14 +248,14 @@ public class RestController extends AbstractComponent implements HttpServerTrans
             // Get the map of matching handlers for a request, for the full set of HTTP methods.
             final Set<RestRequest.Method> validMethodSet = getValidHandlerMethodSet(request);
             if (validMethodSet.size() > 0
-                && validMethodSet.contains(request.method()) == false
+                && !validMethodSet.contains(request.method())
                 && request.method() != RestRequest.Method.OPTIONS) {
                 // If an alternative handler for an explicit path is registered to a
                 // different HTTP method than the one supplied - return a 405 Method
                 // Not Allowed error.
                 handleUnsupportedHttpMethod(request, channel, validMethodSet);
                 requestHandled = true;
-            } else if (validMethodSet.contains(request.method()) == false
+            } else if (!validMethodSet.contains(request.method())
                 && (request.method() == RestRequest.Method.OPTIONS)) {
                 handleOptionsRequest(request, channel, validMethodSet);
                 requestHandled = true;
@@ -306,11 +306,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
     boolean checkErrorTraceParameter(final RestRequest request, final RestChannel channel) {
         // error_trace cannot be used when we disable detailed errors
         // we consume the error_trace parameter first to ensure that it is always consumed
-        if (request.paramAsBoolean("error_trace", false) && channel.detailedErrorsEnabled() == false) {
-            return false;
-        }
-
-        return true;
+        return !request.paramAsBoolean("error_trace", false) || channel.detailedErrorsEnabled();
     }
 
     void tryAllHandlers(final RestRequest request, final RestChannel channel, final ThreadContext threadContext) throws Exception {
@@ -323,7 +319,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
         // Request execution flag
         boolean requestHandled = false;
 
-        if (checkErrorTraceParameter(request, channel) == false) {
+        if (!checkErrorTraceParameter(request, channel)) {
             channel.sendResponse(
                     BytesRestResponse.createSimpleErrorResponse(channel, BAD_REQUEST, "error traces in responses are disabled."));
             return;
@@ -340,7 +336,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
         }
 
         // If request has not been handled, fallback to a bad request error.
-        if (requestHandled == false) {
+        if (!requestHandled) {
             handleBadRequest(request, channel);
         }
     }
@@ -493,7 +489,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
 
         private void close() {
             // attempt to close once atomically
-            if (closed.compareAndSet(false, true) == false) {
+            if (!closed.compareAndSet(false, true)) {
                 throw new IllegalStateException("Channel is already closed");
             }
             inFlightRequestsBreaker(circuitBreakerService).addWithoutBreaking(-contentLength);

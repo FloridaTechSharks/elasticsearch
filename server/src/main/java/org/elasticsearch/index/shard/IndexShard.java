@@ -448,7 +448,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
                      * We could fail the shard in that case, but this will cause it to be removed from the insync allocations list
                      * potentially preventing re-allocation.
                      */
-                    assert newRouting.initializing() == false :
+                    assert !newRouting.initializing() :
                         "a started primary shard should never update its term; "
                             + "shard " + newRouting + ", "
                             + "current term [" + primaryTerm + "], "
@@ -619,7 +619,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
          * says otherwise.
          */
 
-        if (shardRouting.relocating() == false) {
+        if (!shardRouting.relocating()) {
             throw new IllegalIndexShardStateException(shardId, IndexShardState.STARTED,
                 ": shard is no longer relocating " + shardRouting);
         }
@@ -1164,7 +1164,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
         } catch (IOException ex) {
             throw new ElasticsearchException("failed to wrap searcher", ex);
         } finally {
-            if (success == false) {
+            if (!success) {
                 Releasables.close(success, searcher);
             }
         }
@@ -1280,7 +1280,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
     /** creates an empty index and translog and opens the engine **/
     public void createIndexAndTranslog() throws IOException {
         assert recoveryState.getRecoverySource().getType() == RecoverySource.Type.EMPTY_STORE;
-        assert shardRouting.primary() && shardRouting.isRelocationTarget() == false;
+        assert shardRouting.primary() && !shardRouting.isRelocationTarget();
         // note: these are set when recovering from the translog
         final RecoveryState.Translog translogStats = recoveryState().getTranslog();
         translogStats.totalOperations(0);
@@ -1381,15 +1381,11 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
 
     private boolean assertMaxUnsafeAutoIdInCommit() throws IOException {
         final Map<String, String> userData = SegmentInfos.readLatestCommit(store.directory()).getUserData();
-        if (indexSettings.getIndexVersionCreated().onOrAfter(Version.V_5_5_0) &&
+        assert !indexSettings.getIndexVersionCreated().onOrAfter(Version.V_5_5_0) ||
             // TODO: LOCAL_SHARDS need to transfer this information
-            recoveryState().getRecoverySource().getType() != RecoverySource.Type.LOCAL_SHARDS) {
-            // as of 5.5.0, the engine stores the maxUnsafeAutoIdTimestamp in the commit point.
-            // This should have baked into the commit by the primary we recover from, regardless of the index age.
-            assert userData.containsKey(InternalEngine.MAX_UNSAFE_AUTO_ID_TIMESTAMP_COMMIT_ID) :
-                "opening index which was created post 5.5.0 but " + InternalEngine.MAX_UNSAFE_AUTO_ID_TIMESTAMP_COMMIT_ID
-                    + " is not found in commit";
-        }
+            recoveryState().getRecoverySource().getType() == RecoverySource.Type.LOCAL_SHARDS || userData.containsKey(InternalEngine.MAX_UNSAFE_AUTO_ID_TIMESTAMP_COMMIT_ID) :
+            "opening index which was created post 5.5.0 but " + InternalEngine.MAX_UNSAFE_AUTO_ID_TIMESTAMP_COMMIT_ID
+                + " is not found in commit";
         return true;
     }
 
@@ -1450,7 +1446,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
 
     public void readAllowed() throws IllegalIndexShardStateException {
         IndexShardState state = this.state; // one time volatile read
-        if (readAllowedStates.contains(state) == false) {
+        if (!readAllowedStates.contains(state)) {
             throw new IllegalIndexShardStateException(shardId, state, "operations only allowed when shard state is one of " + readAllowedStates.toString());
         }
     }
@@ -1465,7 +1461,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
 
         if (origin == Engine.Operation.Origin.PRIMARY) {
             verifyPrimary();
-            if (writeAllowedStatesForPrimary.contains(state) == false) {
+            if (!writeAllowedStatesForPrimary.contains(state)) {
                 throw new IllegalIndexShardStateException(shardId, state, "operation only allowed when shard state is one of " + writeAllowedStatesForPrimary + ", origin [" + origin + "]");
             }
         } else if (origin.isRecovery()) {
@@ -1475,14 +1471,14 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
         } else {
             assert origin == Engine.Operation.Origin.REPLICA;
             verifyReplicationTarget();
-            if (writeAllowedStatesForReplica.contains(state) == false) {
+            if (!writeAllowedStatesForReplica.contains(state)) {
                 throw new IllegalIndexShardStateException(shardId, state, "operation only allowed when shard state is one of " + writeAllowedStatesForReplica + ", origin [" + origin + "]");
             }
         }
     }
 
     private void verifyPrimary() {
-        if (shardRouting.primary() == false) {
+        if (!shardRouting.primary()) {
             throw new IllegalStateException("shard " + shardRouting + " is not a primary");
         }
     }
@@ -2075,7 +2071,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
                 }
 
                 if (numShards == startedShards.size()) {
-                    assert requiredShards.isEmpty() == false;
+                    assert !requiredShards.isEmpty();
                     markAsRecovering("from local shards", recoveryState); // mark the shard as recovering on the cluster state thread
                     threadPool.generic().execute(() -> {
                         try {
@@ -2289,7 +2285,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
                                     primaryTerm);
                             onPermitAcquired.onFailure(new IllegalStateException(message));
                         } else {
-                            if (globalCheckpointUpdated == false) {
+                            if (!globalCheckpointUpdated) {
                                 try {
                                     updateGlobalCheckpointOnReplica(globalCheckpoint, "operation");
                                 } catch (Exception e) {
@@ -2511,7 +2507,7 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
             if (location != null && lastWriteLocation.compareTo(location) <= 0) {
                 break;
             }
-        } while (pendingRefreshLocation.compareAndSet(location, lastWriteLocation) == false);
+        } while (!pendingRefreshLocation.compareAndSet(location, lastWriteLocation));
     }
 
     /**

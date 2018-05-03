@@ -254,7 +254,7 @@ public class BlobStoreIndexShardSnapshot implements ToXContentFragment {
             builder.field(NAME, file.name);
             builder.field(PHYSICAL_NAME, file.metadata.name());
             builder.field(LENGTH, file.metadata.length());
-            if (file.metadata.checksum().equals(UNKNOWN_CHECKSUM) == false) {
+            if (!file.metadata.checksum().equals(UNKNOWN_CHECKSUM)) {
                 builder.field(CHECKSUM, file.metadata.checksum());
             }
             if (file.partSize != null) {
@@ -323,9 +323,9 @@ public class BlobStoreIndexShardSnapshot implements ToXContentFragment {
             }
 
             // Verify that file information is complete
-            if (name == null || Strings.validFileName(name) == false) {
+            if (name == null || !Strings.validFileName(name)) {
                 throw new ElasticsearchParseException("missing or invalid file name [" + name + "]");
-            } else if (physicalName == null || Strings.validFileName(physicalName) == false) {
+            } else if (physicalName == null || !Strings.validFileName(physicalName)) {
                 throw new ElasticsearchParseException("missing or invalid physical file name [" + physicalName + "]");
             } else if (length < 0) {
                 throw new ElasticsearchParseException("missing or invalid file length");

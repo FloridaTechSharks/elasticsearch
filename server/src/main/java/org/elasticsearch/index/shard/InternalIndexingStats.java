@@ -75,7 +75,7 @@ final class InternalIndexingStats implements IndexingOperationListener {
 
     @Override
     public void postIndex(ShardId shardId, Engine.Index index, Engine.IndexResult result) {
-        if (result.hasFailure() == false) {
+        if (!result.hasFailure()) {
             if (!index.origin().isRecovery()) {
                 long took = result.getTook();
                 totalStats.indexMetric.inc(took);
@@ -111,7 +111,7 @@ final class InternalIndexingStats implements IndexingOperationListener {
 
     @Override
     public void postDelete(ShardId shardId, Engine.Delete delete, Engine.DeleteResult result) {
-        if (result.hasFailure() == false) {
+        if (!result.hasFailure()) {
             if (!delete.origin().isRecovery()) {
                 long took = result.getTook();
                 totalStats.deleteMetric.inc(took);

@@ -65,7 +65,7 @@ public class ScriptService extends AbstractComponent implements Closeable, Clust
     // this allows you to easily define rates
     static final Function<String, Tuple<Integer, TimeValue>> MAX_COMPILATION_RATE_FUNCTION =
             (String value) -> {
-                if (value.contains("/") == false || value.startsWith("/") || value.endsWith("/")) {
+                if (!value.contains("/") || value.startsWith("/") || value.endsWith("/")) {
                     throw new IllegalArgumentException("parameter must contain a positive integer and a timevalue, i.e. 10/1m, but was [" +
                             value + "]");
                 }
@@ -170,7 +170,7 @@ public class ScriptService extends AbstractComponent implements Closeable, Clust
                     }
                 }
 
-                if (found == false) {
+                if (!found) {
                     throw new IllegalArgumentException(
                         "unknown script type [" + settingType + "] found in setting [" + TYPES_ALLOWED_SETTING.getKey() + "].");
                 }
@@ -293,15 +293,15 @@ public class ScriptService extends AbstractComponent implements Closeable, Clust
 
         ScriptEngine scriptEngine = getEngine(lang);
 
-        if (isTypeEnabled(type) == false) {
+        if (!isTypeEnabled(type)) {
             throw new IllegalArgumentException("cannot execute [" + type + "] scripts");
         }
 
-        if (contexts.containsKey(context.name) == false) {
+        if (!contexts.containsKey(context.name)) {
             throw new IllegalArgumentException("script context [" + context.name + "] not supported");
         }
 
-        if (isContextEnabled(context) == false) {
+        if (!isContextEnabled(context)) {
             throw new IllegalArgumentException("cannot execute scripts using [" + context.name + "] context");
         }
 
@@ -397,7 +397,7 @@ public class ScriptService extends AbstractComponent implements Closeable, Clust
     }
 
     public boolean isAnyContextEnabled() {
-        return contextsAllowed == null || contextsAllowed.isEmpty() == false;
+        return contextsAllowed == null || !contextsAllowed.isEmpty();
     }
 
     StoredScriptSource getScriptFromClusterState(String id) {
@@ -427,17 +427,17 @@ public class ScriptService extends AbstractComponent implements Closeable, Clust
 
         StoredScriptSource source = request.source();
 
-        if (isLangSupported(source.getLang()) == false) {
+        if (!isLangSupported(source.getLang())) {
             throw new IllegalArgumentException("unable to put stored script with unsupported lang [" + source.getLang() + "]");
         }
 
         try {
             ScriptEngine scriptEngine = getEngine(source.getLang());
 
-            if (isTypeEnabled(ScriptType.STORED) == false) {
+            if (!isTypeEnabled(ScriptType.STORED)) {
                 throw new IllegalArgumentException(
                     "cannot put [" + ScriptType.STORED + "] script, [" + ScriptType.STORED + "] scripts are not enabled");
-            } else if (isAnyContextEnabled() == false) {
+            } else if (!isAnyContextEnabled()) {
                 throw new IllegalArgumentException(
                     "cannot put [" + ScriptType.STORED + "] script, no script contexts are enabled");
             } else if (request.context() != null) {

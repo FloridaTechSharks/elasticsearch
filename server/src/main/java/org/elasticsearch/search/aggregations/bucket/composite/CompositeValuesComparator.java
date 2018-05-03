@@ -67,8 +67,8 @@ final class CompositeValuesComparator {
      */
     void move(int slot1, int slot2) {
         assert slot1 < size && slot2 < size;
-        for (int i = 0; i < arrays.length; i++) {
-            arrays[i].move(slot1, slot2);
+        for (CompositeValuesSource<?, ?> array : arrays) {
+            array.move(slot1, slot2);
         }
     }
 
@@ -77,8 +77,8 @@ final class CompositeValuesComparator {
      */
     int compare(int slot1, int slot2) {
         assert slot1 < size && slot2 < size;
-        for (int i = 0; i < arrays.length; i++) {
-            int cmp = arrays[i].compare(slot1, slot2);
+        for (CompositeValuesSource<?, ?> array : arrays) {
+            int cmp = array.compare(slot1, slot2);
             if (cmp != 0) {
                 return cmp;
             }
@@ -109,8 +109,8 @@ final class CompositeValuesComparator {
      */
     int compareTop(int slot) {
         assert slot < size;
-        for (int i = 0; i < arrays.length; i++) {
-            int cmp = arrays[i].compareTop(slot);
+        for (CompositeValuesSource<?, ?> array : arrays) {
+            int cmp = array.compareTop(slot);
             if (cmp != 0) {
                 return cmp;
             }

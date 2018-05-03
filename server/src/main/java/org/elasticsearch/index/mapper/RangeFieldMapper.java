@@ -105,7 +105,7 @@ public class RangeFieldMapper extends FieldMapper {
 
         @Override
         public Builder docValues(boolean docValues) {
-            if (docValues == true) {
+            if (docValues) {
                 throw new IllegalArgumentException("field [" + name + "] does not currently support " + TypeParsers.DOC_VALUES);
             }
             return super.docValues(docValues);
@@ -387,7 +387,7 @@ public class RangeFieldMapper extends FieldMapper {
         boolean docValued = fieldType.hasDocValues();
         boolean stored = fieldType.stored();
         fields.addAll(fieldType().rangeType.createFields(context, name(), range, indexed, docValued, stored));
-        if (docValued == false && (indexed || stored)) {
+        if (!docValued && (indexed || stored)) {
             createFieldNamesField(context, fields);
         }
     }
@@ -503,11 +503,11 @@ public class RangeFieldMapper extends FieldMapper {
 
             @Override
             public Query dvRangeQuery(String field, QueryType queryType, Object from, Object to, boolean includeFrom, boolean includeTo) {
-                if (includeFrom == false) {
+                if (!includeFrom) {
                     from = nextUp(from);
                 }
 
-                if (includeTo == false) {
+                if (!includeTo) {
                     to = nextDown(to);
                 }
 
@@ -642,11 +642,11 @@ public class RangeFieldMapper extends FieldMapper {
 
             @Override
             public Query dvRangeQuery(String field, QueryType queryType, Object from, Object to, boolean includeFrom, boolean includeTo) {
-                if (includeFrom == false) {
+                if (!includeFrom) {
                     from = nextUp(from);
                 }
 
-                if (includeTo == false) {
+                if (!includeTo) {
                     to = nextDown(to);
                 }
 
@@ -704,11 +704,11 @@ public class RangeFieldMapper extends FieldMapper {
 
             @Override
             public Query dvRangeQuery(String field, QueryType queryType, Object from, Object to, boolean includeFrom, boolean includeTo) {
-                if (includeFrom == false) {
+                if (!includeFrom) {
                     from = nextUp(from);
                 }
 
-                if (includeTo == false) {
+                if (!includeTo) {
                     to = nextDown(to);
                 }
 
@@ -816,11 +816,11 @@ public class RangeFieldMapper extends FieldMapper {
 
             @Override
             public Query dvRangeQuery(String field, QueryType queryType, Object from, Object to, boolean includeFrom, boolean includeTo) {
-                if (includeFrom == false) {
+                if (!includeFrom) {
                     from = nextUp(from);
                 }
 
-                if (includeTo == false) {
+                if (!includeTo) {
                     to = nextDown(to);
                 }
 

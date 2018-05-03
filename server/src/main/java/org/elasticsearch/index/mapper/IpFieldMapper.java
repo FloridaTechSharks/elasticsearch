@@ -216,7 +216,7 @@ public class IpFieldMapper extends FieldMapper {
                 lower = InetAddressPoint.MIN_VALUE;
             } else {
                 lower = parse(lowerTerm);
-                if (includeLower == false) {
+                if (!includeLower) {
                     if (lower.equals(InetAddressPoint.MAX_VALUE)) {
                         return new MatchNoDocsQuery();
                     }
@@ -229,7 +229,7 @@ public class IpFieldMapper extends FieldMapper {
                 upper = InetAddressPoint.MAX_VALUE;
             } else {
                 upper = parse(upperTerm);
-                if (includeUpper == false) {
+                if (!includeUpper) {
                     if (upper.equals(InetAddressPoint.MIN_VALUE)) {
                         return new MatchNoDocsQuery();
                     }

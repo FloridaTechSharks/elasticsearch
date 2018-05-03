@@ -148,7 +148,7 @@ public class PluginInfo implements Writeable, ToXContentObject {
                             plugin.getFileName().toString().startsWith(".removing-")) {
                         continue;
                     }
-                    if (seen.add(plugin.getFileName().toString()) == false) {
+                    if (!seen.add(plugin.getFileName().toString())) {
                         throw new IllegalStateException("duplicate plugin: " + plugin);
                     }
                     if (MetaPluginInfo.isMetaPlugin(plugin)) {
@@ -158,7 +158,7 @@ public class PluginInfo implements Writeable, ToXContentObject {
                                         FileSystemUtils.isDesktopServicesStore(subPlugin)) {
                                     continue;
                                 }
-                                if (seen.add(subPlugin.getFileName().toString()) == false) {
+                                if (!seen.add(subPlugin.getFileName().toString())) {
                                     throw new IllegalStateException("duplicate plugin: " + subPlugin);
                                 }
                                 plugins.add(subPlugin);
@@ -214,7 +214,7 @@ public class PluginInfo implements Writeable, ToXContentObject {
                     "property [elasticsearch.version] is missing for plugin [" + name + "]");
         }
         final Version esVersion = Version.fromString(esVersionString);
-        if (esVersion.equals(Version.CURRENT) == false) {
+        if (!esVersion.equals(Version.CURRENT)) {
             final String message = String.format(
                     Locale.ROOT,
                     "plugin [%s] is incompatible with version [%s]; was designed for version [%s]",
@@ -280,7 +280,7 @@ public class PluginInfo implements Writeable, ToXContentObject {
                                                " but was [" + requiresKeystoreValue + "]", e);
         }
 
-        if (propsMap.isEmpty() == false) {
+        if (!propsMap.isEmpty()) {
             throw new IllegalArgumentException("Unknown properties in plugin descriptor: " + propsMap.keySet());
         }
 
@@ -375,9 +375,7 @@ public class PluginInfo implements Writeable, ToXContentObject {
         PluginInfo that = (PluginInfo) o;
 
         if (!name.equals(that.name)) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-
-        return true;
+        return version != null ? version.equals(that.version) : that.version == null;
     }
 
     @Override

@@ -203,12 +203,8 @@ public class TranslogWriter extends BaseTranslogReader implements Closeable {
         }
         totalOffset += data.length();
 
-        if (minSeqNo == SequenceNumbers.NO_OPS_PERFORMED) {
-            assert operationCounter == 0;
-        }
-        if (maxSeqNo == SequenceNumbers.NO_OPS_PERFORMED) {
-            assert operationCounter == 0;
-        }
+        assert minSeqNo != SequenceNumbers.NO_OPS_PERFORMED || operationCounter == 0;
+        assert maxSeqNo != SequenceNumbers.NO_OPS_PERFORMED || operationCounter == 0;
 
         minSeqNo = SequenceNumbers.min(minSeqNo, seqNo);
         maxSeqNo = SequenceNumbers.max(maxSeqNo, seqNo);
@@ -225,7 +221,7 @@ public class TranslogWriter extends BaseTranslogReader implements Closeable {
             // nothing to do
         } else if (seenSequenceNumbers.containsKey(seqNo)) {
             final Tuple<BytesReference, Exception> previous = seenSequenceNumbers.get(seqNo);
-            if (previous.v1().equals(data) == false) {
+            if (!previous.v1().equals(data)) {
                 Translog.Operation newOp = Translog.readOperation(new BufferedChecksumStreamInput(data.streamInput()));
                 Translog.Operation prvOp = Translog.readOperation(new BufferedChecksumStreamInput(previous.v1().streamInput()));
                 throw new AssertionError(

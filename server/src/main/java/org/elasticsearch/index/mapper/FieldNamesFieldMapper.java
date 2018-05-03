@@ -181,7 +181,7 @@ public class FieldNamesFieldMapper extends MetadataFieldMapper {
 
         @Override
         public Query termQuery(Object value, QueryShardContext context) {
-            if (isEnabled() == false) {
+            if (!isEnabled()) {
                 throw new IllegalStateException("Cannot run [exists] queries if the [_field_names] field is disabled");
             }
             DEPRECATION_LOGGER.deprecated(
@@ -259,7 +259,7 @@ public class FieldNamesFieldMapper extends MetadataFieldMapper {
 
     @Override
     protected void parseCreateField(ParseContext context, List<IndexableField> fields) throws IOException {
-        if (fieldType().isEnabled() == false) {
+        if (!fieldType().isEnabled()) {
             return;
         }
         for (ParseContext.Document document : context.docs()) {
@@ -296,7 +296,7 @@ public class FieldNamesFieldMapper extends MetadataFieldMapper {
     public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
         boolean includeDefaults = params.paramAsBoolean("include_defaults", false);
 
-        if (includeDefaults == false && fieldType().isEnabled() == Defaults.ENABLED) {
+        if (!includeDefaults && fieldType().isEnabled() == Defaults.ENABLED) {
             return builder;
         }
 

@@ -303,7 +303,7 @@ public class ParentFieldMapper extends MetadataFieldMapper {
     @Override
     protected void doMerge(Mapper mergeWith) {
         ParentFieldMapper fieldMergeWith = (ParentFieldMapper) mergeWith;
-        if (fieldMergeWith.parentType != null && Objects.equals(parentType, fieldMergeWith.parentType) == false) {
+        if (fieldMergeWith.parentType != null && !Objects.equals(parentType, fieldMergeWith.parentType)) {
             throw new IllegalArgumentException("The _parent field's type option can't be changed: [" + parentType + "]->[" + fieldMergeWith.parentType + "]");
         }
         // If fieldMergeWith is not active it means the user provided a mapping

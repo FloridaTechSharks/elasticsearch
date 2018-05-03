@@ -63,7 +63,7 @@ public final class HistogramAggregatorFactory extends ValuesSourceAggregatorFact
     @Override
     protected Aggregator doCreateInternal(ValuesSource.Numeric valuesSource, Aggregator parent, boolean collectsFromSingleBucket,
             List<PipelineAggregator> pipelineAggregators, Map<String, Object> metaData) throws IOException {
-        if (collectsFromSingleBucket == false) {
+        if (!collectsFromSingleBucket) {
             return asMultiBucketAggregator(this, context, parent);
         }
         return createAggregator(valuesSource, parent, pipelineAggregators, metaData);

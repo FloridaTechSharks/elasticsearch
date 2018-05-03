@@ -232,8 +232,7 @@ public final class IndicesRequestCache extends AbstractComponent implements Remo
             Key key = (Key) o;
             if (readerVersion != key.readerVersion) return false;
             if (!entity.getCacheIdentity().equals(key.entity.getCacheIdentity())) return false;
-            if (!value.equals(key.value)) return false;
-            return true;
+            return value.equals(key.value);
         }
 
         @Override
@@ -270,8 +269,7 @@ public final class IndicesRequestCache extends AbstractComponent implements Remo
             }
             CleanupKey that = (CleanupKey) o;
             if (readerVersion != that.readerVersion) return false;
-            if (!entity.getCacheIdentity().equals(that.entity.getCacheIdentity())) return false;
-            return true;
+            return entity.getCacheIdentity().equals(that.entity.getCacheIdentity());
         }
 
         @Override
@@ -292,7 +290,7 @@ public final class IndicesRequestCache extends AbstractComponent implements Remo
         for (Iterator<CleanupKey> iterator = keysToClean.iterator(); iterator.hasNext(); ) {
             CleanupKey cleanupKey = iterator.next();
             iterator.remove();
-            if (cleanupKey.readerVersion == -1 || cleanupKey.entity.isOpen() == false) {
+            if (cleanupKey.readerVersion == -1 || !cleanupKey.entity.isOpen()) {
                 // -1 indicates full cleanup, as does a closed shard
                 currentFullClean.add(cleanupKey.entity.getCacheIdentity());
             } else {

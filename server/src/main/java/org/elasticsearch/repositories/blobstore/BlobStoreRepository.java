@@ -502,7 +502,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
             // When we delete corrupted snapshots we might not know which version we are dealing with
             // We can try detecting the version based on the metadata file format
             assert ignoreIndexErrors;
-            if (globalMetaDataFormat.exists(snapshotsBlobContainer, snapshotId.getUUID()) == false) {
+            if (!globalMetaDataFormat.exists(snapshotsBlobContainer, snapshotId.getUUID())) {
                 throw new SnapshotMissingException(metadata.name(), snapshotId);
             }
         }
@@ -657,7 +657,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
     }
 
     protected void writeIndexGen(final RepositoryData repositoryData, final long repositoryStateId) throws IOException {
-        assert isReadOnly() == false; // can not write to a read only repository
+        assert !isReadOnly(); // can not write to a read only repository
         final long currentGen = latestIndexBlobId();
         if (repositoryStateId != SnapshotsInProgress.UNDEFINED_REPOSITORY_STATE_ID && currentGen != repositoryStateId) {
             // the index file was updated by a concurrent operation, so we were operating on stale
@@ -681,7 +681,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
         logger.debug("Repository [{}] writing new index generational blob [{}]", metadata.name(), indexBlob);
         writeAtomic(indexBlob, snapshotsBytes);
         // delete the N-2 index file if it exists, keep the previous one around as a backup
-        if (isReadOnly() == false && newGen - 2 >= 0) {
+        if (!isReadOnly() && newGen - 2 >= 0) {
             final String oldSnapshotIndexFile = INDEX_FILE_PREFIX + Long.toString(newGen - 2);
             if (snapshotsBlobContainer.blobExists(oldSnapshotIndexFile)) {
                 snapshotsBlobContainer.deleteBlob(oldSnapshotIndexFile);
@@ -707,7 +707,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
      * Package private for testing.
      */
     void writeIncompatibleSnapshots(RepositoryData repositoryData) throws IOException {
-        assert isReadOnly() == false; // can not write to a read only repository
+        assert !isReadOnly(); // can not write to a read only repository
         final BytesReference bytes;
         try (BytesStreamOutput bStream = new BytesStreamOutput()) {
             try (StreamOutput stream = new OutputStreamStreamOutput(bStream)) {
@@ -1061,7 +1061,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
                     final String file = SNAPSHOT_INDEX_PREFIX + latest;
                     logger.warn((Supplier<?>) () -> new ParameterizedMessage("failed to read index file [{}]", file), e);
                 }
-            } else if (blobKeys.isEmpty() == false) {
+            } else if (!blobKeys.isEmpty()) {
                 logger.debug("Could not find a readable index-N file in a non-empty shard snapshot directory [{}]", blobContainer.path());
             }
 
@@ -1585,7 +1585,7 @@ public abstract class BlobStoreRepository extends AbstractLifecycleComponent imp
                     }
                     throw ex;
                 } finally {
-                    if (success == false) {
+                    if (!success) {
                         store.deleteQuiet(fileInfo.physicalName());
                     }
                 }

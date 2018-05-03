@@ -341,7 +341,7 @@ public class GeoShapeQueryBuilder extends AbstractQueryBuilder<GeoShapeQueryBuil
             } else {
                 throw new QueryShardException(context, "failed to find geo_shape field [" + fieldName + "]");
             }
-        } else if (fieldType.typeName().equals(GeoShapeFieldMapper.CONTENT_TYPE) == false) {
+        } else if (!fieldType.typeName().equals(GeoShapeFieldMapper.CONTENT_TYPE)) {
             throw new QueryShardException(context,
                     "Field [" + fieldName + "] is not of type [geo_shape] but of type [" + fieldType.typeName() + "]");
         }
@@ -379,7 +379,7 @@ public class GeoShapeQueryBuilder extends AbstractQueryBuilder<GeoShapeQueryBuil
      *            Shape itself is located
      */
     private void fetch(Client client, GetRequest getRequest, String path, ActionListener<ShapeBuilder> listener) {
-        if (ShapesAvailability.JTS_AVAILABLE == false) {
+        if (!ShapesAvailability.JTS_AVAILABLE) {
             throw new IllegalStateException("JTS not available");
         }
         getRequest.preference("_local");

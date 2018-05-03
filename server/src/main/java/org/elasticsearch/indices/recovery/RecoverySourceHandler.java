@@ -189,7 +189,7 @@ public class RecoverySourceHandler {
 
             try {
                 // For a sequence based recovery, the target can keep its local translog
-                prepareTargetForTranslog(isSequenceNumberBasedRecovery == false, translog.estimateTotalOperationsFromMinSeq(startingSeqNo));
+                prepareTargetForTranslog(!isSequenceNumberBasedRecovery, translog.estimateTotalOperationsFromMinSeq(startingSeqNo));
             } catch (final Exception e) {
                 throw new RecoveryEngineException(shard.shardId(), 1, "prepare target for translog failed", e);
             }
@@ -386,7 +386,7 @@ public class RecoverySourceHandler {
                             for (StoreFileMetaData md : metadata) {
                                 cancellableThreads.checkForCancel();
                                 logger.debug("checking integrity for file {} after remove corruption exception", md);
-                                if (store.checkIntegrityNoException(md) == false) { // we are corrupted on the primary -- fail!
+                                if (!store.checkIntegrityNoException(md)) { // we are corrupted on the primary -- fail!
                                     shard.failShard("recovery", corruptIndexException);
                                     logger.warn("Corrupted file detected {} checksum mismatch", md);
                                     throw corruptIndexException;
@@ -655,8 +655,7 @@ public class RecoverySourceHandler {
         store.incRef();
         try {
             ArrayUtil.timSort(files, Comparator.comparingLong(StoreFileMetaData::length)); // send smallest first
-            for (int i = 0; i < files.length; i++) {
-                final StoreFileMetaData md = files[i];
+            for (final StoreFileMetaData md : files) {
                 try (IndexInput indexInput = store.directory().openInput(md.name(), IOContext.READONCE)) {
                     // it's fine that we are only having the indexInput in the try/with block. The copy methods handles
                     // exceptions during close correctly and doesn't hide the original exception.
@@ -664,13 +663,13 @@ public class RecoverySourceHandler {
                 } catch (Exception e) {
                     final IOException corruptIndexException;
                     if ((corruptIndexException = ExceptionsHelper.unwrapCorruption(e)) != null) {
-                        if (store.checkIntegrityNoException(md) == false) { // we are corrupted on the primary -- fail!
+                        if (!store.checkIntegrityNoException(md)) { // we are corrupted on the primary -- fail!
                             logger.warn("{} Corrupted file detected {} checksum mismatch", shardId, md);
                             failEngine(corruptIndexException);
                             throw corruptIndexException;
                         } else { // corruption has happened on the way to replica
                             RemoteTransportException exception = new RemoteTransportException("File corruption occurred on recovery but " +
-                                    "checksums are ok", null);
+                                "checksums are ok", null);
                             exception.addSuppressed(e);
                             logger.warn(
                                 (org.apache.logging.log4j.util.Supplier<?>) () -> new ParameterizedMessage(

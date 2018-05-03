@@ -130,13 +130,13 @@ public class PipelineExecutionService implements ClusterStateApplier {
         Iterator<String> iterator = newStatsPerPipeline.keySet().iterator();
         while (iterator.hasNext()) {
             String pipeline = iterator.next();
-            if (ingestMetadata.getPipelines().containsKey(pipeline) == false) {
+            if (!ingestMetadata.getPipelines().containsKey(pipeline)) {
                 iterator.remove();
                 changed = true;
             }
         }
         for (String pipeline : ingestMetadata.getPipelines().keySet()) {
-            if (newStatsPerPipeline.containsKey(pipeline) == false) {
+            if (!newStatsPerPipeline.containsKey(pipeline)) {
                 newStatsPerPipeline.put(pipeline, new StatsHolder());
                 changed = true;
             }

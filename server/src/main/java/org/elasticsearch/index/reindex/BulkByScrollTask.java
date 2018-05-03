@@ -84,7 +84,7 @@ public class BulkByScrollTask extends CancellableTask {
      * set as a leader for slice subtasks
      */
     public TaskInfo taskInfoGivenSubtaskInfo(String localNodeId, List<TaskInfo> sliceInfo) {
-        if (isLeader() == false) {
+        if (!isLeader()) {
             throw new IllegalStateException("This task is not set to be a leader of other slice subtasks");
         }
 

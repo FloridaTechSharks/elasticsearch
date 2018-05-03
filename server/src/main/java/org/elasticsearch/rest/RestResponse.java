@@ -72,11 +72,7 @@ public abstract class RestResponse {
         if (customHeaders == null) {
             customHeaders = new HashMap<>(2);
         }
-        List<String> header = customHeaders.get(name);
-        if (header == null) {
-            header = new ArrayList<>();
-            customHeaders.put(name, header);
-        }
+        List<String> header = customHeaders.computeIfAbsent(name, k -> new ArrayList<>());
         header.add(value);
     }
 

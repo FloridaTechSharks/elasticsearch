@@ -454,10 +454,7 @@ public class OsProbe {
         if (!Files.exists(PathUtils.get("/sys/fs/cgroup/cpuacct"))) {
             return false;
         }
-        if (!Files.exists(PathUtils.get("/sys/fs/cgroup/memory"))) {
-            return false;
-        }
-        return true;
+        return Files.exists(PathUtils.get("/sys/fs/cgroup/memory"));
     }
 
     /**

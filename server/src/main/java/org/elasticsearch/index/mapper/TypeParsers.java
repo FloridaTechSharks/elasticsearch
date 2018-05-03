@@ -88,43 +88,55 @@ public class TypeParsers {
             Map.Entry<String, Object> entry = iterator.next();
             final String propName = entry.getKey();
             final Object propNode = entry.getValue();
-            if (propName.equals("term_vector")) {
-                parseTermVector(name, propNode.toString(), builder);
-                iterator.remove();
-            } else if (propName.equals("store_term_vectors")) {
-                builder.storeTermVectors(nodeBooleanValue(name, "store_term_vectors", propNode, parserContext));
-                iterator.remove();
-            } else if (propName.equals("store_term_vector_offsets")) {
-                builder.storeTermVectorOffsets(nodeBooleanValue(name, "store_term_vector_offsets", propNode, parserContext));
-                iterator.remove();
-            } else if (propName.equals("store_term_vector_positions")) {
-                builder.storeTermVectorPositions(
-                    nodeBooleanValue(name, "store_term_vector_positions", propNode, parserContext));
-                iterator.remove();
-            } else if (propName.equals("store_term_vector_payloads")) {
-                builder.storeTermVectorPayloads(nodeBooleanValue(name,"store_term_vector_payloads", propNode, parserContext));
-                iterator.remove();
-            } else if (propName.equals("analyzer")) {
-                NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
-                if (analyzer == null) {
-                    throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+            switch (propName) {
+                case "term_vector":
+                    parseTermVector(name, propNode.toString(), builder);
+                    iterator.remove();
+                    break;
+                case "store_term_vectors":
+                    builder.storeTermVectors(nodeBooleanValue(name, "store_term_vectors", propNode, parserContext));
+                    iterator.remove();
+                    break;
+                case "store_term_vector_offsets":
+                    builder.storeTermVectorOffsets(nodeBooleanValue(name, "store_term_vector_offsets", propNode, parserContext));
+                    iterator.remove();
+                    break;
+                case "store_term_vector_positions":
+                    builder.storeTermVectorPositions(
+                        nodeBooleanValue(name, "store_term_vector_positions", propNode, parserContext));
+                    iterator.remove();
+                    break;
+                case "store_term_vector_payloads":
+                    builder.storeTermVectorPayloads(nodeBooleanValue(name, "store_term_vector_payloads", propNode, parserContext));
+                    iterator.remove();
+                    break;
+                case "analyzer": {
+                    NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
+                    if (analyzer == null) {
+                        throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+                    }
+                    indexAnalyzer = analyzer;
+                    iterator.remove();
+                    break;
                 }
-                indexAnalyzer = analyzer;
-                iterator.remove();
-            } else if (propName.equals("search_analyzer")) {
-                NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
-                if (analyzer == null) {
-                    throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+                case "search_analyzer": {
+                    NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
+                    if (analyzer == null) {
+                        throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+                    }
+                    searchAnalyzer = analyzer;
+                    iterator.remove();
+                    break;
                 }
-                searchAnalyzer = analyzer;
-                iterator.remove();
-            } else if (propName.equals("search_quote_analyzer")) {
-                NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
-                if (analyzer == null) {
-                    throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+                case "search_quote_analyzer": {
+                    NamedAnalyzer analyzer = parserContext.getIndexAnalyzers().get(propNode.toString());
+                    if (analyzer == null) {
+                        throw new MapperParsingException("analyzer [" + propNode.toString() + "] not found for field [" + name + "]");
+                    }
+                    searchQuoteAnalyzer = analyzer;
+                    iterator.remove();
+                    break;
                 }
-                searchQuoteAnalyzer = analyzer;
-                iterator.remove();
             }
         }
 
@@ -158,7 +170,7 @@ public class TypeParsers {
 
     public static void parseNorms(FieldMapper.Builder builder, String fieldName, Object propNode,
                                      Mapper.TypeParser.ParserContext parserContext) {
-        builder.omitNorms(nodeBooleanValue(fieldName, "norms", propNode, parserContext) == false);
+        builder.omitNorms(!nodeBooleanValue(fieldName, "norms", propNode, parserContext));
     }
 
     /**
@@ -189,7 +201,7 @@ public class TypeParsers {
             Map.Entry<String, Object> entry = iterator.next();
             final String propName = entry.getKey();
             final Object propNode = entry.getValue();
-            if (false == propName.equals("null_value") && propNode == null) {
+            if (!propName.equals("null_value") && propNode == null) {
                 /*
                  * No properties *except* null_value are allowed to have null. So we catch it here and tell the user something useful rather
                  * than send them a null pointer exception later.

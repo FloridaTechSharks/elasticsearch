@@ -405,7 +405,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
     public synchronized void removeShard(int shardId, String reason) {
         final ShardId sId = new ShardId(index(), shardId);
         final IndexShard indexShard;
-        if (shards.containsKey(shardId) == false) {
+        if (!shards.containsKey(shardId)) {
             return;
         }
         logger.debug("[{}] closing... (reason: [{}])", shardId, reason);
@@ -428,7 +428,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
                 if (indexShard != null) {
                     try {
                         // only flush we are we closed (closed index or shutdown) and if we are not deleted
-                        final boolean flushEngine = deleted.get() == false && closed.get();
+                        final boolean flushEngine = !deleted.get() && closed.get();
                         indexShard.close(reason, flushEngine);
                     } catch (Exception e) {
                         logger.debug((org.apache.logging.log4j.util.Supplier<?>)
@@ -627,7 +627,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
                             "[{}] failed to notify shard about setting change", shard.shardId().id()), e);
                 }
             }
-            if (refreshTask.getInterval().equals(indexSettings.getRefreshInterval()) == false) {
+            if (!refreshTask.getInterval().equals(indexSettings.getRefreshInterval())) {
                 // once we change the refresh interval we schedule yet another refresh
                 // to ensure we are in a clean and predictable state.
                 // it doesn't matter if we move from or to <code>-1</code>  in both cases we want
@@ -804,8 +804,8 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
 
         boolean mustReschedule() {
             // don't re-schedule if its closed or if we don't have a single shard here..., we are done
-            return indexService.closed.get() == false
-                && closed.get() == false && interval.millis() > 0;
+            return !indexService.closed.get()
+                && !closed.get() && interval.millis() > 0;
         }
 
         private synchronized void onTaskCompletion() {
@@ -829,7 +829,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
             try {
                 runInternal();
             } catch (Exception ex) {
-                if (lastThrownException == null || sameException(lastThrownException, ex) == false) {
+                if (lastThrownException == null || !sameException(lastThrownException, ex)) {
                     // prevent the annoying fact of logging the same stuff all the time with an interval of 1 sec will spam all your logs
                     indexService.logger.warn(
                         (Supplier<?>) () -> new ParameterizedMessage(
@@ -850,7 +850,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
                     StackTraceElement[] stackTraceRight = right.getStackTrace();
                     if (stackTraceLeft.length == stackTraceRight.length) {
                         for (int i = 0; i < stackTraceLeft.length; i++) {
-                            if (stackTraceLeft[i].equals(stackTraceRight[i]) == false) {
+                            if (!stackTraceLeft[i].equals(stackTraceRight[i])) {
                                 return false;
                             }
                         }
@@ -1020,7 +1020,7 @@ public class IndexService extends AbstractIndexComponent implements IndicesClust
                 }
             }
         }
-        if (clearedAtLeastOne == false) {
+        if (!clearedAtLeastOne) {
             if (fields.length ==  0) {
                 indexCache.clear("api");
                 indexFieldData.clear();

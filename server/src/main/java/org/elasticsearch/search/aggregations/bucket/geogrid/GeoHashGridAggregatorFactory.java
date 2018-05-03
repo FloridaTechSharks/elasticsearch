@@ -68,7 +68,7 @@ public class GeoHashGridAggregatorFactory extends ValuesSourceAggregatorFactory<
     @Override
     protected Aggregator doCreateInternal(final ValuesSource.GeoPoint valuesSource, Aggregator parent, boolean collectsFromSingleBucket,
             List<PipelineAggregator> pipelineAggregators, Map<String, Object> metaData) throws IOException {
-        if (collectsFromSingleBucket == false) {
+        if (!collectsFromSingleBucket) {
             return asMultiBucketAggregator(this, context, parent);
         }
         CellIdSource cellIdSource = new CellIdSource(valuesSource, precision);

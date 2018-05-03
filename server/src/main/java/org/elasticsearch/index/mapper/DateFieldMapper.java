@@ -222,10 +222,10 @@ public class DateFieldMapper extends FieldMapper {
         public void checkCompatibility(MappedFieldType fieldType, List<String> conflicts) {
             super.checkCompatibility(fieldType, conflicts);
             DateFieldType other = (DateFieldType) fieldType;
-            if (Objects.equals(dateTimeFormatter().format(), other.dateTimeFormatter().format()) == false) {
+            if (!Objects.equals(dateTimeFormatter().format(), other.dateTimeFormatter().format())) {
                 conflicts.add("mapper [" + name() + "] has different [format] values");
             }
-            if (Objects.equals(dateTimeFormatter().locale(), other.dateTimeFormatter().locale()) == false) {
+            if (!Objects.equals(dateTimeFormatter().locale(), other.dateTimeFormatter().locale())) {
                 conflicts.add("mapper [" + name() + "] has different [locale] values");
             }
         }
@@ -282,7 +282,7 @@ public class DateFieldMapper extends FieldMapper {
                 l = Long.MIN_VALUE;
             } else {
                 l = parseToMilliseconds(lowerTerm, !includeLower, timeZone, parser, context);
-                if (includeLower == false) {
+                if (!includeLower) {
                     ++l;
                 }
             }
@@ -290,7 +290,7 @@ public class DateFieldMapper extends FieldMapper {
                 u = Long.MAX_VALUE;
             } else {
                 u = parseToMilliseconds(upperTerm, includeUpper, timeZone, parser, context);
-                if (includeUpper == false) {
+                if (!includeUpper) {
                     --u;
                 }
             }
@@ -329,7 +329,7 @@ public class DateFieldMapper extends FieldMapper {
             long fromInclusive = Long.MIN_VALUE;
             if (from != null) {
                 fromInclusive = parseToMilliseconds(from, !includeLower, timeZone, dateParser, context);
-                if (includeLower == false) {
+                if (!includeLower) {
                     if (fromInclusive == Long.MAX_VALUE) {
                         return Relation.DISJOINT;
                     }
@@ -340,7 +340,7 @@ public class DateFieldMapper extends FieldMapper {
             long toInclusive = Long.MAX_VALUE;
             if (to != null) {
                 toInclusive = parseToMilliseconds(to, includeUpper, timeZone, dateParser, context);
-                if (includeUpper == false) {
+                if (!includeUpper) {
                     if (toInclusive == Long.MIN_VALUE) {
                         return Relation.DISJOINT;
                     }

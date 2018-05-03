@@ -197,10 +197,7 @@ public class GeoGridAggregationBuilder extends ValuesSourceAggregationBuilder<Va
         if (requiredSize != other.requiredSize) {
             return false;
         }
-        if (shardSize != other.shardSize) {
-            return false;
-        }
-        return true;
+        return shardSize == other.shardSize;
     }
 
     @Override

@@ -120,7 +120,7 @@ public class PipelineStore extends AbstractComponent implements ClusterStateAppl
                 toRemove.add(pipelineKey);
             }
         }
-        if (toRemove.isEmpty() && Regex.isMatchAllPattern(request.getId()) == false) {
+        if (toRemove.isEmpty() && !Regex.isMatchAllPattern(request.getId())) {
             throw new ResourceNotFoundException("pipeline [{}] is missing", request.getId());
         } else if (toRemove.isEmpty()) {
             return currentState;
@@ -168,7 +168,7 @@ public class PipelineStore extends AbstractComponent implements ClusterStateAppl
         List<Exception> exceptions = new ArrayList<>();
         for (Processor processor : pipeline.flattenAllProcessors()) {
             for (Map.Entry<DiscoveryNode, IngestInfo> entry : ingestInfos.entrySet()) {
-                if (entry.getValue().containsProcessor(processor.getType()) == false) {
+                if (!entry.getValue().containsProcessor(processor.getType())) {
                     String message = "Processor type [" + processor.getType() + "] is not installed on node [" + entry.getKey() + "]";
                     exceptions.add(ConfigurationUtils.newConfigurationException(processor.getType(), processor.getTag(), null, message));
                 }
