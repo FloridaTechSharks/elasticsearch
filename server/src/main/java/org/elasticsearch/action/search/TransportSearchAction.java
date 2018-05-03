@@ -335,7 +335,7 @@ public class TransportSearchAction extends HandledTransportAction<SearchRequest,
             }
             return searchTransportService.getConnection(clusterName, discoveryNode);
         };
-        if (searchRequest.isMaxConcurrentShardRequestsSet() == false) {
+        if (!searchRequest.isMaxConcurrentShardRequestsSet()) {
             // we try to set a default of max concurrent shard requests based on
             // the node count but upper-bound it by 256 by default to keep it sane. A single
             // search request that fans out lots of shards should hit a cluster too hard while 256 is already a lot.

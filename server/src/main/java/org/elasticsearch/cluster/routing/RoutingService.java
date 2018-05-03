@@ -86,7 +86,7 @@ public class RoutingService extends AbstractLifecycleComponent {
             if (lifecycle.stopped()) {
                 return;
             }
-            if (rerouting.compareAndSet(false, true) == false) {
+            if (!rerouting.compareAndSet(false, true)) {
                 logger.trace("already has pending reroute, ignoring {}", reason);
                 return;
             }

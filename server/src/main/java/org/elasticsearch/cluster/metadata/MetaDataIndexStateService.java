@@ -141,7 +141,7 @@ public class MetaDataIndexStateService extends AbstractComponent {
                 String[] indexNames = Arrays.stream(request.indices()).map(Index::getName).toArray(String[]::new);
                 activeShardsObserver.waitForActiveShards(indexNames, request.waitForActiveShards(), request.ackTimeout(),
                     shardsAcknowledged -> {
-                        if (shardsAcknowledged == false) {
+                        if (!shardsAcknowledged) {
                             logger.debug("[{}] indices opened, but the operation timed out while waiting for " +
                                 "enough shards to be started.", Arrays.toString(indexNames));
                         }

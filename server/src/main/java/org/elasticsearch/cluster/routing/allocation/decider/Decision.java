@@ -120,10 +120,7 @@ public abstract class Decision implements ToXContent, Writeable {
                 return false;
             } else if (other == NO) {
                 return true;
-            } else if (other == THROTTLE && this == YES) {
-                return true;
-            }
-            return false;
+            } else return other == THROTTLE && this == YES;
         }
 
     }
@@ -290,8 +287,8 @@ public abstract class Decision implements ToXContent, Writeable {
         @Override
         public Type type() {
             Type ret = Type.YES;
-            for (int i = 0; i < decisions.size(); i++) {
-                Type type = decisions.get(i).type();
+            for (Decision decision : decisions) {
+                Type type = decision.type();
                 if (type == Type.NO) {
                     return type;
                 } else if (type == Type.THROTTLE) {

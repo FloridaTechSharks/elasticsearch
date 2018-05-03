@@ -134,10 +134,7 @@ public class AliasMetaData extends AbstractDiffable<AliasMetaData> {
         if (alias != null ? !alias.equals(that.alias) : that.alias != null) return false;
         if (filter != null ? !filter.equals(that.filter) : that.filter != null) return false;
         if (indexRouting != null ? !indexRouting.equals(that.indexRouting) : that.indexRouting != null) return false;
-        if (searchRouting != null ? !searchRouting.equals(that.searchRouting) : that.searchRouting != null)
-            return false;
-
-        return true;
+        return searchRouting != null ? searchRouting.equals(that.searchRouting) : that.searchRouting == null;
     }
 
     @Override

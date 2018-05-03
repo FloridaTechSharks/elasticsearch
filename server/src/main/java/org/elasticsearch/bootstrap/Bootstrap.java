@@ -297,7 +297,7 @@ final class Bootstrap {
             }
         }
 
-        final boolean closeStandardStreams = (foreground == false) || quiet;
+        final boolean closeStandardStreams = (!foreground) || quiet;
         try {
             if (closeStandardStreams) {
                 final Logger rootLogger = ESLoggerFactory.getRootLogger();
@@ -387,7 +387,7 @@ final class Bootstrap {
     }
 
     private static void checkLucene() {
-        if (Version.CURRENT.luceneVersion.equals(org.apache.lucene.util.Version.LATEST) == false) {
+        if (!Version.CURRENT.luceneVersion.equals(org.apache.lucene.util.Version.LATEST)) {
             throw new AssertionError("Lucene version mismatch this version of Elasticsearch requires lucene version ["
                 + Version.CURRENT.luceneVersion + "]  but the current lucene version is [" + org.apache.lucene.util.Version.LATEST + "]");
         }

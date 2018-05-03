@@ -457,7 +457,7 @@ public class TermVectorsRequest extends SingleShardRequest<TermVectorsRequest> i
      * Sets the settings for filtering out terms.
      */
     public TermVectorsRequest filterSettings(FilterSettings settings) {
-        this.filterSettings = settings != null ? settings : null;
+        this.filterSettings = settings;
         return this;
     }
 
@@ -687,22 +687,30 @@ public class TermVectorsRequest extends SingleShardRequest<TermVectorsRequest> i
             if (token == XContentParser.Token.FIELD_NAME) {
                 currentFieldName = parser.currentName();
             } else if (currentFieldName != null) {
-                if (currentFieldName.equals("max_num_terms")) {
-                    settings.maxNumTerms = parser.intValue();
-                } else if (currentFieldName.equals("min_term_freq")) {
-                    settings.minTermFreq = parser.intValue();
-                } else if (currentFieldName.equals("max_term_freq")) {
-                    settings.maxTermFreq = parser.intValue();
-                } else if (currentFieldName.equals("min_doc_freq")) {
-                    settings.minDocFreq = parser.intValue();
-                } else if (currentFieldName.equals("max_doc_freq")) {
-                    settings.maxDocFreq = parser.intValue();
-                } else if (currentFieldName.equals("min_word_length")) {
-                    settings.minWordLength = parser.intValue();
-                } else if (currentFieldName.equals("max_word_length")) {
-                    settings.maxWordLength = parser.intValue();
-                } else {
-                    throw new ElasticsearchParseException("failed to parse term vectors request. the field [{}] is not valid for filter parameter for term vector request", currentFieldName);
+                switch (currentFieldName) {
+                    case "max_num_terms":
+                        settings.maxNumTerms = parser.intValue();
+                        break;
+                    case "min_term_freq":
+                        settings.minTermFreq = parser.intValue();
+                        break;
+                    case "max_term_freq":
+                        settings.maxTermFreq = parser.intValue();
+                        break;
+                    case "min_doc_freq":
+                        settings.minDocFreq = parser.intValue();
+                        break;
+                    case "max_doc_freq":
+                        settings.maxDocFreq = parser.intValue();
+                        break;
+                    case "min_word_length":
+                        settings.minWordLength = parser.intValue();
+                        break;
+                    case "max_word_length":
+                        settings.maxWordLength = parser.intValue();
+                        break;
+                    default:
+                        throw new ElasticsearchParseException("failed to parse term vectors request. the field [{}] is not valid for filter parameter for term vector request", currentFieldName);
                 }
             }
         }

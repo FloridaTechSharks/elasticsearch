@@ -180,9 +180,7 @@ public class ClusterBlock implements Streamable, ToXContentFragment {
 
         ClusterBlock that = (ClusterBlock) o;
 
-        if (id != that.id) return false;
-
-        return true;
+        return id == that.id;
     }
 
     @Override

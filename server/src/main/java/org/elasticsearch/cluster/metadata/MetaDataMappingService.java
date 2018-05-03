@@ -136,7 +136,7 @@ public class MetaDataMappingService extends AbstractComponent {
                     logger.debug("{} ignoring task [{}] - index meta data doesn't match task uuid", index, task);
                 }
             }
-            if (hasTaskWithRightUUID == false) {
+            if (!hasTaskWithRightUUID) {
                 continue;
             }
 
@@ -183,7 +183,7 @@ public class MetaDataMappingService extends AbstractComponent {
             }
 
             // if a single type is not up-to-date, re-send everything
-            if (updatedTypes.isEmpty() == false) {
+            if (!updatedTypes.isEmpty()) {
                 logger.warn("[{}] re-syncing mappings with cluster state because of types [{}]", index, updatedTypes);
                 dirty = true;
                 for (DocumentMapper mapper : indexService.mapperService().docMappers(true)) {
@@ -220,7 +220,7 @@ public class MetaDataMappingService extends AbstractComponent {
                     try {
                         for (Index index : request.indices()) {
                             final IndexMetaData indexMetaData = currentState.metaData().getIndexSafe(index);
-                            if (indexMapperServices.containsKey(indexMetaData.getIndex()) == false) {
+                            if (!indexMapperServices.containsKey(indexMetaData.getIndex())) {
                                 MapperService mapperService = indicesService.createIndexMapperService(indexMetaData);
                                 indexMapperServices.put(index, mapperService);
                                 // add mappings for all types, we need them for cross-type validation
@@ -287,14 +287,14 @@ public class MetaDataMappingService extends AbstractComponent {
                 }
                 if (mappingType == null) {
                     mappingType = newMapper.type();
-                } else if (mappingType.equals(newMapper.type()) == false) {
+                } else if (!mappingType.equals(newMapper.type())) {
                     throw new InvalidTypeNameException("Type name provided does not match type name within mapping definition");
                 }
             }
             assert mappingType != null;
 
-            if (MapperService.DEFAULT_MAPPING.equals(mappingType) == false
-                    && MapperService.SINGLE_MAPPING_NAME.equals(mappingType) == false
+            if (!MapperService.DEFAULT_MAPPING.equals(mappingType)
+                    && !MapperService.SINGLE_MAPPING_NAME.equals(mappingType)
                     && mappingType.charAt(0) == '_') {
                 throw new InvalidTypeNameException("Document mapping type name can't start with '_', found: [" + mappingType + "]");
             }

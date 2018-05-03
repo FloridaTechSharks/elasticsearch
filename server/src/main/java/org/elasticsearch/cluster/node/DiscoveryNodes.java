@@ -391,12 +391,12 @@ public class DiscoveryNodes extends AbstractDiffable<DiscoveryNodes> implements 
         final List<DiscoveryNode> removed = new ArrayList<>();
         final List<DiscoveryNode> added = new ArrayList<>();
         for (DiscoveryNode node : other) {
-            if (this.nodeExists(node) == false) {
+            if (!this.nodeExists(node)) {
                 removed.add(node);
             }
         }
         for (DiscoveryNode node : this) {
-            if (other.nodeExists(node) == false) {
+            if (!other.nodeExists(node)) {
                 added.add(node);
             }
         }
@@ -444,7 +444,7 @@ public class DiscoveryNodes extends AbstractDiffable<DiscoveryNodes> implements 
         }
 
         public boolean masterNodeChanged() {
-            return Objects.equals(newMasterNode, previousMasterNode) == false;
+            return !Objects.equals(newMasterNode, previousMasterNode);
         }
 
         @Nullable
@@ -643,11 +643,11 @@ public class DiscoveryNodes extends AbstractDiffable<DiscoveryNodes> implements 
             for (ObjectCursor<DiscoveryNode> cursor : nodes.values()) {
                 final DiscoveryNode existingNode = cursor.value;
                 if (node.getAddress().equals(existingNode.getAddress()) &&
-                    node.getId().equals(existingNode.getId()) == false) {
+                    !node.getId().equals(existingNode.getId())) {
                     return "can't add node " + node + ", found existing node " + existingNode + " with same address";
                 }
                 if (node.getId().equals(existingNode.getId()) &&
-                    node.equals(existingNode) == false) {
+                    !node.equals(existingNode)) {
                     return "can't add node " + node + ", found existing node " + existingNode
                         + " with the same id but is a different node instance";
                 }

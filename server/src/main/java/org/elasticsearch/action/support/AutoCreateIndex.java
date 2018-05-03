@@ -72,7 +72,7 @@ public final class AutoCreateIndex {
         }
         // One volatile read, so that all checks are done against the same instance:
         final AutoCreate autoCreate = this.autoCreate;
-        if (autoCreate.autoCreateIndex == false) {
+        if (!autoCreate.autoCreateIndex) {
             throw new IndexNotFoundException("no such index and [" + AUTO_CREATE_INDEX_SETTING.getKey() + "] is [false]", index);
         }
         if (dynamicMappingDisabled) {

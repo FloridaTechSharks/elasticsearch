@@ -155,11 +155,11 @@ public class ClusterBlocks extends AbstractDiffable<ClusterBlocks> {
     }
 
     private boolean globalBlocked(ClusterBlockLevel level) {
-        return global(level).isEmpty() == false;
+        return !global(level).isEmpty();
     }
 
     public ClusterBlockException globalBlockedException(ClusterBlockLevel level) {
-        if (globalBlocked(level) == false) {
+        if (!globalBlocked(level)) {
             return null;
         }
         return new ClusterBlockException(global(level));
@@ -183,7 +183,7 @@ public class ClusterBlocks extends AbstractDiffable<ClusterBlocks> {
     }
 
     public boolean indexBlocked(ClusterBlockLevel level, String index) {
-        return globalBlocked(level) || blocksForIndex(level, index).isEmpty() == false;
+        return globalBlocked(level) || !blocksForIndex(level, index).isEmpty();
     }
 
     public ClusterBlockException indicesBlockedException(ClusterBlockLevel level, String[] indices) {
@@ -193,7 +193,7 @@ public class ClusterBlocks extends AbstractDiffable<ClusterBlocks> {
                 indexIsBlocked = true;
             }
         }
-        if (globalBlocked(level) == false && indexIsBlocked == false) {
+        if (!globalBlocked(level) && !indexIsBlocked) {
             return null;
         }
         Function<String, Stream<ClusterBlock>> blocksForIndexAtLevel = index -> blocksForIndex(level, index).stream();
@@ -214,7 +214,7 @@ public class ClusterBlocks extends AbstractDiffable<ClusterBlocks> {
             blocksForIndex(ClusterBlockLevel.METADATA_WRITE, index).stream();
         Stream<ClusterBlock> blocks = concat(
             global(ClusterBlockLevel.METADATA_WRITE).stream(),
-            Stream.of(indices).flatMap(blocksForIndexAtLevel)).filter(clusterBlock -> clusterBlock.isAllowReleaseResources() == false);
+            Stream.of(indices).flatMap(blocksForIndexAtLevel)).filter(clusterBlock -> !clusterBlock.isAllowReleaseResources());
         Set<ClusterBlock> clusterBlocks = unmodifiableSet(blocks.collect(toSet()));
         if (clusterBlocks.isEmpty()) {
             return null;
@@ -230,7 +230,7 @@ public class ClusterBlocks extends AbstractDiffable<ClusterBlocks> {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("blocks: \n");
-        if (global.isEmpty() == false) {
+        if (!global.isEmpty()) {
             sb.append("   _global_:\n");
             for (ClusterBlock block : global) {
                 sb.append("      ").append(block);

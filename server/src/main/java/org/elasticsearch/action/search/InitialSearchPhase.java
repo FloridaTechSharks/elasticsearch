@@ -149,7 +149,7 @@ abstract class InitialSearchPhase<FirstResult extends SearchPhaseResult> extends
             assert success;
             for (int index = 0; index < maxConcurrentShardRequests; index++) {
                 final SearchShardIterator shardRoutings = shardsIts.get(index);
-                assert shardRoutings.skip() == false;
+                assert !shardRoutings.skip();
                 performPhaseOnShard(index, shardRoutings, shardRoutings.nextOrNull());
             }
         }
@@ -252,7 +252,7 @@ abstract class InitialSearchPhase<FirstResult extends SearchPhaseResult> extends
         } else if (xTotalOps > expectedTotalOps) {
             throw new AssertionError("unexpected higher total ops [" + xTotalOps + "] compared to expected ["
                 + expectedTotalOps + "]");
-        } else if (shardsIt.skip() == false) {
+        } else if (!shardsIt.skip()) {
             maybeExecuteNext();
         }
     }

@@ -127,11 +127,7 @@ public class MappingMetaData extends AbstractDiffable<MappingMetaData> {
         } else {
             this.routing = Routing.EMPTY;
         }
-        if (withoutType.containsKey("_parent")) {
-            this.hasParentField = true;
-        } else {
-            this.hasParentField = false;
-        }
+        this.hasParentField = withoutType.containsKey("_parent");
     }
 
     void updateDefaultMapping(MappingMetaData defaultMapping) {

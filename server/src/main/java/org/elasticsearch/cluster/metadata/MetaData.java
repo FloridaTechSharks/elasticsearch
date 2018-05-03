@@ -232,7 +232,7 @@ public class MetaData implements Iterable<IndexMetaData>, Diffable<MetaData>, To
             if (thisIndex == null) {
                 return false;
             }
-            if (otherIndex.getAliases().equals(thisIndex.getAliases()) == false) {
+            if (!otherIndex.getAliases().equals(thisIndex.getAliases())) {
                 return false;
             }
         }
@@ -429,7 +429,7 @@ public class MetaData implements Iterable<IndexMetaData>, Diffable<MetaData>, To
             }
 
             //only remove a field if it has no sub-fields left and it has to be excluded
-            if (fieldPredicate.test(newPath) == false) {
+            if (!fieldPredicate.test(newPath)) {
                 if (mayRemove) {
                     entryIterator.remove();
                 } else if (isMultiField) {
@@ -480,7 +480,7 @@ public class MetaData implements Iterable<IndexMetaData>, Diffable<MetaData>, To
         }
 
         AliasOrIndex result = getAliasAndIndexLookup().get(aliasOrIndex);
-        if (result == null || result.isAlias() == false) {
+        if (result == null || !result.isAlias()) {
             return routingOrParent(parent, routing);
         }
         AliasOrIndex.Alias alias = (AliasOrIndex.Alias) result;
@@ -669,8 +669,7 @@ public class MetaData implements Iterable<IndexMetaData>, Diffable<MetaData>, To
                 customCount2++;
             }
         }
-        if (customCount1 != customCount2) return false;
-        return true;
+        return customCount1 == customCount2;
     }
 
     @Override
@@ -1027,7 +1026,7 @@ public class MetaData implements Iterable<IndexMetaData>, Diffable<MetaData>, To
                 indexMetaData.getAliases().keysIt().forEachRemaining(duplicateAliasesIndices::add);
             }
             duplicateAliasesIndices.retainAll(allIndices);
-            if (duplicateAliasesIndices.isEmpty() == false) {
+            if (!duplicateAliasesIndices.isEmpty()) {
                 // iterate again and constructs a helpful message
                 ArrayList<String> duplicates = new ArrayList<>();
                 for (ObjectCursor<IndexMetaData> cursor : indices.values()) {

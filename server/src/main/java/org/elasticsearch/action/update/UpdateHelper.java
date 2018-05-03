@@ -83,7 +83,7 @@ public class UpdateHelper extends AbstractComponent {
      */
     @SuppressWarnings("unchecked")
     protected Result prepare(ShardId shardId, UpdateRequest request, final GetResult getResult, LongSupplier nowInMillis) {
-        if (getResult.isExists() == false) {
+        if (!getResult.isExists()) {
             // If the document didn't exist, execute the update request as an upsert
             return prepareUpsert(shardId, request, getResult, nowInMillis);
         } else if (getResult.internalSourceRef() == null) {
@@ -318,7 +318,7 @@ public class UpdateHelper extends AbstractComponent {
                                              final Map<String, Object> source, XContentType sourceContentType,
                                              @Nullable final BytesReference sourceAsBytes) {
         if ((request.fields() == null || request.fields().length == 0) &&
-            (request.fetchSource() == null || request.fetchSource().fetchSource() == false)) {
+            (request.fetchSource() == null || !request.fetchSource().fetchSource())) {
             return null;
         }
         SourceLookup sourceLookup = new SourceLookup();

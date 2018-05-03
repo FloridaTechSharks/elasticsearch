@@ -111,8 +111,8 @@ public class MetaDataIndexUpgradeService extends AbstractComponent {
      * before they can be opened by this version of elasticsearch.
      */
     private void checkSupportedVersion(IndexMetaData indexMetaData, Version minimumIndexCompatibilityVersion) {
-        if (indexMetaData.getState() == IndexMetaData.State.OPEN && isSupportedVersion(indexMetaData,
-            minimumIndexCompatibilityVersion) == false) {
+        if (indexMetaData.getState() == IndexMetaData.State.OPEN && !isSupportedVersion(indexMetaData,
+            minimumIndexCompatibilityVersion)) {
             throw new IllegalStateException("The index [" + indexMetaData.getIndex() + "] was created with version ["
                 + indexMetaData.getCreationVersion() + "] but the minimum compatible version is ["
 

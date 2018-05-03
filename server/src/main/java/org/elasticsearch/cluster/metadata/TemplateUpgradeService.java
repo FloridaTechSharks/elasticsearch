@@ -116,7 +116,7 @@ public class TemplateUpgradeService extends AbstractComponent implements Cluster
             return;
         }
 
-        if (state.nodes().isLocalNodeElectedMaster() == false) {
+        if (!state.nodes().isLocalNodeElectedMaster()) {
             return;
         }
 
@@ -144,7 +144,7 @@ public class TemplateUpgradeService extends AbstractComponent implements Cluster
                     if(updatesInProgress.decrementAndGet() == 0) {
                         logger.info("Finished upgrading templates to version {}", Version.CURRENT);
                     }
-                    if (response.isAcknowledged() == false) {
+                    if (!response.isAcknowledged()) {
                         logger.warn("Error updating template [{}], request was not acknowledged", change.getKey());
                     }
                 }
@@ -166,7 +166,7 @@ public class TemplateUpgradeService extends AbstractComponent implements Cluster
                 @Override
                 public void onResponse(DeleteIndexTemplateResponse response) {
                     updatesInProgress.decrementAndGet();
-                    if (response.isAcknowledged() == false) {
+                    if (!response.isAcknowledged()) {
                         logger.warn("Error deleting template [{}], request was not acknowledged", template);
                     }
                 }
@@ -174,7 +174,7 @@ public class TemplateUpgradeService extends AbstractComponent implements Cluster
                 @Override
                 public void onFailure(Exception e) {
                     updatesInProgress.decrementAndGet();
-                    if (e instanceof IndexTemplateMissingException == false) {
+                    if (!(e instanceof IndexTemplateMissingException)) {
                         // we might attempt to delete the same template from different nodes - so that's ok if template doesn't exist
                         // otherwise we need to warn
                         logger.warn(new ParameterizedMessage("Error deleting template [{}]", template), e);
@@ -197,17 +197,17 @@ public class TemplateUpgradeService extends AbstractComponent implements Cluster
         }
         // upgrade global custom meta data
         Map<String, IndexTemplateMetaData> upgradedMap = indexTemplateMetaDataUpgraders.apply(existingMap);
-        if (upgradedMap.equals(existingMap) == false) {
+        if (!upgradedMap.equals(existingMap)) {
             Set<String> deletes = new HashSet<>();
             Map<String, BytesReference> changes = new HashMap<>();
             // remove templates if needed
             existingMap.keySet().forEach(s -> {
-                if (upgradedMap.containsKey(s) == false) {
+                if (!upgradedMap.containsKey(s)) {
                     deletes.add(s);
                 }
             });
             upgradedMap.forEach((key, value) -> {
-                if (value.equals(existingMap.get(key)) == false) {
+                if (!value.equals(existingMap.get(key))) {
                     changes.put(key, toBytesReference(value));
                 }
             });

@@ -158,7 +158,7 @@ public class BaseTasksRequest<Request extends BaseTasksRequest<Request>> extends
     }
 
     public boolean match(Task task) {
-        if (getActions() != null && getActions().length > 0 && Regex.simpleMatch(getActions(), task.getAction()) == false) {
+        if (getActions() != null && getActions().length > 0 && !Regex.simpleMatch(getActions(), task.getAction())) {
             return false;
         }
         if (getTaskId().isSet()) {
@@ -167,7 +167,7 @@ public class BaseTasksRequest<Request extends BaseTasksRequest<Request>> extends
             }
         }
         if (parentTaskId.isSet()) {
-            if (parentTaskId.equals(task.getParentTaskId()) == false) {
+            if (!parentTaskId.equals(task.getParentTaskId())) {
                 return false;
             }
         }

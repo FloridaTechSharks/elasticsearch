@@ -100,7 +100,7 @@ public class DiskThresholdMonitor extends AbstractComponent {
             // from the map that tracks watermark crossing
             ObjectLookupContainer<String> nodes = usages.keys();
             for (String node : nodeHasPassedWatermark) {
-                if (nodes.contains(node) == false) {
+                if (!nodes.contains(node)) {
                     nodeHasPassedWatermark.remove(node);
                 }
             }
@@ -157,7 +157,7 @@ public class DiskThresholdMonitor extends AbstractComponent {
                 reroute();
             }
             indicesToMarkReadOnly.removeIf(index -> state.getBlocks().indexBlocked(ClusterBlockLevel.WRITE, index));
-            if (indicesToMarkReadOnly.isEmpty() == false) {
+            if (!indicesToMarkReadOnly.isEmpty()) {
                 markIndicesReadOnly(indicesToMarkReadOnly);
             }
         }

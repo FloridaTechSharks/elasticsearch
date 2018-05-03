@@ -634,7 +634,7 @@ public abstract class TransportReplicationAction<
         protected void doRun() throws Exception {
             setPhase(task, "replica");
             final String actualAllocationId = this.replica.routingEntry().allocationId().getId();
-            if (actualAllocationId.equals(targetAllocationID) == false) {
+            if (!actualAllocationId.equals(targetAllocationID)) {
                 throw new ShardNotFoundException(this.replica.shardId(), "expected aID [{}] but found [{}]", targetAllocationID,
                     actualAllocationId);
             }
@@ -775,13 +775,13 @@ public abstract class TransportReplicationAction<
         }
 
         private boolean retryIfUnavailable(ClusterState state, ShardRouting primary) {
-            if (primary == null || primary.active() == false) {
+            if (primary == null || !primary.active()) {
                 logger.trace("primary shard [{}] is not yet active, scheduling a retry: action [{}], request [{}], "
                     + "cluster state version [{}]", request.shardId(), actionName, request, state.version());
                 retryBecauseUnavailable(request.shardId(), "primary shard is not active");
                 return true;
             }
-            if (state.nodes().nodeExists(primary.currentNodeId()) == false) {
+            if (!state.nodes().nodeExists(primary.currentNodeId())) {
                 logger.trace("primary shard [{}] is assigned to an unknown node [{}], scheduling a retry: action [{}], request [{}], "
                     + "cluster state version [{}]", request.shardId(), primary.currentNodeId(), actionName, request, state.version());
                 retryBecauseUnavailable(request.shardId(), "primary shard isn't assigned to a known node.");
@@ -955,12 +955,12 @@ public abstract class TransportReplicationAction<
         // we may end up here if the cluster state used to route the primary is so stale that the underlying
         // index shard was replaced with a replica. For example - in a two node cluster, if the primary fails
         // the replica will take over and a replica will be assigned to the first node.
-        if (indexShard.routingEntry().primary() == false) {
+        if (!indexShard.routingEntry().primary()) {
             throw new ReplicationOperation.RetryOnPrimaryException(indexShard.shardId(),
                 "actual shard is not a primary " + indexShard.routingEntry());
         }
         final String actualAllocationId = indexShard.routingEntry().allocationId().getId();
-        if (actualAllocationId.equals(allocationId) == false) {
+        if (!actualAllocationId.equals(allocationId)) {
             throw new ShardNotFoundException(shardId, "expected aID [{}] but found [{}]", allocationId, actualAllocationId);
         }
         final long actualTerm = indexShard.getPrimaryTerm();

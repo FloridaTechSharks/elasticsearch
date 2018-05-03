@@ -388,7 +388,7 @@ public class BalancedShardsAllocator extends AbstractComponent implements Shards
                     // then even though the node we are examining has a better weight and may make the cluster balance
                     // more even, it doesn't make sense to execute the heavyweight operation of relocating a shard unless
                     // the gains make it worth it, as defined by the threshold
-                    boolean deltaAboveThreshold = lessThan(currentDelta, threshold) == false;
+                    boolean deltaAboveThreshold = !lessThan(currentDelta, threshold);
                     // simulate the weight of the node if we were to relocate the shard to it
                     float weightWithShardAdded = weight.weightShardAdded(this, node, idxName);
                     // calculate the delta of the weights of the two nodes if we were to add the shard to the
@@ -675,7 +675,7 @@ public class BalancedShardsAllocator extends AbstractComponent implements Shards
          *      {@link MoveDecision#nodeDecisions} will have a non-null value.
          */
         public MoveDecision decideMove(final ShardRouting shardRouting) {
-            if (shardRouting.started() == false) {
+            if (!shardRouting.started()) {
                 // we can only move started shards
                 return MoveDecision.NOT_TAKEN;
             }
@@ -916,7 +916,7 @@ public class BalancedShardsAllocator extends AbstractComponent implements Shards
                 // simulate weight if we would add shard to node
                 float currentWeight = weight.weightShardAdded(this, node, shard.getIndexName());
                 // moving the shard would not improve the balance, and we are not in explain mode, so short circuit
-                if (currentWeight > minWeight && explain == false) {
+                if (currentWeight > minWeight && !explain) {
                     continue;
                 }
 
@@ -1120,7 +1120,7 @@ public class BalancedShardsAllocator extends AbstractComponent implements Shards
 
         public boolean containsShard(ShardRouting shard) {
             ModelIndex index = getIndex(shard.getIndexName());
-            return index == null ? false : index.containsShard(shard);
+            return index != null && index.containsShard(shard);
         }
 
     }

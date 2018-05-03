@@ -86,7 +86,7 @@ public class MappingUpdatedAction extends AbstractComponent {
      * been applied to the master node and propagated to data nodes.
      */
     public void updateMappingOnMaster(Index index, String type, Mapping mappingUpdate, TimeValue timeout) {
-        if (updateMappingRequest(index, type, mappingUpdate, timeout).get().isAcknowledged() == false) {
+        if (!updateMappingRequest(index, type, mappingUpdate, timeout).get().isAcknowledged()) {
             throw new ElasticsearchTimeoutException("Failed to acknowledge mapping update within [" + timeout + "]");
         }
     }

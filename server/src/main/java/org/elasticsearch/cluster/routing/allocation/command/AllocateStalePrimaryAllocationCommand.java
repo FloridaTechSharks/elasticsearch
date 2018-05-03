@@ -114,11 +114,11 @@ public class AllocateStalePrimaryAllocationCommand extends BasePrimaryAllocation
         } catch (IndexNotFoundException | ShardNotFoundException e) {
             return explainOrThrowRejectedCommand(explain, allocation, e);
         }
-        if (shardRouting.unassigned() == false) {
+        if (!shardRouting.unassigned()) {
             return explainOrThrowRejectedCommand(explain, allocation, "primary [" + index + "][" + shardId + "] is already assigned");
         }
 
-        if (acceptDataLoss == false) {
+        if (!acceptDataLoss) {
             String dataLossWarning = "allocating an empty primary for [" + index + "][" + shardId + "] can result in data loss. Please " +
                 "confirm by setting the accept_data_loss parameter to true";
             return explainOrThrowRejectedCommand(explain, allocation, dataLossWarning);

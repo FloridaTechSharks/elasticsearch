@@ -102,7 +102,7 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
             throw new IllegalStateException(index + " exists in routing does not exists in metadata");
         }
         IndexMetaData indexMetaData = metaData.index(index.getName());
-        if (indexMetaData.getIndexUUID().equals(index.getUUID()) == false) {
+        if (!indexMetaData.getIndexUUID().equals(index.getUUID())) {
             throw new IllegalStateException(index.getName() + " exists in routing does not exists in metadata with the same uuid");
         }
 
@@ -133,14 +133,14 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
                 }
                 final Set<String> inSyncAllocationIds = indexMetaData.inSyncAllocationIds(shardRouting.id());
                 if (shardRouting.active() &&
-                    inSyncAllocationIds.contains(shardRouting.allocationId().getId()) == false) {
+                    !inSyncAllocationIds.contains(shardRouting.allocationId().getId())) {
                     throw new IllegalStateException("active shard routing " + shardRouting + " has no corresponding entry in the in-sync " +
                         "allocation set " + inSyncAllocationIds);
                 }
 
                 if (shardRouting.primary() && shardRouting.initializing() &&
                     shardRouting.recoverySource().getType() == RecoverySource.Type.EXISTING_STORE &&
-                    inSyncAllocationIds.contains(shardRouting.allocationId().getId()) == false)
+                    !inSyncAllocationIds.contains(shardRouting.allocationId().getId()))
                     throw new IllegalStateException("a primary shard routing " + shardRouting + " is a primary that is recovering from " +
                         "a known allocation id but has no corresponding entry in the in-sync " +
                         "allocation set " + inSyncAllocationIds);
@@ -408,7 +408,7 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
             for (int shardNumber = 0; shardNumber < indexMetaData.getNumberOfShards(); shardNumber++) {
                 ShardId shardId = new ShardId(index, shardNumber);
                 final RecoverySource primaryRecoverySource;
-                if (indexMetaData.inSyncAllocationIds(shardNumber).isEmpty() == false) {
+                if (!indexMetaData.inSyncAllocationIds(shardNumber).isEmpty()) {
                     // we have previous valid copies for this shard. use them for recovery
                     primaryRecoverySource = StoreRecoverySource.EXISTING_STORE_INSTANCE;
                 } else if (indexMetaData.getResizeSourceIndex() != null) {

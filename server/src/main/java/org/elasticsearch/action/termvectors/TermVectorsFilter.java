@@ -253,10 +253,7 @@ public class TermVectorsFilter {
             return true;
         }
         // filter out words that occur too many times in the source
-        if (freq > maxTermFreq) {
-            return true;
-        }
-        return false;
+        return freq > maxTermFreq;
     }
 
     private boolean isAccepted(long docFreq) {
@@ -269,10 +266,7 @@ public class TermVectorsFilter {
             return false;
         }
         // index update problem?
-        if (docFreq == 0) {
-            return false;
-        }
-        return true;
+        return docFreq != 0;
     }
 
     private long getDocCount(String fieldName, Terms topLevelTerms) throws IOException {

@@ -47,7 +47,7 @@ public class DiscoveryNodeFilters {
         if (rawValue != null) {
             if (propertyKey.endsWith("._ip") || propertyKey.endsWith("._host_ip") || propertyKey.endsWith("_publish_ip")) {
                 for (String value : Strings.tokenizeToStringArray(rawValue, ",")) {
-                    if (Regex.isSimpleMatchPattern(value) == false && InetAddresses.isInetAddress(value) == false) {
+                    if (!Regex.isSimpleMatchPattern(value) && InetAddresses.isInetAddress(value) == false) {
                         throw new IllegalArgumentException("invalid IP address [" + value + "] for [" + propertyKey + "]");
                     }
                 }
@@ -212,11 +212,7 @@ public class DiscoveryNodeFilters {
                 }
             }
         }
-        if (opType == OpType.OR) {
-            return false;
-        } else {
-            return true;
-        }
+        return opType != OpType.OR;
     }
 
     /**

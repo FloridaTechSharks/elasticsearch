@@ -30,7 +30,7 @@ public abstract class AliasAction {
     private final String index;
 
     private AliasAction(String index) {
-        if (false == Strings.hasText(index)) {
+        if (!Strings.hasText(index)) {
             throw new IllegalArgumentException("[index] is required");
         }
         this.index = index;
@@ -51,7 +51,7 @@ public abstract class AliasAction {
 
     /**
      * Apply the action.
-     * 
+     *
      * @param aliasValidator call to validate a new alias before adding it to the builder
      * @param metadata metadata builder for the changes made by all actions as part of this request
      * @param index metadata for the index being changed

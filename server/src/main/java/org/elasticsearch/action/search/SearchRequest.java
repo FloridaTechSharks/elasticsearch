@@ -163,7 +163,7 @@ public final class SearchRequest extends ActionRequest implements IndicesRequest
     public ActionRequestValidationException validate() {
         ActionRequestValidationException validationException = null;
         final Scroll scroll = scroll();
-        if (source != null && source.trackTotalHits() == false && scroll != null) {
+        if (source != null && !source.trackTotalHits() && scroll != null) {
             validationException =
                 addValidationError("disabling [track_total_hits] is not allowed in a scroll context", validationException);
         }

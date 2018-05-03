@@ -145,16 +145,16 @@ public class ReplicationOperation<
         // If the index gets deleted after primary operation, we skip replication
         for (final ShardRouting shard : indexShardRoutingTable) {
             if (shard.unassigned()) {
-                assert shard.primary() == false : "primary shard should not be unassigned in a replication group: " + shard;
+                assert !shard.primary() : "primary shard should not be unassigned in a replication group: " + shard;
                 totalShards.incrementAndGet();
                 continue;
             }
 
-            if (shard.currentNodeId().equals(localNodeId) == false) {
+            if (!shard.currentNodeId().equals(localNodeId)) {
                 performOnReplica(shard, replicaRequest, globalCheckpoint);
             }
 
-            if (shard.relocating() && shard.relocatingNodeId().equals(localNodeId) == false) {
+            if (shard.relocating() && !shard.relocatingNodeId().equals(localNodeId)) {
                 performOnReplica(shard.getTargetRelocatingShard(), replicaRequest, globalCheckpoint);
             }
         }

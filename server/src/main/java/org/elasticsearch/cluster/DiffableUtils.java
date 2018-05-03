@@ -181,7 +181,7 @@ public final class DiffableUtils {
                 T beforePart = before.get(partIter.getKey());
                 if (beforePart == null) {
                     upserts.put(partIter.getKey(), partIter.getValue());
-                } else if (partIter.getValue().equals(beforePart) == false) {
+                } else if (!partIter.getValue().equals(beforePart)) {
                     if (valueSerializer.supportsDiffableValues()) {
                         diffs.put(partIter.getKey(), valueSerializer.diff(partIter.getValue(), beforePart));
                     } else {
@@ -241,7 +241,7 @@ public final class DiffableUtils {
                 T beforePart = before.get(partIter.key);
                 if (beforePart == null) {
                     upserts.put(partIter.key, partIter.value);
-                } else if (partIter.value.equals(beforePart) == false) {
+                } else if (!partIter.value.equals(beforePart)) {
                     if (valueSerializer.supportsDiffableValues()) {
                         diffs.put(partIter.key, valueSerializer.diff(partIter.value, beforePart));
                     } else {
@@ -256,7 +256,7 @@ public final class DiffableUtils {
          * If the key does not exist in the diff map, the same instance is returned.
          */
         public ImmutableOpenMapDiff<K, T> withKeyRemoved(K key) {
-            if (this.diffs.containsKey(key) == false && this.upserts.containsKey(key) == false) {
+            if (!this.diffs.containsKey(key) && !this.upserts.containsKey(key)) {
                 return this;
             }
             Map<K, Diff<T>> newDiffs = new HashMap<>(this.diffs);
@@ -312,7 +312,7 @@ public final class DiffableUtils {
                 T beforePart = before.get(partIter.key);
                 if (beforePart == null) {
                     upserts.put(partIter.key, partIter.value);
-                } else if (partIter.value.equals(beforePart) == false) {
+                } else if (!partIter.value.equals(beforePart)) {
                     if (valueSerializer.supportsDiffableValues()) {
                         diffs.put(partIter.key, valueSerializer.diff(partIter.value, beforePart));
                     } else {

@@ -583,7 +583,7 @@ public class IndexMetaData implements Diffable<IndexMetaData>, ToXContentFragmen
         if (routingFactor != that.routingFactor) {
             return false;
         }
-        if (Arrays.equals(primaryTerms, that.primaryTerms) == false) {
+        if (!Arrays.equals(primaryTerms, that.primaryTerms)) {
             return false;
         }
         if (!inSyncAllocationIds.equals(that.inSyncAllocationIds)) {

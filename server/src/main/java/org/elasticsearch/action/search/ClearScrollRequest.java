@@ -111,13 +111,13 @@ public class ClearScrollRequest extends ActionRequest implements ToXContentObjec
                 } else if ("scroll_id".equals(currentFieldName)){
                     if (token == XContentParser.Token.START_ARRAY) {
                         while ((token = parser.nextToken()) != XContentParser.Token.END_ARRAY) {
-                            if (token.isValue() == false) {
+                            if (!token.isValue()) {
                                 throw new IllegalArgumentException("scroll_id array element should only contain scroll_id");
                             }
                             addScrollId(parser.text());
                         }
                     } else {
-                        if (token.isValue() == false) {
+                        if (!token.isValue()) {
                             throw new IllegalArgumentException("scroll_id element should only contain scroll_id");
                         }
                         addScrollId(parser.text());

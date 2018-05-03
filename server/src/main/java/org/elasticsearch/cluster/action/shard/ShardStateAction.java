@@ -411,7 +411,7 @@ public class ShardStateAction extends AbstractComponent {
                     logger.debug("{} ignoring shard started task [{}] (shard does not exist anymore)", task.shardId, task);
                     builder.success(task);
                 } else {
-                    if (matched.initializing() == false) {
+                    if (!matched.initializing()) {
                         assert matched.active() : "expected active shard routing for task " + task + " but found " + matched;
                         // same as above, this might have been a stale in-flight request, so we just ignore.
                         logger.debug("{} ignoring shard started task [{}] (shard exists but is not initializing: {})", task.shardId, task,

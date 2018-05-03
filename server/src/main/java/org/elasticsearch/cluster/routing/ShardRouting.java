@@ -532,10 +532,7 @@ public final class ShardRouting implements Writeable, ToXContentObject {
         if (state != other.state) {
             return false;
         }
-        if (recoverySource != null ? !recoverySource.equals(other.recoverySource) : other.recoverySource != null) {
-            return false;
-        }
-        return true;
+        return recoverySource != null ? recoverySource.equals(other.recoverySource) : other.recoverySource == null;
     }
 
     @Override

@@ -173,7 +173,7 @@ public class MasterService extends AbstractLifecycleComponent {
     }
 
     public static boolean assertNotMasterUpdateThread(String reason) {
-        assert Thread.currentThread().getName().contains(MASTER_UPDATE_THREAD_NAME) == false :
+        assert !Thread.currentThread().getName().contains(MASTER_UPDATE_THREAD_NAME) :
             "Expected current thread [" + Thread.currentThread() + "] to not be the master service thread. Reason: [" + reason + "]";
         return true;
     }
@@ -404,7 +404,7 @@ public class MasterService extends AbstractLifecycleComponent {
             for (Batcher.UpdateTask updateTask : taskInputs.updateTasks) {
                 assert executionResults.containsKey(updateTask.task) : "missing " + updateTask;
                 final ClusterStateTaskExecutor.TaskResult taskResult = executionResults.get(updateTask.task);
-                if (taskResult.isSuccess() == false) {
+                if (!taskResult.isSuccess()) {
                     updateTask.listener.onFailure(updateTask.source(), taskResult.getFailure());
                 }
             }
@@ -643,7 +643,7 @@ public class MasterService extends AbstractLifecycleComponent {
             clusterTasksResult = taskInputs.executor.execute(previousClusterState, inputs);
             if (previousClusterState != clusterTasksResult.resultingState &&
                 previousClusterState.nodes().isLocalNodeElectedMaster() &&
-                (clusterTasksResult.resultingState.nodes().isLocalNodeElectedMaster() == false)) {
+                (!clusterTasksResult.resultingState.nodes().isLocalNodeElectedMaster())) {
                 throw new AssertionError("update task submitted to MasterService cannot remove master");
             }
         } catch (Exception e) {

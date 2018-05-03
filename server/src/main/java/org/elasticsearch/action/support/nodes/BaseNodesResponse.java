@@ -71,7 +71,7 @@ public abstract class BaseNodesResponse<TNodeResponse extends BaseNodeResponse> 
      * @return {@code true} if {@link #failures} contains at least 1 {@link FailedNodeException}.
      */
     public boolean hasFailures() {
-        return failures.isEmpty() == false;
+        return !failures.isEmpty();
     }
 
     /**

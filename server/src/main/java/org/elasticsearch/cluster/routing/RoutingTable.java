@@ -162,7 +162,7 @@ public class RoutingTable implements Iterable<IndexRoutingTable>, Diffable<Routi
 
     public boolean validate(MetaData metaData) {
         for (IndexRoutingTable indexRoutingTable : this) {
-            if (indexRoutingTable.validate(metaData) == false) {
+            if (!indexRoutingTable.validate(metaData)) {
                 return false;
             }
         }

@@ -323,7 +323,7 @@ public class AllocationService extends AbstractComponent {
             clusterInfoService.getClusterInfo(), currentNanoTime());
         allocation.debugDecision(debug);
         reroute(allocation);
-        if (allocation.routingNodesChanged() == false) {
+        if (!allocation.routingNodesChanged()) {
             return clusterState;
         }
         return buildResultAndLogHealthChange(clusterState, allocation, reason);
@@ -339,7 +339,7 @@ public class AllocationService extends AbstractComponent {
 
     private boolean hasDeadNodes(RoutingAllocation allocation) {
         for (RoutingNode routingNode : allocation.routingNodes()) {
-            if (allocation.nodes().getDataNodes().containsKey(routingNode.nodeId()) == false) {
+            if (!allocation.nodes().getDataNodes().containsKey(routingNode.nodeId())) {
                 return true;
             }
         }
@@ -347,7 +347,7 @@ public class AllocationService extends AbstractComponent {
     }
 
     private void reroute(RoutingAllocation allocation) {
-        assert hasDeadNodes(allocation) == false : "dead nodes should be explicitly cleaned up. See deassociateDeadNodes";
+        assert !hasDeadNodes(allocation) : "dead nodes should be explicitly cleaned up. See deassociateDeadNodes";
 
         // now allocate all the unassigned to available nodes
         if (allocation.routingNodes().unassigned().size() > 0) {
@@ -381,7 +381,7 @@ public class AllocationService extends AbstractComponent {
     }
 
     private void applyStartedShards(RoutingAllocation routingAllocation, List<ShardRouting> startedShardEntries) {
-        assert startedShardEntries.isEmpty() == false : "non-empty list of started shard entries expected";
+        assert !startedShardEntries.isEmpty() : "non-empty list of started shard entries expected";
         RoutingNodes routingNodes = routingAllocation.routingNodes();
         for (ShardRouting startedShard : startedShardEntries) {
             assert startedShard.initializing() : "only initializing shards can be started";

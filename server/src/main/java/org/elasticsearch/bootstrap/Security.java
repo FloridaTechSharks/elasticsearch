@@ -143,7 +143,7 @@ final class Security {
         for (URL url : urls) {
             try {
                 String fileName = PathUtils.get(url.toURI()).getFileName().toString();
-                if (fileName.endsWith(".jar") == false) {
+                if (!fileName.endsWith(".jar")) {
                     // tests :(
                     continue;
                 }
@@ -168,7 +168,7 @@ final class Security {
         if (Files.exists(environment.modulesFile())) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(environment.modulesFile())) {
                 for (Path module : stream) {
-                    if (pluginsAndModules.add(module) == false) {
+                    if (!pluginsAndModules.add(module)) {
                         throw new IllegalStateException("duplicate module: " + module);
                     }
                 }
@@ -184,7 +184,7 @@ final class Security {
                 try (DirectoryStream<Path> jarStream = Files.newDirectoryStream(plugin, "*.jar")) {
                     for (Path jar : jarStream) {
                         URL url = jar.toRealPath().toUri().toURL();
-                        if (codebases.add(url) == false) {
+                        if (!codebases.add(url)) {
                             throw new IllegalStateException("duplicate module/plugin: " + url);
                         }
                     }
@@ -228,7 +228,7 @@ final class Security {
                     // only means policy grants would need to include the entire jar filename as they always have before.
                     String property = "codebase." + name;
                     String aliasProperty = "codebase." + name.replaceFirst("-\\d+\\.\\d+.*\\.jar", "");
-                    if (aliasProperty.equals(property) == false) {
+                    if (!aliasProperty.equals(property)) {
                         propertiesSet.add(aliasProperty);
                         String previous = System.setProperty(aliasProperty, url.toString());
                         if (previous != null) {

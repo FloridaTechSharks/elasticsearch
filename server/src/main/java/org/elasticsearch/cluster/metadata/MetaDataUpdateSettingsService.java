@@ -164,13 +164,13 @@ public class MetaDataUpdateSettingsService extends AbstractComponent implements 
         Settings.Builder settingsForOpenIndices = Settings.builder();
         final Set<String> skippedSettings = new HashSet<>();
 
-        indexScopedSettings.validate(normalizedSettings.filter(s -> Regex.isSimpleMatchPattern(s) == false  /* don't validate wildcards */),
+        indexScopedSettings.validate(normalizedSettings.filter(s -> !Regex.isSimpleMatchPattern(s)  /* don't validate wildcards */),
             false); //don't validate dependencies here we check it below never allow to change the number of shards
         for (String key : normalizedSettings.keySet()) {
             Setting setting = indexScopedSettings.get(key);
             boolean isWildcard = setting == null && Regex.isSimpleMatchPattern(key);
             assert setting != null // we already validated the normalized settings
-                || (isWildcard && normalizedSettings.hasValue(key) == false)
+                || (isWildcard && !normalizedSettings.hasValue(key))
                 : "unknown setting: " + key + " isWildcard: " + isWildcard + " hasValue: " + normalizedSettings.hasValue(key);
             settingsForClosedIndices.copy(key, normalizedSettings);
             if (isWildcard || setting.isDynamic()) {
@@ -219,7 +219,7 @@ public class MetaDataUpdateSettingsService extends AbstractComponent implements 
                 }
 
                 int updatedNumberOfReplicas = openSettings.getAsInt(IndexMetaData.SETTING_NUMBER_OF_REPLICAS, -1);
-                if (updatedNumberOfReplicas != -1 && preserveExisting == false) {
+                if (updatedNumberOfReplicas != -1 && !preserveExisting) {
                     // we do *not* update the in sync allocation ids as they will be removed upon the first index
                     // operation which make these copies stale
                     // TODO: update the list once the data is deleted by the node?
@@ -245,7 +245,7 @@ public class MetaDataUpdateSettingsService extends AbstractComponent implements 
                                 indexSettings.put(indexMetaData.getSettings());
                             }
                             Settings finalSettings = indexSettings.build();
-                            indexScopedSettings.validate(finalSettings.filter(k -> indexScopedSettings.isPrivateSetting(k) == false), true);
+                            indexScopedSettings.validate(finalSettings.filter(k -> !indexScopedSettings.isPrivateSetting(k)), true);
                             metaDataBuilder.put(IndexMetaData.builder(indexMetaData).settings(finalSettings));
                         }
                     }
@@ -261,7 +261,7 @@ public class MetaDataUpdateSettingsService extends AbstractComponent implements 
                                 indexSettings.put(indexMetaData.getSettings());
                             }
                             Settings finalSettings = indexSettings.build();
-                            indexScopedSettings.validate(finalSettings.filter(k -> indexScopedSettings.isPrivateSetting(k) == false), true);
+                            indexScopedSettings.validate(finalSettings.filter(k -> !indexScopedSettings.isPrivateSetting(k)), true);
                             metaDataBuilder.put(IndexMetaData.builder(indexMetaData).settings(finalSettings));
                         }
                     }
@@ -329,7 +329,7 @@ public class MetaDataUpdateSettingsService extends AbstractComponent implements 
                     String index = entry.getKey();
                     IndexMetaData indexMetaData = metaDataBuilder.get(index);
                     if (indexMetaData != null) {
-                        if (Version.CURRENT.equals(indexMetaData.getCreationVersion()) == false) {
+                        if (!Version.CURRENT.equals(indexMetaData.getCreationVersion())) {
                             // No reason to pollute the settings, we didn't really upgrade anything
                             metaDataBuilder.put(IndexMetaData.builder(indexMetaData)
                                             .settings(Settings.builder().put(indexMetaData.getSettings())

@@ -55,7 +55,7 @@ public final class ThreadedActionListener<Response> implements ActionListener<Re
         }
 
         public <Response> ActionListener<Response> wrap(ActionListener<Response> listener) {
-            if (threadedListener == false) {
+            if (!threadedListener) {
                 return listener;
             }
             // if its a future, the callback is very lightweight (flipping a bit) so no need to wrap it

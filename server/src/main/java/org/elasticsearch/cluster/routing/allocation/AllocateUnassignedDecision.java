@@ -308,10 +308,10 @@ public class AllocateUnassignedDecision extends AbstractAllocationDecision {
 
     @Override
     public boolean equals(Object other) {
-        if (super.equals(other) == false) {
+        if (!super.equals(other)) {
             return false;
         }
-        if (other instanceof AllocateUnassignedDecision == false) {
+        if (!(other instanceof AllocateUnassignedDecision)) {
             return false;
         }
         @SuppressWarnings("unchecked") AllocateUnassignedDecision that = (AllocateUnassignedDecision) other;
