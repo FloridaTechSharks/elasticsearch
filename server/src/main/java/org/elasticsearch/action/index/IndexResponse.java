@@ -91,7 +91,7 @@ public class IndexResponse extends DocWriteResponse {
         @Override
         public IndexResponse build() {
             IndexResponse indexResponse = new IndexResponse(shardId, type, id, seqNo, primaryTerm, version,
-                    result == Result.CREATED ? true : false);
+                result == Result.CREATED);
             indexResponse.setForcedRefresh(forcedRefresh);
             if (shardInfo != null) {
                 indexResponse.setShardInfo(shardInfo);

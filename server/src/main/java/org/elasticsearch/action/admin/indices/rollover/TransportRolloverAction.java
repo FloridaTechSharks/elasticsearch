@@ -183,7 +183,7 @@ public class TransportRolloverAction extends TransportMasterNodeAction<RolloverR
 
     static String generateRolloverIndexName(String sourceIndexName, IndexNameExpressionResolver indexNameExpressionResolver) {
         String resolvedName = indexNameExpressionResolver.resolveDateMathExpression(sourceIndexName);
-        final boolean isDateMath = sourceIndexName.equals(resolvedName) == false;
+        final boolean isDateMath = !sourceIndexName.equals(resolvedName);
         if (INDEX_NAME_PATTERN.matcher(resolvedName).matches()) {
             int numberIndex = sourceIndexName.lastIndexOf("-");
             assert numberIndex != -1 : "no separator '-' found";
@@ -217,7 +217,7 @@ public class TransportRolloverAction extends TransportMasterNodeAction<RolloverR
         if (aliasOrIndex == null) {
             throw new IllegalArgumentException("source alias does not exist");
         }
-        if (aliasOrIndex.isAlias() == false) {
+        if (!aliasOrIndex.isAlias()) {
             throw new IllegalArgumentException("source alias is a concrete index");
         }
         if (aliasOrIndex.getIndices().size() != 1) {

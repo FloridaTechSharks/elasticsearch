@@ -87,7 +87,7 @@ public class ESLoggerUsageChecker {
         throws IOException {
         for (String classDirectory : classDirectories) {
             Path root = Paths.get(classDirectory);
-            if (Files.isDirectory(root) == false) {
+            if (!Files.isDirectory(root)) {
                 throw new IllegalArgumentException(root + " should be an existing directory");
             }
             Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
@@ -226,7 +226,7 @@ public class ESLoggerUsageChecker {
 
         @Override
         public void visitEnd() {
-            if (ignoreChecks == false) {
+            if (!ignoreChecks) {
                 findBadLoggerUsages((MethodNode) mv);
             }
             super.visitEnd();
@@ -279,8 +279,8 @@ public class ESLoggerUsageChecker {
                             // MULTI-PARAM METHOD: debug(Marker?, String, Object p0, ...)
                             checkFixedArityArgs(methodNode, logMessageFrames[i], lineNumber, methodInsn, markerOffset + 0,
                                 lengthWithoutMarker - 1);
-                        } else if ((lengthWithoutMarker == 1 || lengthWithoutMarker == 2) &&
-                            lengthWithoutMarker == 2 ? argumentTypes[markerOffset + 1].equals(THROWABLE_CLASS) : true) {
+                        } else if ((lengthWithoutMarker != 1 && lengthWithoutMarker != 2) ||
+                            lengthWithoutMarker != 2 || argumentTypes[markerOffset + 1].equals(THROWABLE_CLASS)) {
                             // all the rest: debug(Marker?, (Message|MessageSupplier|CharSequence|Object|String|Supplier), Throwable?)
                             checkFixedArityArgs(methodNode, logMessageFrames[i], lineNumber, methodInsn, markerOffset + 0, 0);
                         } else {

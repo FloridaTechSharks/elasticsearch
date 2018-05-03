@@ -268,7 +268,7 @@ public class BulkProcessor implements Closeable {
     }
 
     boolean isOpen() {
-        return closed == false;
+        return !closed;
     }
 
     protected void ensureOpen() {

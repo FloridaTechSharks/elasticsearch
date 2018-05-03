@@ -70,7 +70,7 @@ public class TransportClusterRerouteAction extends TransportMasterNodeAction<Clu
     protected void masterOperation(final ClusterRerouteRequest request, final ClusterState state, final ActionListener<ClusterRerouteResponse> listener) {
         ActionListener<ClusterRerouteResponse> logWrapper = ActionListener.wrap(
             response -> {
-                if (request.dryRun() == false) {
+                if (!request.dryRun()) {
                     response.getExplanations().getYesDecisionMessages().forEach(logger::info);
                 }
                 listener.onResponse(response);

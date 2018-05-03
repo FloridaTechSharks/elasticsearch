@@ -93,7 +93,7 @@ public class TransportGetSnapshotsAction extends TransportMasterNodeAction<GetSn
             }
 
             final RepositoryData repositoryData;
-            if (isCurrentSnapshotsOnly(request.snapshots()) == false) {
+            if (!isCurrentSnapshotsOnly(request.snapshots())) {
                 repositoryData = snapshotsService.getRepositoryData(repository);
                 for (SnapshotId snapshotId : repositoryData.getAllSnapshotIds()) {
                     allSnapshotIds.put(snapshotId.getName(), snapshotId);
@@ -109,10 +109,10 @@ public class TransportGetSnapshotsAction extends TransportMasterNodeAction<GetSn
                 for (String snapshotOrPattern : request.snapshots()) {
                     if (GetSnapshotsRequest.CURRENT_SNAPSHOT.equalsIgnoreCase(snapshotOrPattern)) {
                         toResolve.addAll(currentSnapshots.stream().map(SnapshotInfo::snapshotId).collect(Collectors.toList()));
-                    } else if (Regex.isSimpleMatchPattern(snapshotOrPattern) == false) {
+                    } else if (!Regex.isSimpleMatchPattern(snapshotOrPattern)) {
                         if (allSnapshotIds.containsKey(snapshotOrPattern)) {
                             toResolve.add(allSnapshotIds.get(snapshotOrPattern));
-                        } else if (request.ignoreUnavailable() == false) {
+                        } else if (!request.ignoreUnavailable()) {
                             throw new SnapshotMissingException(repository, snapshotOrPattern);
                         }
                     } else {
@@ -124,7 +124,7 @@ public class TransportGetSnapshotsAction extends TransportMasterNodeAction<GetSn
                     }
                 }
 
-                if (toResolve.isEmpty() && request.ignoreUnavailable() == false && isCurrentSnapshotsOnly(request.snapshots()) == false) {
+                if (toResolve.isEmpty() && !request.ignoreUnavailable() && !isCurrentSnapshotsOnly(request.snapshots())) {
                     throw new SnapshotMissingException(repository, request.snapshots()[0]);
                 }
             }

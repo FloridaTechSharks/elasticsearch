@@ -168,7 +168,7 @@ public class TransportResizeAction extends TransportMasterNodeAction<ResizeReque
         if (IndexMetaData.INDEX_NUMBER_OF_ROUTING_SHARDS_SETTING.exists(targetIndexSettings)) {
             // if we have a source index with 1 shards it's legal to set this
             final boolean splitFromSingleShards = resizeRequest.getResizeType() == ResizeType.SPLIT && metaData.getNumberOfShards() == 1;
-            if (splitFromSingleShards == false) {
+            if (!splitFromSingleShards) {
                 throw new IllegalArgumentException("cannot provide index.number_of_routing_shards on resize");
             }
         }

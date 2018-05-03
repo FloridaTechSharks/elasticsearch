@@ -156,7 +156,7 @@ public class IndicesSegmentResponse extends BroadcastResponse implements ToXCont
                             }
                             builder.endArray();
                         }
-                        if (segment.attributes != null && segment.attributes.isEmpty() == false) {
+                        if (segment.attributes != null && !segment.attributes.isEmpty()) {
                             builder.field("attributes", segment.attributes);
                         }
                         builder.endObject();
@@ -200,7 +200,7 @@ public class IndicesSegmentResponse extends BroadcastResponse implements ToXCont
         builder.field(Fields.DESCRIPTION, tree.toString());
         builder.byteSizeField(Fields.SIZE_IN_BYTES, Fields.SIZE, new ByteSizeValue(tree.ramBytesUsed()));
         Collection<Accountable> children = tree.getChildResources();
-        if (children.isEmpty() == false) {
+        if (!children.isEmpty()) {
             builder.startArray(Fields.CHILDREN);
             for (Accountable child : children) {
                 toXContent(builder, child);

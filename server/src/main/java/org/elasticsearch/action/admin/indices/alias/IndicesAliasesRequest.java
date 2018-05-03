@@ -250,7 +250,7 @@ public class IndicesAliasesRequest extends AcknowledgedRequest<IndicesAliasesReq
                 throw new IllegalArgumentException("[indices] can't be empty");
             }
             for (String index : indices) {
-                if (false == Strings.hasLength(index)) {
+                if (!Strings.hasLength(index)) {
                     throw new IllegalArgumentException("[indices] can't contain empty string");
                 }
             }
@@ -262,7 +262,7 @@ public class IndicesAliasesRequest extends AcknowledgedRequest<IndicesAliasesReq
          * Set the index this action is operating on.
          */
         public AliasActions index(String index) {
-            if (false == Strings.hasLength(index)) {
+            if (!Strings.hasLength(index)) {
                 throw new IllegalArgumentException("[index] can't be empty string");
             }
             this.indices = new String[] {index};
@@ -281,7 +281,7 @@ public class IndicesAliasesRequest extends AcknowledgedRequest<IndicesAliasesReq
                 throw new IllegalArgumentException("[aliases] can't be empty");
             }
             for (String alias : aliases) {
-                if (false == Strings.hasLength(alias)) {
+                if (!Strings.hasLength(alias)) {
                     throw new IllegalArgumentException("[aliases] can't contain empty string");
                 }
             }
@@ -296,7 +296,7 @@ public class IndicesAliasesRequest extends AcknowledgedRequest<IndicesAliasesReq
             if (type == AliasActions.Type.REMOVE_INDEX) {
                 throw new IllegalArgumentException("[alias] is unsupported for [" + type + "]");
             }
-            if (false == Strings.hasLength(alias)) {
+            if (!Strings.hasLength(alias)) {
                 throw new IllegalArgumentException("[alias] can't be empty string");
             }
             this.aliases = new String[] {alias};

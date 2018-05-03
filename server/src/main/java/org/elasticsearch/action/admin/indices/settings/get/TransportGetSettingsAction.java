@@ -83,7 +83,7 @@ public class TransportGetSettingsAction extends TransportMasterNodeReadAction<Ge
             if (request.humanReadable()) {
                 settings = IndexMetaData.addHumanReadableSettings(settings);
             }
-            if (CollectionUtils.isEmpty(request.names()) == false) {
+            if (!CollectionUtils.isEmpty(request.names())) {
                 settings = settings.filter(k -> Regex.simpleMatch(request.names(), k));
             }
             indexToSettingsBuilder.put(concreteIndex.getName(), settings);

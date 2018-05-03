@@ -384,23 +384,28 @@ public class CreateSnapshotRequest extends MasterNodeRequest<CreateSnapshotReque
     public CreateSnapshotRequest source(Map<String, Object> source) {
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             String name = entry.getKey();
-            if (name.equals("indices")) {
-                if (entry.getValue() instanceof String) {
-                    indices(Strings.splitStringByCommaToArray((String) entry.getValue()));
-                } else if (entry.getValue() instanceof ArrayList) {
-                    indices((ArrayList<String>) entry.getValue());
-                } else {
-                    throw new IllegalArgumentException("malformed indices section, should be an array of strings");
-                }
-            } else if (name.equals("partial")) {
-                partial(nodeBooleanValue(entry.getValue(), "partial"));
-            } else if (name.equals("settings")) {
-                if (!(entry.getValue() instanceof Map)) {
-                    throw new IllegalArgumentException("malformed settings section, should indices an inner object");
-                }
-                settings((Map<String, Object>) entry.getValue());
-            } else if (name.equals("include_global_state")) {
-                includeGlobalState = nodeBooleanValue(entry.getValue(), "include_global_state");
+            switch (name) {
+                case "indices":
+                    if (entry.getValue() instanceof String) {
+                        indices(Strings.splitStringByCommaToArray((String) entry.getValue()));
+                    } else if (entry.getValue() instanceof ArrayList) {
+                        indices((ArrayList<String>) entry.getValue());
+                    } else {
+                        throw new IllegalArgumentException("malformed indices section, should be an array of strings");
+                    }
+                    break;
+                case "partial":
+                    partial(nodeBooleanValue(entry.getValue(), "partial"));
+                    break;
+                case "settings":
+                    if (!(entry.getValue() instanceof Map)) {
+                        throw new IllegalArgumentException("malformed settings section, should indices an inner object");
+                    }
+                    settings((Map<String, Object>) entry.getValue());
+                    break;
+                case "include_global_state":
+                    includeGlobalState = nodeBooleanValue(entry.getValue(), "include_global_state");
+                    break;
             }
         }
         indicesOptions(IndicesOptions.fromMap(source, indicesOptions));

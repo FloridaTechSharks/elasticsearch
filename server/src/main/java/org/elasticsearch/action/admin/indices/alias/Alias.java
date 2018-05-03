@@ -252,9 +252,7 @@ public class Alias implements Streamable, ToXContentObject {
 
         Alias alias = (Alias) o;
 
-        if (name != null ? !name.equals(alias.name) : alias.name != null) return false;
-
-        return true;
+        return name != null ? name.equals(alias.name) : alias.name == null;
     }
 
     @Override

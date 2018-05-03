@@ -75,7 +75,7 @@ public class SearchAfterSortedDocQuery extends Query {
             @Override
             public Scorer scorer(LeafReaderContext context) throws IOException {
                 Sort segmentSort = context.reader().getMetaData().getSort();
-                if (EarlyTerminatingSortingCollector.canEarlyTerminate(sort, segmentSort) == false) {
+                if (!EarlyTerminatingSortingCollector.canEarlyTerminate(sort, segmentSort)) {
                     throw new IOException("search sort :[" + sort.getSort() + "] does not match the index sort:[" + segmentSort + "]");
                 }
                 final int afterDoc = after.doc - context.docBase;
@@ -143,10 +143,7 @@ public class SearchAfterSortedDocQuery extends Query {
                 }
             }
 
-            if (doc <= topDoc) {
-                return false;
-            }
-            return true;
+            return doc > topDoc;
         };
     }
 

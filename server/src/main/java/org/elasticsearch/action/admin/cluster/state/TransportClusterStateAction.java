@@ -127,7 +127,7 @@ public class TransportClusterStateAction extends TransportMasterNodeReadAction<C
         }
         if (request.customs()) {
             for (ObjectObjectCursor<String, ClusterState.Custom> custom : currentState.customs()) {
-                if (custom.value.isPrivate() == false) {
+                if (!custom.value.isPrivate()) {
                     builder.putCustom(custom.key, custom.value);
                 }
             }

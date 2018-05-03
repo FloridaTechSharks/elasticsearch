@@ -90,7 +90,7 @@ public class Sniffer implements Closeable {
         }
 
         synchronized void scheduleNextRun(long delayMillis) {
-            if (scheduledExecutorService.isShutdown() == false) {
+            if (!scheduledExecutorService.isShutdown()) {
                 try {
                     if (scheduledFuture != null) {
                         //regardless of when the next sniff is scheduled, cancel it and schedule a new one with updated delay

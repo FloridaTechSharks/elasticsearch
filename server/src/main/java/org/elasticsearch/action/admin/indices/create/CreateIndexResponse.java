@@ -60,7 +60,7 @@ public class CreateIndexResponse extends AcknowledgedResponse implements ToXCont
 
     protected CreateIndexResponse(boolean acknowledged, boolean shardsAcknowledged, String index) {
         super(acknowledged);
-        assert acknowledged || shardsAcknowledged == false; // if its not acknowledged, then shardsAcknowledged should be false too
+        assert acknowledged || !shardsAcknowledged; // if its not acknowledged, then shardsAcknowledged should be false too
         this.shardsAcknowledged = shardsAcknowledged;
         this.index = index;
     }
@@ -89,7 +89,7 @@ public class CreateIndexResponse extends AcknowledgedResponse implements ToXCont
      * Returns true if the requisite number of shards were started before
      * returning from the index creation operation. If {@link #isAcknowledged()}
      * is false, then this also returns false.
-     * 
+     *
      * @deprecated use {@link #isShardsAcknowledged()}
      */
     @Deprecated

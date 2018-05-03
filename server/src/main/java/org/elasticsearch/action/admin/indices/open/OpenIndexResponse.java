@@ -57,7 +57,7 @@ public class OpenIndexResponse extends AcknowledgedResponse implements ToXConten
 
     OpenIndexResponse(boolean acknowledged, boolean shardsAcknowledged) {
         super(acknowledged);
-        assert acknowledged || shardsAcknowledged == false; // if its not acknowledged, then shards acked should be false too
+        assert acknowledged || !shardsAcknowledged; // if its not acknowledged, then shards acked should be false too
         this.shardsAcknowledged = shardsAcknowledged;
     }
 

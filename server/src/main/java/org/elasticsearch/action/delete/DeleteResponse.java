@@ -88,7 +88,7 @@ public class DeleteResponse extends DocWriteResponse {
         @Override
         public DeleteResponse build() {
             DeleteResponse deleteResponse = new DeleteResponse(shardId, type, id, seqNo, primaryTerm, version,
-                    result == Result.DELETED ? true : false);
+                result == Result.DELETED);
             deleteResponse.setForcedRefresh(forcedRefresh);
             if (shardInfo != null) {
                 deleteResponse.setShardInfo(shardInfo);

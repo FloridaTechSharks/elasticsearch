@@ -558,7 +558,7 @@ public class TransportAnalyzeAction extends TransportSingleShardAction<AnalyzeRe
                     throw new IllegalArgumentException("failed to find char filter under [" + charFilter.name + "]");
                 }
                 if (normalizer) {
-                    if (charFilterFactory instanceof MultiTermAwareComponent == false) {
+                    if (!(charFilterFactory instanceof MultiTermAwareComponent)) {
                         throw new IllegalArgumentException("Custom normalizer may not use char filter ["
                             + charFilterFactory.name() + "]");
                     }
@@ -620,7 +620,7 @@ public class TransportAnalyzeAction extends TransportSingleShardAction<AnalyzeRe
                     throw new IllegalArgumentException("failed to find or create token filter under [" + tokenFilter.name + "]");
                 }
                 if (normalizer) {
-                    if (tokenFilterFactory instanceof MultiTermAwareComponent == false) {
+                    if (!(tokenFilterFactory instanceof MultiTermAwareComponent)) {
                         throw new IllegalArgumentException("Custom normalizer may not use filter ["
                             + tokenFilterFactory.name() + "]");
                     }

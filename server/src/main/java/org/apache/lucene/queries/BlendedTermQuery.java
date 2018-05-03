@@ -285,7 +285,7 @@ public abstract class BlendedTermQuery extends Query {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (sameClassAs(o) == false) return false;
+        if (!sameClassAs(o)) return false;
 
         BlendedTermQuery that = (BlendedTermQuery) o;
         return Arrays.equals(equalsTerms(), that.equalsTerms());

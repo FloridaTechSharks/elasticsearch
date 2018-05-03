@@ -42,7 +42,6 @@ class BulkItemResultHolder {
     }
 
     public boolean isVersionConflict() {
-        return operationResult == null ? false :
-                operationResult.getFailure() instanceof VersionConflictEngineException;
+        return operationResult != null && operationResult.getFailure() instanceof VersionConflictEngineException;
     }
 }

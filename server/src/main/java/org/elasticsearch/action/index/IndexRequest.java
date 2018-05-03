@@ -185,7 +185,7 @@ public class IndexRequest extends ReplicatedWriteRequest<IndexRequest> implement
                             id.getBytes(StandardCharsets.UTF_8).length, validationException);
         }
 
-        if (id == null && (versionType == VersionType.INTERNAL && resolvedVersion == Versions.MATCH_ANY) == false) {
+        if (id == null && !(versionType == VersionType.INTERNAL && resolvedVersion == Versions.MATCH_ANY)) {
             validationException = addValidationError("an id must be provided if version type or value are set", validationException);
         }
 

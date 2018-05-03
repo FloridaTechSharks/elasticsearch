@@ -119,7 +119,7 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
         final IndexMetaData metaData = primary.indexSettings().getIndexMetaData();
         Translog.Location location = null;
         for (int requestIndex = 0; requestIndex < request.items().length; requestIndex++) {
-            if (isAborted(request.items()[requestIndex].getPrimaryResponse()) == false) {
+            if (!isAborted(request.items()[requestIndex].getPrimaryResponse())) {
                 location = executeBulkItemRequest(metaData, primary, request, location, requestIndex,
                     updateHelper, nowInMillisSupplier, mappingUpdater);
             }
@@ -164,7 +164,7 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
     static Translog.Location calculateTranslogLocation(final Translog.Location originalLocation,
                                                        final BulkItemResultHolder bulkItemResult) {
         final Engine.Result operationResult = bulkItemResult.operationResult;
-        if (operationResult != null && operationResult.hasFailure() == false) {
+        if (operationResult != null && !operationResult.hasFailure()) {
             return locationToSync(originalLocation, operationResult.getTranslogLocation());
         } else {
             return originalLocation;
@@ -187,7 +187,7 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
             assert response.getResult() == DocWriteResponse.Result.NOOP : "only noop updates can have a null operation";
             return new BulkItemResponse(replicaRequest.id(), opType, response);
 
-        } else if (operationResult.hasFailure() == false) {
+        } else if (!operationResult.hasFailure()) {
             BulkItemResponse primaryResponse = new BulkItemResponse(replicaRequest.id(), opType, response);
             // set a blank ShardInfo so we can safely send it to the replicas. We won't use it in the real response though.
             primaryResponse.getResponse().setShardInfo(new ShardInfo());
@@ -207,7 +207,7 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
             // if it's a conflict failure, and we already executed the request on a primary (and we execute it
             // again, due to primary relocation and only processing up to N bulk items when the shard gets closed)
             // then just use the response we got from the failed execution
-            if (replicaRequest.getPrimaryResponse() == null || isConflictException(failure) == false) {
+            if (replicaRequest.getPrimaryResponse() == null || !isConflictException(failure)) {
                 return new BulkItemResponse(replicaRequest.id(), docWriteRequest.opType(),
                         // Make sure to use request.index() here, if you
                         // use docWriteRequest.index() it will use the
@@ -407,7 +407,7 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
                     nowInMillis, primaryItemRequest, request.items()[requestIndex].id(), mappingUpdater);
 
             // It was either a successful request, or it was a non-conflict failure
-            if (holder.isVersionConflict() == false) {
+            if (!holder.isVersionConflict()) {
                 return holder;
             }
         }
